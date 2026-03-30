@@ -113,7 +113,7 @@ export default function DashboardLevel() {
 
         {/* ── WORLD MAP TITLE ── */}
         <div className="text-center mb-8">
-          <p className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.4em] mb-1">🗺️ SELECT STAGE</p>
+          <p className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.4em] mb-1">SELECT STAGE</p>
           <h2 className="text-3xl md:text-4xl font-black font-game text-glow-white">PETA DUNIA</h2>
           <p className="text-slate-400 text-sm mt-2">Selesaikan level untuk membuka stage berikutnya!</p>
         </div>

@@ -48,90 +48,204 @@ export default function DashboardGuru() {
     }
   };
 
-  if(isLoading) return <div className="min-h-screen bg-slate-900 text-indigo-200 flex flex-col items-center justify-center"><div className="w-12 h-12 border-4 border-indigo-900 border-t-indigo-500 rounded-full animate-spin mb-4"></div>Memuat Kontrol Panel...</div>;
+  if(isLoading) return (
+    <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center relative overflow-hidden">
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full bg-indigo-600/10 blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full bg-purple-600/10 blur-3xl" />
+      </div>
+      <div className="relative z-10 text-center">
+        <div className="w-16 h-16 border-4 border-indigo-900 border-t-indigo-500 rounded-full animate-spin mb-6 mx-auto"></div>
+        <p className="text-indigo-400 text-lg font-black tracking-widest animate-pulse">LOADING CONTROL PANEL...</p>
+      </div>
+    </div>
+  );
 
   return (
-    <div className="min-h-screen bg-slate-50 p-4 md:p-8 font-sans">
-      <div className="max-w-6xl mx-auto">
-        
-        <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 bg-indigo-950 text-white p-8 rounded-3xl shadow-xl border border-indigo-900/50">
-          <div className="mb-6 sm:mb-0">
-            <h1 className="text-3xl font-extrabold tracking-tight">Dashboard Guru</h1>
-            <p className="text-indigo-300 text-sm mt-1.5 font-medium">Control Panel — Gamifikasi Arsitektur Komputer</p>
-          </div>
-          <button onClick={() => { localStorage.removeItem('adminToken'); navigate('/'); }} className="bg-indigo-900 hover:bg-slate-800 px-6 py-2.5 rounded-xl text-sm font-bold border border-indigo-700 hover:border-slate-700 transition shadow">
-            Keluar Panel
-          </button>
-        </header>
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-950 to-indigo-950 text-white relative overflow-hidden">
+      {/* Animated background */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute top-10 left-10 w-96 h-96 rounded-full bg-indigo-600/10 blur-3xl animate-pulse" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 rounded-full bg-purple-600/10 blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-1/2 left-1/2 w-80 h-80 rounded-full bg-cyan-600/5 blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+      </div>
 
+      <div className="relative z-10 max-w-6xl mx-auto px-4 md:px-8 py-8">
+        
+        {/* HEADER */}
+        <motion.div 
+          initial={{ y: -30, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.6 }}
+          className="glass rounded-3xl p-8 md:p-10 mb-8 border border-indigo-500/30 backdrop-blur-xl shadow-2xl" 
+          style={{ boxShadow: '0 0 40px rgba(99,102,241,0.2)' }}>
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div>
+              <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-2" style={{ textShadow: '0 0 20px rgba(99,102,241,0.5)' }}>CONTROL PANEL</h1>
+              <p className="text-indigo-300/90 text-sm md:text-base font-medium">Gamifikasi Arsitektur Komputer — Monitoring Kinerja Siswa</p>
+            </div>
+            <motion.button 
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => { localStorage.removeItem('adminToken'); navigate('/'); }} 
+              className="px-6 py-3 bg-red-600/20 hover:bg-red-600/40 border border-red-500/50 rounded-xl text-sm font-bold transition-all shadow-lg text-red-300">
+              Logout
+            </motion.button>
+          </div>
+        </motion.div>
+
+        {/* STATS CARDS */}
         {data && (
-           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-10">
-             <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 text-center flex flex-col items-center justify-center">
-               <p className="text-slate-400 text-xs font-black uppercase tracking-wider mb-2">Total Murid</p>
-               <p className="text-4xl font-black text-slate-800">{data.summary.total_siswa}</p>
-             </div>
-             <div className="bg-emerald-50 p-6 rounded-3xl shadow-sm border border-emerald-100/50 text-center flex flex-col items-center justify-center">
-               <p className="text-emerald-600/80 text-xs font-black uppercase tracking-wider mb-2">Selesai (Lulus)</p>
-               <p className="text-4xl font-black text-emerald-600">{data.summary.selesai}</p>
-             </div>
-             <div className="bg-amber-50 p-6 rounded-3xl shadow-sm border border-amber-100/50 text-center flex flex-col items-center justify-center">
-               <p className="text-amber-600/80 text-xs font-black uppercase tracking-wider mb-2">Sedang Main</p>
-               <p className="text-4xl font-black text-amber-500">{data.summary.aktif}</p>
-             </div>
-             <div className="bg-blue-50 p-6 rounded-3xl shadow-sm border border-blue-100/50 text-center flex flex-col items-center justify-center">
-               <p className="text-blue-600/80 text-xs font-black uppercase tracking-wider mb-2">Rata-Rata Poin</p>
-               <p className="text-4xl font-black text-blue-600">{data.summary.rata_rata_poin}</p>
-             </div>
-           </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+            {/* Total Siswa */}
+            <motion.div 
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.1 }}
+              className="glass rounded-2xl p-6 border border-white/10 backdrop-blur-md hover:border-blue-500/50 transition-all" 
+              style={{ boxShadow: '0 0 30px rgba(59,130,246,0.1)' }}>
+              <p className="text-blue-400/80 text-xs font-black uppercase tracking-widest mb-3">Total Siswa</p>
+              <motion.p 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3, duration: 0.5 }}
+                className="text-5xl font-black text-blue-300" 
+                style={{ textShadow: '0 0 15px rgba(59,130,246,0.5)' }}>
+                {data.summary.total_siswa}
+              </motion.p>
+            </motion.div>
+
+            {/* Lulus */}
+            <motion.div 
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.15 }}
+              className="glass rounded-2xl p-6 border border-emerald-500/30 backdrop-blur-md hover:border-emerald-400/50 transition-all" 
+              style={{ boxShadow: '0 0 30px rgba(16,185,129,0.1)' }}>
+              <p className="text-emerald-400/80 text-xs font-black uppercase tracking-widest mb-3">Lulus</p>
+              <motion.p 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.35, duration: 0.5 }}
+                className="text-5xl font-black text-emerald-300" 
+                style={{ textShadow: '0 0 15px rgba(16,185,129,0.5)' }}>
+                {data.summary.selesai}
+              </motion.p>
+            </motion.div>
+
+            {/* Sedang Main */}
+            <motion.div 
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="glass rounded-2xl p-6 border border-amber-500/30 backdrop-blur-md hover:border-amber-400/50 transition-all" 
+              style={{ boxShadow: '0 0 30px rgba(251,146,60,0.1)' }}>
+              <p className="text-amber-400/80 text-xs font-black uppercase tracking-widest mb-3">Aktif Bermain</p>
+              <motion.p 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4, duration: 0.5 }}
+                className="text-5xl font-black text-amber-300" 
+                style={{ textShadow: '0 0 15px rgba(251,146,60,0.5)' }}>
+                {data.summary.aktif}
+              </motion.p>
+            </motion.div>
+
+            {/* Rata-rata */}
+            <motion.div 
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.25 }}
+              className="glass rounded-2xl p-6 border border-purple-500/30 backdrop-blur-md hover:border-purple-400/50 transition-all" 
+              style={{ boxShadow: '0 0 30px rgba(139,92,246,0.1)' }}>
+              <p className="text-purple-400/80 text-xs font-black uppercase tracking-widest mb-3">Rata-rata Poin</p>
+              <motion.p 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.45, duration: 0.5 }}
+                className="text-5xl font-black text-purple-300" 
+                style={{ textShadow: '0 0 15px rgba(139,92,246,0.5)' }}>
+                {data.summary.rata_rata_poin}
+              </motion.p>
+            </motion.div>
+          </div>
         )}
 
-        <div className="bg-white rounded-3xl shadow-md border border-slate-200 overflow-hidden mb-10">
-          <div className="p-6 md:px-8 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-            <h2 className="text-xl font-bold text-slate-800">📋 Daftar Progress Siswa</h2>
-            <button onClick={fetchAdminData} className="text-sm text-indigo-600 font-bold hover:text-indigo-800 bg-indigo-50 px-3 py-1.5 rounded-lg transition">🔄 Refresh Data</button>
+        {/* TABLE */}
+        <motion.div 
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="glass rounded-3xl border border-white/10 backdrop-blur-xl overflow-hidden shadow-2xl mb-10">
+          <div className="p-6 md:p-8 border-b border-white/10 bg-gradient-to-r from-indigo-600/10 to-purple-600/10 flex justify-between items-center">
+            <h2 className="text-xl md:text-2xl font-black">Daftar Progress Siswa</h2>
+            <motion.button 
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={fetchAdminData} 
+              className="text-xs font-black px-4 py-2 rounded-lg bg-indigo-500/30 hover:bg-indigo-500/50 border border-indigo-500/50 text-indigo-300 transition-all">
+              Refresh
+            </motion.button>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead className="bg-slate-50 border-b border-slate-200">
+            <table className="w-full text-sm">
+              <thead className="border-b border-white/10 bg-white/5 backdrop-blur">
                 <tr>
-                  <th className="p-4 md:px-8 text-xs font-black text-slate-400 uppercase tracking-widest whitespace-nowrap">Nama Siswa</th>
-                  <th className="p-4 text-xs font-black text-slate-400 uppercase tracking-widest text-center whitespace-nowrap">Absen</th>
-                  <th className="p-4 text-xs font-black text-slate-400 uppercase tracking-widest text-center whitespace-nowrap">Status</th>
-                  <th className="p-4 text-xs font-black text-blue-500 uppercase tracking-widest text-right whitespace-nowrap">Total Poin</th>
-                  <th className="p-4 md:px-8 text-xs font-black text-amber-500 uppercase tracking-widest text-right whitespace-nowrap">Bintang</th>
+                  <th className="p-4 text-left text-xs font-black text-sky-400/80 uppercase tracking-widest">Nama</th>
+                  <th className="p-4 text-center text-xs font-black text-sky-400/80 uppercase tracking-widest whitespace-nowrap">Absen</th>
+                  <th className="p-4 text-center text-xs font-black text-sky-400/80 uppercase tracking-widest whitespace-nowrap">Status</th>
+                  <th className="p-4 text-right text-xs font-black text-blue-400/80 uppercase tracking-widest whitespace-nowrap">Poin</th>
+                  <th className="p-4 text-right text-xs font-black text-amber-400/80 uppercase tracking-widest whitespace-nowrap">Bintang</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
-                {data?.students.map(s => (
-                  <tr key={s.id} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="p-4 md:px-8 font-bold text-slate-800 text-lg whitespace-nowrap">{s.name}</td>
-                    <td className="p-4 text-slate-500 text-center font-medium">{s.absen}</td>
+              <tbody className="divide-y divide-white/5">
+                {data?.students.map((s, i) => (
+                  <motion.tr 
+                    key={s.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.05 }}
+                    className="hover:bg-white/5 transition-colors">
+                    <td className="p-4 font-bold text-white">{s.name}</td>
+                    <td className="p-4 text-center text-slate-400">{s.absen}</td>
                     <td className="p-4 text-center">
                       {s.is_complete ? 
-                        <span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-md text-xs font-bold border border-emerald-200 shadow-sm">LULUS</span> : 
-                        <span className="bg-amber-100 text-amber-700 px-3 py-1 rounded-md text-xs font-bold border border-amber-200 shadow-sm">BERMAIN</span>}
+                        <span className="inline-block bg-emerald-500/30 text-emerald-300 px-3 py-1 rounded-lg text-xs font-black border border-emerald-500/50">Lulus</span> : 
+                        <span className="inline-block bg-amber-500/30 text-amber-300 px-3 py-1 rounded-lg text-xs font-black border border-amber-500/50 animate-pulse">Bermain</span>}
                     </td>
-                    <td className="p-4 font-black text-blue-600 text-right text-xl">{s.total_poin}</td>
-                    <td className="p-4 md:px-8 font-bold text-amber-500 text-right text-xl">★ {s.total_bintang}</td>
-                  </tr>
+                    <td className="p-4 text-right font-black text-blue-400 text-lg">{s.total_poin}</td>
+                    <td className="p-4 text-right font-black text-amber-400 text-lg">★ {s.total_bintang}</td>
+                  </motion.tr>
                 ))}
                 {data?.students.length === 0 && (
-                  <tr><td colSpan="5" className="p-12 text-center text-slate-400 font-medium">Belum ada siswa yang mendaftar sesi.</td></tr>
+                  <tr><td colSpan="5" className="p-12 text-center text-slate-400/60 font-medium">Belum ada siswa yang terdaftar.</td></tr>
                 )}
               </tbody>
             </table>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="bg-red-50 p-6 md:p-8 rounded-3xl border border-red-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-          <div>
-            <h3 className="text-red-800 font-black text-lg mb-1 flex items-center gap-2">⚠️ ZONA BAHAYA</h3>
-            <p className="text-red-600/80 text-sm font-medium mt-1 max-w-xl">Menghapus semua data sesi pendaftaran siswa dan riwayat permainan skor poin di database. <b>Pastikan anda melakukannya hanya ketika sesi kelas ini telah usai secara keseluruhan!</b></p>
+        {/* DANGER ZONE */}
+        <motion.div 
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="glass rounded-3xl p-6 md:p-8 border border-red-500/30 backdrop-blur-xl shadow-2xl" 
+          style={{ boxShadow: '0 0 20px rgba(239,68,68,0.15)' }}>
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div>
+              <h3 className="text-red-400 font-black text-lg md:text-xl mb-2 flex items-center gap-2">Zona Bahaya</h3>
+              <p className="text-red-400/70 text-sm md:text-base font-medium max-w-xl">Menghapus SEMUA data sesi: pendaftaran siswa, riwayat permainan, dan skor poin. <b className="text-red-300">Hanya lakukan ketika sesi kelas telah berakhir!</b></p>
+            </div>
+            <motion.button 
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleReset} 
+              className="w-full md:w-auto px-8 py-4 bg-red-600/40 hover:bg-red-600/60 border border-red-500/70 rounded-2xl font-black text-red-300 transition-all shadow-lg">
+              Bersihkan Sesi
+            </motion.button>
           </div>
-          <button onClick={handleReset} className="w-full md:w-auto flex-shrink-0 bg-red-600 hover:bg-red-700 text-white font-bold px-8 py-3.5 rounded-xl transition shadow-lg shadow-red-500/30">
-            Bersihkan Sesi Kelas
-          </button>
-        </div>
+        </motion.div>
 
       </div>
     </div>

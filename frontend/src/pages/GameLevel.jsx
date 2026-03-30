@@ -13,7 +13,7 @@ const CHARS = {
   NARASI:       { img: null,                    name: 'SYSTEM',       color: '#94a3b8', side: 'center',emoji: '⚙️'  },
   NPC:          { img: '/char_npc_female.png',  name: 'NPC',          color: '#10b981', side: 'left',  emoji: '🧑'  },
   'PAK DARMO':  { img: '/char_npc_male.png',    name: 'Pak Darmo',    color: '#fb923c', side: 'left',  emoji: '🧓'  },
-  'REZA':       { img: '/char_npc_male.png',    name: 'Pak Reza',     color: '#2dd4bf', side: 'left',  emoji: '👔'  },
+  REZA:         { img: '/char_npc_male.png',    name: 'Reza',         color: '#2dd4bf', side: 'right', emoji: '👨‍🎓' },
   'SARI':       { img: '/char_npc_female.png',  name: 'Mbak Sari',    color: '#fbbf24', side: 'left',  emoji: '👩‍🎨' },
   'WIRA':       { img: '/char_npc_male.png',    name: 'Wira',         color: '#4ade80', side: 'left',  emoji: '👷'  },
   'DITO':       { img: '/char_npc_male.png',    name: 'Dito',         color: '#22d3ee', side: 'left',  emoji: '🧑‍🔧' },
@@ -21,6 +21,7 @@ const CHARS = {
   'DR. FANDI':  { img: '/char_npc_male.png',    name: 'Dr. Fandi',    color: '#a78bfa', side: 'left',  emoji: '🔬'  },
   'PUSTAKAWAN': { img: '/char_npc_female.png',  name: 'Pustakawan',   color: '#94a3b8', side: 'left',  emoji: '📚'  },
   'SISWA RINA': { img: '/char_npc_female.png',  name: 'Siswa Rina',   color: '#fb7185', side: 'left',  emoji: '🙋'  },
+  'JURNALIS':   { img: '/char_npc_female.png',  name: 'Jurnalis',     color: '#fbbf24', side: 'left',  emoji: '📝'  },
 };
 
 const MOOD = {
@@ -156,6 +157,19 @@ function CharacterSprite({ charKey, isActive, side, mood }) {
         transformOrigin: 'bottom center',
       }}
     >
+      {/* Mood emoji floating at shoulder/chest area */}
+      {isActive && moodDef.emoji && (
+        <motion.div
+          initial={{ y: 0, opacity: 0, scale: 0 }}
+          animate={{ y: [0, -8, 0], opacity: 1, scale: 1 }}
+          exit={{ y: 0, opacity: 0, scale: 0 }}
+          transition={{ y: { duration: 1.5, repeat: Infinity, ease: 'easeInOut' }, opacity: { duration: 0.3 }, scale: { duration: 0.3 } }}
+          className="absolute top-1/3 left-1/2 -translate-x-1/2 text-5xl z-50 drop-shadow-lg pointer-events-none"
+        >
+          {moodDef.emoji}
+        </motion.div>
+      )}
+
       {/* Glow pedestal under active character */}
       {isActive && (
         <div
@@ -249,7 +263,7 @@ function DialogBox({ dialog, onNext, isLast, sceneGlow }) {
                   border: `1px solid ${def.color}70`,
                 }}
               >
-                {def.emoji}{moodDef.emoji}
+                {def.emoji}
               </motion.div>
               <div className="flex-1 min-w-0">
                 <span className="block text-[10px] font-mono font-bold tracking-[0.25em] uppercase opacity-60 mb-0.5" style={{ color: def.color }}>
