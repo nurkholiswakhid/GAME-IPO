@@ -3,6 +3,9 @@ const bcrypt = require('bcryptjs');
 const prisma = new PrismaClient();
 
 // Helper to create story dialog arrays
+// speaker: 'ARDI'(protagonist) | 'BUDI'(mentor) | 'NPC'(other) | 'NARASI'(narrator)
+// mood: 'normal' | 'panic' | 'happy' | 'thinking' | 'sad' | 'confident'
+// npcName: Custom NPC name (e.g., 'REZA', 'SARI' for distinct characters)
 const S = (speaker, text, mood = 'normal', npcName = null) => ({ speaker, text, mood, ...(npcName && { npcName }) });
 
 async function main() {
@@ -18,434 +21,406 @@ async function main() {
 
   const questions = [
     // ─────────────────────────────────────────────────────
-    //  CHAPTER 1 — Kelas DKV SMKN 1 Lamongan
+    //  CHAPTER 1 — Lab Komputer - Masuk & Keluar Data
     // ─────────────────────────────────────────────────────
     {
       level_number: 1,
       type: 'CLASSIFICATION',
       story_json: JSON.stringify({
         scene: 'lab_komputer',
-        chapter: 'Chapter 1: Hari Pertama KP DKV',
+        chapter: 'Chapter 1: Perangkat Masuk vs Keluar',
         intro: [
           S('NARASI', 'Pagi hari, Senin, 07.30 WIB. SMK Negeri 1 Lamongan.'),
-          S('NARASI', 'Ardi — mahasiswa S1 DKV UNESA — memulai Kerja Praktik hari ini di kelas X DKV sekolah ini.'),
-          S('BUDI', 'Selamat datang, Ardi! Saya Pak Budi, Guru Desain. Kamu datang di saat yang tepat!', 'thinking'),
-          S('ARDI', 'Terima kasih, Pak. Apa ada yang bisa saya bantu hari ini?', 'normal'),
-          S('BUDI', 'Kami baru terima project besar dari klien: 4 elemen desain graphis yang perlu dipahami siswa. Tapi file-file bingung mana yang apa!', 'panic'),
-          S('ARDI', 'Elemen desain? Itu mudah, Pak! Saya bisa bantu klasifikasikan berdasarkan prinsip desain!', 'confident'),
-          S('BUDI', 'Bagus! Tunjukkan keahlianmu. Ini kesempatan pertama mengajar murid!', 'happy'),
+          S('NARASI', 'Reza — siswa magang dari SMK — dimulai hari pertamanya di lab komputer.'),
+          S('BUDI', 'Selamat datang, Reza! Saya Pak Budi, guru IT. Aku mau minta bantuanmu!', 'thinking'),
+          S('REZA', 'Apa yang bisa saya bantu, Pak?', 'normal'),
+          S('BUDI', 'Komputer baru tiba. Ada printer, keyboard, scanner, sama monitor. Mana yang kita gunakan untuk MASUKKAN data, mana untuk KELUARKAN hasil?', 'thinking'),
+          S('REZA', 'Hmm... begini Pak, bayangkan komputer seperti kepala kita. Mata dan telinga kita adalah perangkat yang MENERIMA informasi...', 'confident'),
+          S('BUDI', 'Ooh, analogi yang bagus! Lanjutkan!', 'happy'),
         ],
         outro: [
-          S('BUDI', 'Sempurna! Kamu memahami elemen desain dengan benar, Ardi!', 'happy'),
-          S('ARDI', 'Terima kasih, Pak. Warna, garis, bentuk, tekstur — ini adalah fondasi desain yang harus dikuasai!', 'confident'),
-          S('BUDI', 'Benar sekali. Omong-omong, ada studio desain di kota yang sedang chaos. Mau bantu?', 'thinking'),
-          S('ARDI', 'Studio desain? Tentu saja! Kapan kita ke sana, Pak?', 'confident'),
+          S('REZA', '...dan mulut serta tangan kita untuk MENGELUARKAN hasil. Begitu juga komputer, Pak!', 'happy'),
+          S('BUDI', 'Sempurna! Keyboard dan scanner itu seperti mata dan telinga. Printer dan monitor seperti mulut dan tangan!', 'happy'),
+          S('REZA', 'Jadi setiap perangkat punya peran yang jelas, ya Pak!', 'confident'),
+          S('BUDI', 'Betul. Oh ya, tadi ada klien yang butuh bantuan teknis. Mau kita kunjungi?', 'thinking'),
+          S('REZA', 'Siapa, Pak? Apa permasalahannya?', 'normal'),
         ]
       }),
-      question_text: 'Ardi membantu guru mengorganisir project elemen desain! Ada 4 asset design: Gradient Warna RGB, Garis tebal hitam, Tekstur kayu, Bentuk segitiga 3D. Klasifikasikan berdasarkan ELEMEN vs PRINSIP DESAIN!',
-      options_json: JSON.stringify(['Gradient Warna RGB', 'Garis Tebal Hitam', 'Tekstur Kayu', 'Bentuk Segitiga 3D']),
+      question_text: '🖥️ Reza harus mengelompokkan perangkat lab! Keyboard, scanner, monitor, dan printer baru tiba. Mana yang MENERIMA data dari kita (input) dan mana yang MENAMPILKAN hasil (output)?',
+      options_json: JSON.stringify(['Keyboard', 'Scanner', 'Monitor', 'Printer']),
       correct_config: JSON.stringify({
-        'ELEMEN DESAIN (Bahan Dasar)': ['Gradient Warna RGB', 'Garis Tebal Hitam', 'Tekstur Kayu', 'Bentuk Segitiga 3D'],
-        'PRINSIP DESAIN (Cara Menggunakan)': [],
+        'MENERIMA dari Kita (Input)': ['Keyboard', 'Scanner'],
+        'MENAMPILKAN Hasil (Output)': ['Monitor', 'Printer'],
       }),
       bloom_level: 'C2 - Memahami',
-      topic: 'Elemen & Prinsip Desain',
-      explanation: 'Warna, Garis, Tekstur, Bentuk adalah ELEMEN desain — "bahan baku". Sebaliknya, keseimbangan, harmoni, kontras adalah PRINSIP — cara mengorganisir elemen semata-mata!'
+      topic: 'Perangkat Masuk dan Keluar',
+      explanation: 'Keyboard & Scanner = Perangkat MASUK (kita memberikan perintah). Monitor & Printer = Perangkat KELUAR (komputer menampilkan hasil). Setiap perangkat punya peran khusus!'
     },
 
     // ─────────────────────────────────────────────────────
-    //  CHAPTER 2 — Studio Desain Kota Lamongan
+    //  CHAPTER 2 — Bank - Komputer Macet
     // ─────────────────────────────────────────────────────
     {
       level_number: 2,
       type: 'SEQUENCE',
       story_json: JSON.stringify({
         scene: 'server_room',
-        chapter: 'Chapter 2: Chaos di Studio Desain',
+        chapter: 'Chapter 2: Komputer Macet Saat Bekerja',
         intro: [
-          S('NARASI', 'Siang hari. Studio Desain Grafis "KreatiLab" di pusat kota Lamongan. Suasana sangat chaos!'),
-          S('NPC', 'Tolong, Ardi! Project deadline besok 2 jam! Tapi timeline kerjanya berantakan!', 'panic', 'REZA'),
-          S('ARDI', 'Tenang, Pak. Ceritakan prosesnya dari awal.', 'thinking'),
-          S('NPC', 'Client minta poster band. Tapi tim saya tidak tahu urutan kerja yang benar! Ada briefing, konsep, design, revisi, final...', 'panic', 'REZA'),
-          S('ARDI', 'Ah, itu prosesnya. Urutan sangat penting agar desain berkualitas...', 'thinking'),
-          S('BUDI', 'Ardi, ingatkan mereka: penelitian terlebih dahulu baru brainstorm! Jangan langsung design!', 'thinking'),
-          S('ARDI', 'Betul, Pak! Mari saya susun urutan proses desain yang tepat!', 'confident'),
+          S('NARASI', 'Siang hari. Kantor Bank Lamongan. Semua orang kelihatan panik.'),
+          S('NPC', 'Tolong, Mas! ATM kami macet saat pelanggan mau ambil uang!', 'panic', 'MANAGER'),
+          S('REZA', 'Bagaimana bisa macet, Pak?', 'thinking'),
+          S('NPC', 'Sistemnya tiba-tiba berhenti dan error "Sistem tidak merespons".', 'panic', 'MANAGER'),
+          S('REZA', 'Sepertinya komputer tidak bisa "mendengarkan" perintah dengan benar...', 'thinking'),
+          S('BUDI', 'Reza, bayangkan komputer seperti teller bank yang melayani pelanggan. Dia harus MENDENGARKAN pesanan, MEMAHAMI, MELAKUKAN, lalu MEMBERIKAN hasil!', 'thinking'),
+          S('REZA', 'Ohhh! Jadi ada tahapan-tahapan yang harus urut!', 'confident'),
         ],
         outro: [
-          S('ARDI', 'Nah! Urutan yang benar: Briefing ➜ Research ➜ Brainstorm ➜ Konsep ➜ Design ➜ Revisi ➜ Final!', 'happy'),
-          S('NPC', 'Wah, ternyata gitu prosesnya! Sekarang jelas kenapa hasilnya sering kena reject!', 'happy', 'REZA'),
-          S('BUDI', 'Kerja bagus, Ardi. Proses desain yang terstruktur adalah kunci klien puas.', 'happy'),
-          S('ARDI', 'Pak, ada project lagi ungkin untuk studio lain?', 'normal'),
-          S('BUDI', 'Ada. Kantor printing bilang ada masalah fonts di desain export mereka. Ayo ke sana!', 'thinking'),
+          S('REZA', 'Setelah saya reset urutan sistemnya, ATM bisa normal kembali!', 'happy'),
+          S('NPC', 'Alhamdulillah! Pelanggan bisa ambil uang lagi! Terima kasih banyak!', 'happy', 'MANAGER'),
+          S('BUDI', 'Kerja bagus, Reza. Urutan dalam bekerja itu penting, baik buat manusia maupun komputer!', 'happy'),
         ]
       }),
-      question_text: 'Studio desain chaos! Pak Reza bingung urutan proses design yang benar. Ardi harus menyusun tahapan dari awal sampai klien menerima desain final!',
+      question_text: '🏦 ATM di bank macet! Reza perlu memperbaiki urutan cara komputer bekerja. Bayangkan ATM seperti teller bank yang melayani nasabah. Urutan kerja yang BENAR adalah?',
       options_json: JSON.stringify([
-        'Design — Membuat komposisi visual sesuai konsep yang sudah disetujui',
-        'Brainstorm — Mengumpulkan ide-ide kreatif dengan tim',
-        'Briefing — Klien menjelaskan kebutuhan & target desain',
-        'Research — Mempelajari brand, kompetitor, trend pasar terkini',
-        'Konsep — Menuangkan ide terbaik menjadi arah visual',
-        'Revisi — Menerima feedback klien & perbaikan desain',
-        'Final — Deliver file publish-ready ke klien',
+        'Memberikan uang kepada pelanggan',
+        'Teller mendengarkan pesanan pelanggan',
+        'Teller memahami pesanan dan mengecek rekening',
+        'Teller mengambil uang dari brankas dan menghitung',
       ]),
       correct_config: JSON.stringify([
-        'Briefing — Klien menjelaskan kebutuhan & target desain',
-        'Research — Mempelajari brand, kompetitor, trend pasar terkini',
-        'Brainstorm — Mengumpulkan ide-ide kreatif dengan tim',
-        'Konsep — Menuangkan ide terbaik menjadi arah visual',
-        'Design — Membuat komposisi visual sesuai konsep yang sudah disetujui',
-        'Revisi — Menerima feedback klien & perbaikan desain',
-        'Final — Deliver file publish-ready ke klien',
+        'Teller mendengarkan pesanan pelanggan',
+        'Teller memahami pesanan dan mengecek rekening',
+        'Teller mengambil uang dari brankas dan menghitung',
+        'Memberikan uang kepada pelanggan',
       ]),
       bloom_level: 'C3 - Mengaplikasikan',
-      topic: 'Proses Desain Profesional',
-      explanation: 'Proses design: Briefing ➔ Research (pahami klien) ➔ Brainstorm ➔ Konsep (arah visual) ➔ Design (eksekusi) ➔ Revisi ➔ Final. Jangan terburu-buru jump ke design sebelum research selesai!'
+      topic: 'Urutan Kerja Komputer',
+      explanation: 'Dengarkan ➜ Pahami ➜ Lakukan ➜ Berikan hasil. Komputer bekerja dengan tahapan yang sama. Jika urutannya salah, komputer akan error atau macet!'
     },
 
     // ─────────────────────────────────────────────────────
-    //  CHAPTER 3 — Kantor Printing Klien
+    //  CHAPTER 3 — Studio Desain - PC Lambat
     // ─────────────────────────────────────────────────────
     {
       level_number: 3,
       type: 'MULTIPLE_CHOICE',
       story_json: JSON.stringify({
         scene: 'studio_it',
-        chapter: 'Chapter 3: Problem Typography',
+        chapter: 'Chapter 3: Komputer Lambat untuk Edit Video',
         intro: [
-          S('NARASI', 'Sore hari. Kantor Percetakan "PrintMaster" di tepi kota.'),
-          S('NPC', 'Ardi! Syukurlah kamu datang! File desain poster dari studio kemarin, font-nya jelek di cetak!', 'panic', 'SARI'),
-          S('ARDI', 'Font jelek gimana, Mbak? Bisa dijelaskan?', 'thinking'),
-          S('NPC', 'Font scriptnya terlalu tipis, tidak fokus di ukuran cetak kecil. Banyak garis putus-putus!', 'panic', 'SARI'),
-          S('ARDI', 'Ah, klasik! Masalah cetak dengan font jenis apa...', 'thinking'),
-          S('BUDI', 'Ardi, ini tentang font family! Serif vs Sans-serif punya karakteristik berbeda di cetak!', 'thinking'),
-          S('ARDI', 'Oh! Justru untuk cetak kecil, sans-serif atau serif tebal lebih cocok!', 'confident'),
+          S('NARASI', 'Sore hari. Studio desain grafis di Lamongan.'),
+          S('NPC', 'Reza! Tolong! PC saya sangat lambat waktu edit video 4K!', 'panic', 'SARI'),
+          S('REZA', 'Mbak Sari, spesifikasi PCnya apa?', 'thinking'),
+          S('NPC', 'Prosesor terbaik, tapi cuma punya 8GB RAM. Tapi kok tetap lambat?', 'panic', 'SARI'),
+          S('REZA', 'Hmm... prosesor bagus tapi lambat... Pasti merasa kesulitan! Seperti apa ya?', 'thinking'),
+          S('BUDI', 'Reza, bayangkan prosesor seperti chef yang terampil. Dia bisa memasak cepat, tapi tunggu dulu... meja kerjanya kecil dan sempit!', 'thinking'),
+          S('REZA', 'Ohhh! Jadi RAM itu seperti meja kerja chef?', 'confident'),
         ],
         outro: [
-          S('ARDI', 'Ganti font-nya jadi "Helvetica Bold" atau "Georgia". Keduanya cocok cetak kecil!', 'confident'),
-          S('NPC', 'Wah, bedanya apa sih? Sebelumnya pakai Script Italic tipis...', 'thinking', 'SARI'),
-          S('ARDI', 'Script itu dekoratif, cocok headline besar. Tapi serif/sans-serif tebal lebih readabel di cetak kecil!', 'happy'),
-          S('BUDI', 'Benar. Typography untuk digital berbeda dari cetak. Fontnya pun perlu disesuaikan dpi dan ukurannya.', 'happy'),
-          S('ARDI', 'Pak, setelah ini ada project apa lagi?', 'normal'),
-          S('BUDI', 'Ada klien telpon. Anaknya bilang kalau warna "biru" di folder project aman dan cocok cetak tanpa perlu color correction!', 'thinking'),
+          S('REZA', 'Chef bagus tidak berguna kalau meja kerjanya kecil! Begitu juga PC, Mbak.', 'happy'),
+          S('NPC', 'Jadi harus upgrade RAM? Berapa banyak?', 'thinking', 'SARI'),
+          S('REZA', 'Minimal 32GB buat edit video 4K dengan nyaman!', 'confident'),
+          S('BUDI', 'Bagus, Reza. Analogi chef itu sempurna!', 'happy'),
         ]
       }),
-      question_text: 'Font di poster terlihat jelek saat dicetak! Garis-garis tipis font Script Italic "putus-putus". Font MANA yang paling cocok untuk cetakan kecil dengan keterbacaan maksimal?',
+      question_text: '🎬 Mbak Sari edit video 4K tapi PC sangat lambat. Prosesornya bagus, tapi hanya 8GB RAM. Komponen MANA yang sebenarnya jadi kemacetan?',
       options_json: JSON.stringify([
-        'Script Italic Tipis — Elegan dan dekoratif',
-        'Serif Bold (Georgia) — Readabel cetak, ada kaki garis',
-        'Sans-Serif Bold (Helvetica) — Readabel cetak, garis tegas',
-        'Display Decorative — Unik tapi sulit dibaca cetak kecil'
+        'Prosesor — tidak cukup kuat',
+        'RAM (Memori) — tidak cukup besar untuk file 4K yang berat',
+        'Harddisk — rusak bad sector',
+        'Layar monitor — resolusi rendah'
       ]),
-      correct_config: JSON.stringify('Sans-Serif Bold (Helvetica) — Readabel cetak, garis tegas'),
+      correct_config: JSON.stringify('RAM (Memori) — tidak cukup besar untuk file 4K yang berat'),
       bloom_level: 'C4 - Menganalisis',
-      topic: 'Typography untuk Cetak',
-      explanation: 'Script tipis jelek di cetak kecil! Font untuk cetak harus Bold (tebal) dengan letterform jelas. Sans-Serif (Helvetica, Arial) atau Serif (Georgia, Times) Bold yang terbaik!'
+      topic: 'Peran RAM dalam Performa',
+      explanation: 'RAM adalah "ruang kerja" komputer. Semakin besar file yang dibuka, semakin banyak RAM yang dibutuhkan. Prosesor cepat tapi RAM kecil = tetap lambat! Seperti chef di dapur sempit.'
     },
 
     // ─────────────────────────────────────────────────────
-    //  CHAPTER 4 — Rumah Klien
+    //  CHAPTER 4 — Rumah - Data Hilang Saat Listrik Mati
     // ─────────────────────────────────────────────────────
     {
       level_number: 4,
       type: 'TRUE_FALSE',
       story_json: JSON.stringify({
         scene: 'rumah_user',
-        chapter: 'Chapter 4: Miskonsepsi Warna',
+        chapter: 'Chapter 4: Mengapa Data Hilang?',
         intro: [
-          S('NARASI', 'Malam hari. Rumah di perumahan Lamongan Baru. Klien sidang dengan anaknya.'),
-          S('NPC', 'Mas Ardi, anak saya bilang warna "biru muda" di design saya aman dan cocok cetak tanpa color correction!', 'thinking', 'PAK DARMO'),
-          S('ARDI', 'Hmm, nama "biru muda" itu dari mana?', 'thinking'),
-          S('NPC', 'Dari file design RGB di laptop dia. Dia bilang, "Kan cuma ganti mode cetak jadi CMYK, pasti aman!"', 'sad', 'PAK DARMO'),
-          S('ARDI', 'Astaga... dan hasilnya?', 'panic'),
-          S('NPC', 'Hasilnya kusam sekali! Beda jauh dari yang di design dulu!', 'sad', 'PAK DARMO'),
-          S('BUDI', 'Ardi, ini kesempatan edukasi penting! Jelaskan perbedaan RGB cetak dan perubahan CMYK!', 'thinking'),
+          S('NARASI', 'Malam hari. Rumah keluarga Pak Darmo.'),
+          S('NPC', 'Mas Reza, anak saya bilang data di layar komputer itu AMAN, walaupun padam listrik!', 'thinking', 'PAK DARMO'),
+          S('REZA', 'Siapa yang bilang gitu?', 'thinking'),
+          S('NPC', 'Anaknya sendiri. Kata dia RAM itu menyimpan SELAMANYA. Terus dia matikan listriknya...', 'sad', 'PAK DARMO'),
+          S('ARDI', 'Astaga... laporan 50 halaman hilang semua?', 'panic'),
+          S('NPC', 'Iya! Anaknya pikir RAM sama seperti Flashdisk! Hilang semua!', 'sad', 'PAK DARMO'),
+          S('BUDI', 'Reza, ini penting! Ada dua jenis penyimpanan data. Jelaskan perbedaannya!', 'thinking'),
         ],
         outro: [
-          S('ARDI', 'Pernyataan itu SALAH, Pak. Konversi RGB ke CMYK bisa mengubah warna secara drastis!', 'confident'),
-          S('NPC', 'Mengapa bisa berbeda jauh? Padahal warnanya sama, to?', 'normal', 'PAK DARMO'),
-          S('ARDI', 'RGB itu cahaya (layar), CMYK itu tinta cetak. Rentang warna RGB lebih luas dari CMYK!', 'confident'),
-          S('ARDI', 'Warna "biru cerah" RGB tidak bisa replikasi sempurna di CMYK. Jadi lebih kusam.', 'happy'),
-          S('BUDI', 'Solusinya? Proofing dan color correction SEBELUM cetak, bukan setelah!', 'happy'),
-          S('ARDI', 'Pak, besok ada yang lagi?', 'normal'),
-          S('BUDI', 'Ada. Percetakan besar butuh bantuan. Ada 4 format warna yang perlu dicocokkan dengan penggunaannya!', 'thinking'),
+          S('REZA', 'Pernyataan itu SALAH, Pak! RAM itu HILANG saat listrik mati. Seperti papan tulis yang dihapus!', 'confident'),
+          S('NPC', 'Lalu mana yang AMAN, Mas?', 'normal', 'PAK DARMO'),
+          S('REZA', 'SSD atau Harddisk itu yang AMAN! Seperti buku tulis. Meskipun listrik mati, data masih ada!', 'confident'),
+          S('BUDI', 'Tepat! Ingat: tekan CTRL+S untuk SIMPAN ke SSD atau Harddisk. Baru data kamu aman!', 'happy'),
         ]
       }),
-      question_text: 'Klien percaya anaknya yang bilang: "Warna biru muda di design RGB aman untuk cetak CMYK tanpa perbaikan warna!" Benar atau Salah?',
+      question_text: '💾 Anak Pak Darmo yakin: "Data di RAM itu aman, tidak akan hilang meski listrik padam!" Apakah pernyataan itu BENAR atau SALAH?',
       options_json: JSON.stringify(['BENAR', 'SALAH']),
       correct_config: JSON.stringify('SALAH'),
       bloom_level: 'C5 - Mengevaluasi',
-      topic: 'Color Mode Conversion',
-      explanation: 'SALAH! RGB (cahaya) dan CMYK (tinta) punya gamut warna berbeda. RGB lebih luas. Konversi RGB➜CMYK pasti ada color shift. HARUS ada proofing & color correction sebelum cetak!'
+      topic: 'Jenis Penyimpanan Data',
+      explanation: 'SALAH! RAM = hilang saat listrik mati (seperti papan tulis). SSD/Harddisk = aman selamanya (seperti buku tulis). Selalu SIMPAN (CTRL+S) data penting ke SSD/Harddisk!'
     },
 
     // ─────────────────────────────────────────────────────
-    //  CHAPTER 5 — Percetakan Besar Surabaya
+    //  CHAPTER 5 — Lab Komputer - Siapa Hitung, Siapa Atur?
     // ─────────────────────────────────────────────────────
     {
       level_number: 5,
       type: 'MATCHING',
       story_json: JSON.stringify({
-        scene: 'data_center',
-        chapter: 'Chapter 5: Ujian Warna di Percetakan',
+        scene: 'lab_komputer',
+        chapter: 'Chapter 5: Bagian-Bagian Processor',
         intro: [
-          S('NARASI', 'Selasa pagi. Percetakan Besar Tier-1, Surabaya. Mesin cetak besar berjajar rapi.'),
-          S('NPC', 'Selamat datang, Mas Ardi, Pak Budi! Saya Wira, Head Print Dept di sini.', 'normal', 'WIRA'),
-          S('ARDI', 'Wah, fasilitasnya profesional sekali, Pak Wira!', 'happy'),
-          S('NPC', 'Terima kasih. Kami baru hire 4 designer junior lokal. Mereka harus tahu perbedaan format warna sebelum kerja!', 'normal', 'WIRA'),
-          S('BUDI', 'Ardi, kamu buat soal testing-nya! Jodohkan format warna dengan penggunaan yang tepat!', 'confident'),
-          S('ARDI', 'Baik! RGB, CMYK, HEX, Pantone... semua harus mereka pahami!', 'confident'),
+          S('NARASI', 'Lab Komputer. Reza diminta Pak Budi untuk menjelaskan bagian-bagian processor.'),
+          S('NPC', 'Reza! Ada tamu dari Majalah Teknologi SMK. Jelaskan untuk mereka: apa itu ALU, Control Unit, Register, dan Bus?', 'thinking', 'PAK BUDI'),
+          S('JURNALIS', 'Iya, tapi jelaskan pakai analogi yang gampang dimengerti, jangan yang teknis!', 'normal', 'JURNALIS'),
+          S('REZA', 'Baik! Saya jelasin pake cerita. Bayangkan kalo processor itu tim resepsionis tamu di hotel!', 'confident'),
+          S('NPC', 'Hotel? Menarik! Lanjut terus!', 'happy', 'JURNALIS'),
         ],
         outro: [
-          S('NARASI', 'Sepuluh menit kemudian...'),
-          S('NPC', 'Sempurna! Semua designer junior lulus! Mereka sekarang paham kapan pakai RGB, CMYK, HEX!', 'happy', 'WIRA'),
-          S('ARDI', 'RGB untuk digital, CMYK untuk cetak offset, HEX untuk web/UI, Pantone untuk warna khusus!', 'happy'),
-          S('BUDI', 'Excellent! Kamu sudah jadi "color consultant" yang handal, Ardi!', 'happy'),
-          S('NPC', 'Ada satu project lagi untuk minggu depan. Asset library kami kacau organisasinya.', 'thinking', 'WIRA'),
-          S('ARDI', 'Asset library? Mau saya bantu organisir!', 'confident'),
+          S('REZA', 'Jadi: ALU itu yang HITUNG (kalkulator), CU itu yang ATUR (manajer), Register itu MEMO (catatan), Bus itu JALAN (transportasi)!', 'confident'),
+          S('NPC', 'Wah! Analoginya membantu banget! Terima kasih Reza!', 'happy', 'JURNALIS'),
+          S('NPC', 'Reza, jawaban bagus! Sekarang turun ke Lab Storage. Lihat-lihat perangkat penyimpanan yang ada!', 'happy', 'PAK BUDI'),
         ]
       }),
-      question_text: '⚡ Testing untuk designer junior! Wira minta Ardi jodohkan FORMAT WARNA dengan PENGGUNAAN yang paling tepat untuk setiap medium!',
+      question_text: '🔧 Reza harus menjelaskan peran masing-masing bagian processor. Jodohkan nama dengan PERAN utamanya!',
       options_json: JSON.stringify({
-        left: ['RGB Color Mode', 'CMYK Color Mode', 'HEX Code Color', 'Pantone PMS Color'],
+        left: ['ALU', 'Control Unit (CU)', 'Register', 'System Bus'],
         right: [
-          'Editing: software saat design display/digital.',
-          'Percetakan: offset printing untuk media cetak berkualitas tinggi.',
-          'Web/Mobile: coding CSS & desain interface digital.',
-          'Branding: warna eksklusif brand yang konsisten semua medium.'
+          'Jalur transportasi data antar komponen (seperti jalan raya)',
+          'Melakukan semua perhitungan dan operasi logika',
+          'Mengatur & mengendalikan semua proses di processor',
+          'Penyimpanan data sementara paling cepat'
         ]
       }),
       correct_config: JSON.stringify({
-        'RGB Color Mode': 'Editing: software saat design display/digital.',
-        'CMYK Color Mode': 'Percetakan: offset printing untuk media cetak berkualitas tinggi.',
-        'HEX Code Color': 'Web/Mobile: coding CSS & desain interface digital.',
-        'Pantone PMS Color': 'Branding: warna eksklusif brand yang konsisten semua medium.',
+        'ALU': 'Melakukan semua perhitungan dan operasi logika',
+        'Control Unit (CU)': 'Mengatur & mengendalikan semua proses di processor',
+        'Register': 'Penyimpanan data sementara paling cepat',
+        'System Bus': 'Jalur transportasi data antar komponen (seperti jalan raya)',
       }),
-      bloom_level: 'C4 - Menganalisis',
-      topic: 'Color Modes & Standards',
-      explanation: 'RGB = Cahaya (design) | CMYK = Tinta (cetak) | HEX = Web coding | Pantone = Brand identity. Masing-masing punya konteks pakai yang sangat spesifik!'
+      bloom_level: 'C3 - Mengaplikasikan',
+      topic: 'Bagian-Bagian Processor',
+      explanation: 'ALU = si HITUNG (kalkulus), CU = si ATUR (manajer), Register = catatan cepat (memo), Bus = jalan transportasi data. Keempat bekerja sama dalam setiap operasi komputer!'
     },
 
     // ─────────────────────────────────────────────────────
-    //  CHAPTER 6 — Asset Library Percetakan
+    //  CHAPTER 6 — Lab Komputer - Mana Sementara, Mana Abadi?
     // ─────────────────────────────────────────────────────
     {
       level_number: 6,
       type: 'CLASSIFICATION',
       story_json: JSON.stringify({
-        scene: 'lab_storage',
-        chapter: 'Chapter 6: Organisir Asset Library',
+        scene: 'lab_komputer',
+        chapter: 'Chapter 6: Volatile vs Non-Volatile',
         intro: [
-          S('NARASI', 'Ruang file server percetakan. Folder-folder design terlihat berantakan.'),
-          S('NPC', 'Mas Ardi! Kacau sekali! Ada AI, PSD, JPEG, SVG semua campur aduk di satu folder!', 'panic', 'DITO'),
-          S('ARDI', 'Waduh, file format campur aduk! Susah dicari yang mana!', 'thinking'),
-          S('NPC', 'Iya! Saya tidak tahu mana file kerja, mana file final, mana hasil export!', 'panic', 'DITO'),
-          S('ARDI', 'Tenang. Ini bisa diorganisir berdasarkan tipe file dan fungsinya!', 'confident'),
-          S('BUDI', 'Bagus, Ardi! Ingatkan tentang perbedaan Vector, Raster, dan Working File!', 'happy'),
+          S('NARASI', 'Siang hari di Lab Komputer. Pak Budi menunjukkan berbagai komponen storage kepada Reza.'),
+          S('NPC', 'Reza! Ada kiriman perangkat storage baru. RAM, Cache, SSD, sama HDD campur aduk!', 'thinking', 'PAK BUDI'),
+          S('REZA', 'Lalu saya diminta apa, Pak?', 'thinking'),
+          S('NPC', 'Kelompokkan menjadi DUA kategori: yang DATA HILANG saat listrik mati vs yang DATA AMAN selamanya!', 'normal', 'PAK BUDI'),
+          S('REZA', 'Ini kan dari Chapter 4 dulu! Volatile sama Non-Volatile!', 'happy'),
+          S('NPC', 'Tepat! Tunjukkan pemahaman kamu dengan mengelompokkan ini dengan benar!', 'confident', 'PAK BUDI'),
         ],
         outro: [
-          S('ARDI', 'Selesai! Sekarang terorganisir: Folder Adobe untuk working files, Folder Export untuk hasil jadi!', 'happy'),
-          S('NPC', 'Wow, jadi rapi gini! SVG sama AI ke folder Vector, JPEG ke Raster export... jelas!', 'happy', 'DITO'),
-          S('BUDI', 'Benar. Sistem folder yang logis menghemat waktu cari file. Penting banget untuk agency besar!', 'happy'),
-          S('ARDI', 'Pak, sudah minggu kedua. Masih ada project lagi?', 'normal'),
-          S('BUDI', 'Ada. Workshop pengajaran design di SMKN 1. Kali ini kamu yang jadi semacam mentor junior!', 'thinking'),
+          S('REZA', 'Selesai! RAM dan Cache = Volatile (hilang saat mati). SSD dan HDD = Non-Volatile (selamanya aman)!', 'confident'),
+          S('NPC', 'Bagus! Kamu sudah paham perbedaannya. Sekarang kita belajar soal kecepatan, oke?', 'happy', 'PAK BUDI'),
+          S('REZA', 'Siap, Pak!', 'happy'),
         ]
       }),
-      question_text: 'Asset library chaos! Ada AI, PSD, JPEG, SVG, EPS semua campur di 1 folder. Ardi perlu organize berdasarkan FORMAT & FUNGSI. Klasifikasikan dengan benar!',
-      options_json: JSON.stringify(['Adobe Illustrator (AI)', 'Photoshop Document (PSD)', 'Joint Photographic (JPEG)', 'Scalable Vector (SVG)', 'Encapsulated Postscript (EPS)']),
+      question_text: '💾 Kelompokkan perangkat storage berikut! Mana yang DATA-nya HILANG saat listrik mati (Volatile)? Mana yang AMAN selamanya (Non-Volatile)?',
+      options_json: JSON.stringify(['RAM DDR5 32GB', 'L3 CPU Cache', 'SSD NVMe 2TB', 'Hard Disk Drive 4TB']),
       correct_config: JSON.stringify({
-        'WORKING FILES (Editing — disimpan di PC lokal)': ['Adobe Illustrator (AI)', 'Photoshop Document (PSD)'],
-        'EXPORT FILES (Final — disimpan di server backup)': ['Joint Photographic (JPEG)', 'Scalable Vector (SVG)', 'Encapsulated Postscript (EPS)'],
+        'Volatile — Hilang saat mati listrik': ['RAM DDR5 32GB', 'L3 CPU Cache'],
+        'Non-Volatile — Aman selamanya': ['SSD NVMe 2TB', 'Hard Disk Drive 4TB'],
       }),
       bloom_level: 'C3 - Mengaplikasikan',
-      topic: 'File Format & Organization',
-      explanation: 'Working files (AI, PSD) = editing document. Export files (JPEG, SVG, EPS) = final delivery. Sistem folder yang jelas menghemat waktu dan prevent file corruption!'
+      topic: 'Jenis Penyimpanan Data',
+      explanation: 'Volatile = RAM, Cache: data hilang saat listrik mati (seperti papan tulis). Non-Volatile = SSD, HDD: data aman selamanya (seperti buku tulis). SELALU SIMPAN data penting sebelum mematikan komputer!'
     },
 
     // ─────────────────────────────────────────────────────
-    //  CHAPTER 7 — Workshop SMKN 1
+    //  CHAPTER 7 — Lab Komputer - Dari Tombol sampai Print!
     // ─────────────────────────────────────────────────────
     {
       level_number: 7,
       type: 'SEQUENCE',
       story_json: JSON.stringify({
-        scene: 'kelas_smk',
-        chapter: 'Chapter 7: Ardi Sebagai Mentor!',
+        scene: 'lab_komputer',
+        chapter: 'Chapter 7: Alur Kerja Nyata',
         intro: [
-          S('NARASI', 'Rabu pagi. Kelas XI DKV SMKN 1 Lamongan. 30 murid menunggu workshop mentor.'),
-          S('NPC', 'Selamat datang, Mas Ardi! Murid-murid sudah siap belajar!', 'happy', 'BU AINI'),
-          S('ARDI', 'Terima kasih, Bu Aini! Pai teman-teman! Hari ini "Workflow Design dari Briefing hingga Delivery"!', 'happy'),
-          S('NPC', 'Mas, pertanyaan! Kalau design saya di-reject klien, apa yang harus saya lakukan?', 'normal', 'SISWA RINA'),
-          S('ARDI', 'Pertanyaan bagus! Itu bagian dari tahap "Revisi" dalam proses design!', 'happy'),
-          S('ARDI', 'Yuk kita susun ulang urutan workflow dari user submit design sampai klien happy!', 'confident'),
+          S('NARASI', 'Siang hari di Lab Komputer. Reza sedang bermain-main dengan printer.'),
+          S('REZA', 'Pak! Saya penasaran. Ketika saya tekan Ctrl+P di Word, kenapa gambar langsung muncul di kertas?', 'thinking'),
+          S('NPC', 'Bagus pertanyaan, Reza! Itu adalah siklus IPO nyata! Input, Process, Output!', 'happy', 'PAK BUDI'),
+          S('REZA', 'Lalu bagaimana urutan prosesnya, Pak?', 'thinking'),
+          S('NPC', 'Nah, ini kamu yang susun urutannya! Dari tombol Ctrl+P sampai kertas keluar!', 'confident', 'PAK BUDI'),
+          S('REZA', 'Wah, saya harus proses berapa tahapan?', 'thinking'),
         ],
         outro: [
-          S('NPC', 'Wow! Jadi gitu alurnya! Design ➜ Present ➜ Feedback ➜ Revisi ➜ Final ➜ Deliver!', 'happy', 'SISWA RINA'),
-          S('ARDI', 'Tepat! Dan jangan lupa dokumentasi setiap tahap untuk portfolio!', 'happy'),
-          S('NPC', 'Keren banget mentor-nya! Jelas dan mudah dipahami, Mas!', 'happy', 'BU AINI'),
-          S('BUDI', 'Ardi, ada email mendesak dari creative agency di kota. Ada UX problem di aplikasi mereka!', 'thinking'),
-          S('ARDI', 'UX problem? Itu tentang user experience kan? Menarik!', 'confident'),
+          S('REZA', 'Jadi: Tombol Ctrl+P ➜ CPU olah ➜ Driver ubah format ➜ Printer cetak! Wah keren!', 'happy'),
+          S('NPC', 'Tepat! Itulah siklus I-P-O: Input diterima, CPU process, hasil output di printer!', 'happy', 'PAK BUDI'),
+          S('REZA', 'Setiap hari saya menggunakan siklus ini tanpa disadari, Pak!', 'happy'),
+          S('NPC', 'Itulah kecanggihan Von Neumann! Semua operasi mengikuti pola IPO yang sama!', 'happy', 'PAK BUDI'),
         ]
       }),
-      question_text: 'Ardi mengajar workflow design! Rina bertanya: urutan workflow setelah design jadi, hingga klien puas dan bayar. Susun tahapannya dengan benar!',
+      question_text: '⌨️ Reza penasaran: "Pak, ketika tekan Ctrl+P di Word, apa urutannya sampai kertas keluar?" Susun tahapan siklus IPO yang benar!',
       options_json: JSON.stringify([
-        'Deliver — Serah file final & dokumentasi ke klien',
-        'Design — Buat final art sesuai konsep yang disetujui',
-        'Present — Presentasi draft design ke klien',
-        'Revisi — Menerima feedback & perbaikan design',
-        'Approval — Klien setuju final version, approval untuk print/publish',
+        'Driver printer mengubah format data, lalu kirim ke port printer',
+        'Tekan tombol Ctrl+P — keyboard utus input ke CPU',
+        'Printer fisik mencetak dokumen pada kertas putih',
+        'CPU memproses perintah, ambil data dokumen dari RAM',
       ]),
       correct_config: JSON.stringify([
-        'Design — Buat final art sesuai konsep yang disetujui',
-        'Present — Presentasi draft design ke klien',
-        'Revisi — Menerima feedback & perbaikan design',
-        'Approval — Klien setuju final version, approval untuk print/publish',
-        'Deliver — Serah file final & dokumentasi ke klien',
+        'Tekan tombol Ctrl+P — keyboard utus input ke CPU',
+        'CPU memproses perintah, ambil data dokumen dari RAM',
+        'Driver printer mengubah format data, lalu kirim ke port printer',
+        'Printer fisik mencetak dokumen pada kertas putih',
       ]),
-      bloom_level: 'C4 - Menganalisis',
-      topic: 'Workflow Design Profesional',
-      explanation: 'Design ➔ Present (jangan langsung deliver!) ➔ Revisi (sesuai feedback) ➔ Approval (final) ➔ Deliver (dengan dokumen lengkap). Transparansi & dokumentasi itu kunci!'
+      bloom_level: 'C3 - Mengaplikasikan',
+      topic: 'Siklus Input-Process-Output',
+      explanation: 'Siklus Nyata: Input (Ctrl+P) → Process (CPU+RAM siapkan) → Process lanjutan (driver konversi) → Output (printer cetak). Pola ini terjadi di setiap operasi komputer!'
     },
 
     // ─────────────────────────────────────────────────────
-    //  CHAPTER 8 — Creative Agency Surabaya
+    //  CHAPTER 8 — Lab Komputer - Game yang Hang!
     // ─────────────────────────────────────────────────────
     {
       level_number: 8,
       type: 'MULTIPLE_CHOICE',
       story_json: JSON.stringify({
-        scene: 'lab_riset',
-        chapter: 'Chapter 8: Problem UX di Aplikasi',
+        scene: 'lab_komputer',
+        chapter: 'Chapter 8: Komputer Kehabisan Arah',
         intro: [
-          S('NARASI', 'Kamis siang. Creative Agency "DigitalMind", Surabaya.'),
-          S('NPC', 'Mas Ardi! Akhirnya! Aplikasi mobile kami launch tapi user-nya banyak yang langsung uninstall!', 'panic', 'DR. FANDI'),
-          S('ARDI', 'Alasan uninstall-nya apa?', 'normal'),
-          S('NPC', 'Mereka bilang interface-nya rumit, tombol tidak jelas, warna background terlalu gelap!', 'panic', 'DR. FANDI'),
-          S('ARDI', 'Ah, jelas masalah UX! Harus dievaluasi dengan user research...', 'thinking'),
-          S('BUDI', 'Ardi, ini tentang prinsip design apa? Clarity? Contrast? Simplicity?', 'thinking'),
-          S('ARDI', 'Semua tiga-tiganya! Tapi prioritas utama adalah... clarity UI!', 'confident'),
+          S('NARASI', 'Sore hari. Reza sedang main game grafis tinggi di Lab Komputer ketika terjadi disaster!'),
+          S('REZA', 'Pak... komputer saya hang total! Game freeze! Tidak bisa gerak apapun!', 'panic'),
+          S('NPC', 'Coba cerita terjadi apa, Reza?', 'thinking', 'PAK BUDI'),
+          S('REZA', 'Tadi lancar-lancar aja, terus tiba-tiba gambar berhenti. CPU masih panas, tapi tidak ada respons!', 'panic'),
+          S('NPC', 'Hmm... terhenti berarti CPU tidak tahu instruksi mana yang harus dijalankan selanjutnya...', 'thinking', 'PAK BUDI'),
+          S('NPC', 'Ada register khusus di CPU yang menyimpan "nomor urut" instruksi berikutnya. Kalau register itu rusak, CPU bingung!', 'thinking', 'PAK BUDI'),
+          S('REZA', 'Register apa, Pak? Yang seperti yang kita pelajari tadi?', 'thinking'),
         ],
         outro: [
-          S('ARDI', 'Masalahnya: button tidak jelas teksture, warna text dan background contrast rendah!', 'confident'),
-          S('NPC', 'Jadi... apa solusinya, Mas?', 'normal', 'DR. FANDI'),
-          S('ARDI', 'Redesign interface: tombol lebih prominent, warna background terang, contrast text diperbaiki!', 'happy'),
-          S('BUDI', 'Desain bukan sekadar cantik. Harus functional dan user-friendly juga!', 'happy'),
-          S('ARDI', 'Pak, minggu ketiga sudah mau selesai. Masih ada kasus lagi?', 'normal'),
-          S('BUDI', 'Final minggu... empat project besar dari klien berbeda sekaligus. Itu ujian final-mu!', 'confident'),
-          S('ARDI', 'Empat proyek sekaligus?! B-baik, Pak!', 'panic'),
+          S('NPC', 'Benar! Register yang disebut Program Counter (PC). Itu seperti "penanda halaman" dalam buku instruksi!', 'happy', 'PAK BUDI'),
+          S('REZA', 'Jadi kalau PC-nya error, CPU tidak tahu halaman mana yang dibaca?', 'thinking'),
+          S('NPC', 'Tepat! Inilah yang terjadi pada gamemu. Mari kita restart komputer, reset PC-nya!', 'happy', 'PAK BUDI'),
+          S('NARASI', 'Komputer di-restart. Lancar kembali.'),
+          S('REZA', 'Alhamdulillah! Jadi Program Counter itu sangat penting ya?', 'happy'),
         ]
       }),
-      question_text: 'Aplikasi launch tapi langsung dihapus user! Interface rumit, tombol tidak jelas, warna gelap. Masalah DESIGN mana yang paling kritis sebabkan user frustasi & uninstall?',
+      question_text: '🎮 Game Reza hang tiba-tiba! CPU tidak tahu instruksi mana yang harus eksekusi selanjutnya. Register MANA yang berperan menyimpan alamat instruksi berikutnya?',
       options_json: JSON.stringify([
-        'Clarity — Interface tidak intuitif, user bingung mencari fungsi',
-        'Contrast — Text dan background tidak cukup berbeda, susah dibaca',
-        'Consistency — Design style tidak konsisten antar screen',
-        'Color Harmony — Warna background terlalu dominan, membuat mata lelah'
+        'Accumulator — tempat hasil kalkulasi ALU',
+        'Program Counter (PC) — penanda instruksi berikutnya',
+        'Memory Address Register (MAR) — penanda alamat memori',
+        'Instruction Register (IR) — menyimpan instruksi sekarang'
       ]),
-      correct_config: JSON.stringify('Clarity — Interface tidak intuitif, user bingung mencari fungsi'),
-      bloom_level: 'C4 - Menganalisis',
-      topic: 'Prinsip UX Design',
-      explanation: 'Clarity adalah prioritas pertama UX! User harus langsung paham fungsi setiap elemen tanpa thinking. Jika tidak jelas, user akan langsung annoyed dan uninstall!'
+      correct_config: JSON.stringify('Program Counter (PC) — penanda instruksi berikutnya'),
+      bloom_level: 'C2 - Memahami',
+      topic: 'Register Khusus CPU',
+      explanation: 'Program Counter (PC) adalah "penanda halaman" instruksi CPU. Setiap selesai instruksi, PC otomatis tambah 1 (index berikutnya). Jika PC rusak/corrupt, CPU bingung & hang!'
     },
 
     // ─────────────────────────────────────────────────────
-    //  CHAPTER 9 — Galeri Design Modern
+    //  CHAPTER 9 — Lab Komputer - Program & Data Satu Rumah
     // ─────────────────────────────────────────────────────
     {
       level_number: 9,
       type: 'TRUE_FALSE',
       story_json: JSON.stringify({
-        scene: 'perpustakaan',
-        chapter: 'Chapter 9: Teori Design Sejati',
+        scene: 'lab_komputer',
+        chapter: 'Chapter 9: Teori Penting Von Neumann',
         intro: [
-          S('NARASI', 'Jumat pagi. Galeri Digital Kota Lamongan. Pameran design kerjaan lokal.'),
-          S('NPC', 'Mas Ardi, lihat karya desainer muda ini. Judulnya "Simplicity is Beauty". Dia claim, desain bagus harus "simple"!', 'thinking', 'PUSTAKAWAN'),
-          S('ARDI', 'Hmm, simple gimana?', 'normal'),
-          S('NPC', 'Dia bilang: "Desain bagus harus selalu simple, tanpa dekorasi, minimal design saja!"', 'thinking', 'PUSTAKAWAN'),
-          S('ARDI', 'Ee... tunggu. Itu tidak selalu benar lho!', 'thinking'),
-          S('BUDI', 'Ardi, ini tentang filosofi desain. "Simple" dan "Effective" adalah dua hal berbeda!', 'confident'),
-          S('ARDI', 'Betul! Simplicity adalah TOOLS, bukan GOAL dalam design!', 'confident'),
+          S('NARASI', 'Siang hari. Reza bertanya kepada Pak Budi tentang konsep yang agak abstrak.'),
+          S('REZA', 'Pak, saya penasaran. Kenapa di komputer, PROGRAM dan DATA bisa hidup dalam memory yang SAMA?', 'thinking'),
+          S('NPC', 'Pertanyaan yang sangat bagus! Itu ide revolusioner dari Von Neumann!', 'happy', 'PAK BUDI'),
+          S('NPC', 'Coba bayangkan: dulu waktu komputer ENIAC, program dan data harus disimpan terpisah. Berbeda lokasi!', 'thinking', 'PAK BUDI'),
+          S('REZA', 'Lalu apa masalahnya, Pak?', 'thinking'),
+          S('NPC', 'Kalau mau ubah program, harus ubah hardware fisik! Ganti kabel, ganti saklar! Rumit sekali!', 'sad', 'PAK BUDI'),
+          S('NPC', 'Von Neumann punya ide: kenapa tidak program & data disimpan sama-sama di memory?', 'thinking', 'PAK BUDI'),
         ],
         outro: [
-          S('ARDI', 'Pernyataan itu SALAH! Simple bukan satu-satunya "bagus" dalam design!', 'confident'),
-          S('NPC', 'Terus yang penting apa, Mas? Kalau bukan simple?', 'normal', 'PUSTAKAWAN'),
-          S('ARDI', 'Yang penting adalah EFFECTIVE! Desain bisa simple, atau bisa ornamental — selama SEL ALIGN dengan brief & problem!', 'happy'),
-          S('ARDI', 'Poster jualan bisa penuh warna & ornamented. Tapi logo brand harus clean & timeless. Keduanya BAGUS, sesuai konteks!', 'happy'),
-          S('BUDI', 'Bravo, Ardi. Kamu sudah belajar prinsip penting: design adalah tentang SOLVING PROBLEM, bukan tentang aesthetic semata!', 'happy'),
-          S('ARDI', 'Pak, minggu terakhir KP... apa yang menunggu?', 'thinking'),
-          S('BUDI', 'Empat klien besar, empat masalah design berbeda. Hari Sabtu adalah ujian final-mu yang sesungguhnya!', 'confident'),
-          S('ARDI', 'Saya siap, Pak. Bismillah!', 'confident'),
+          S('REZA', 'Jadi BENAR kalau program dan data dalam satu memory yang sama?', 'thinking'),
+          S('NPC', 'SANGAT BENAR! Itu yang disebut "Stored-Program Concept" — konsep paling fundamental Von Neumann!', 'happy', 'PAK BUDI'),
+          S('NPC', 'Dengan idea ini, mau ubah program? Cukup ubah data di memory. Tidak perlu ganti hardware!', 'happy', 'PAK BUDI'),
+          S('REZA', 'Wah! Itulah mengapa software bisa di-update dan diganti-ganti tanpa buka-buka casing komputer!', 'happy'),
+          S('NPC', 'Tepat sekali! Itulah kecanggihan desain Von Neumann. Simple tapi powerful!', 'happy', 'PAK BUDI'),
         ]
       }),
-      question_text: 'Desainer muda claim: "Desain yang bagus HARUS simple, minimal, tanpa dekorasi! Ornamental design itu tanda desainer kuno." Benar atau Salah?',
+      question_text: '💡 Pak Budi menjelaskan teori Von Neumann: "Program dan data disimpan DALAM memory yang SAMA, bukan terpisah. Ini memungkinkan software diubah tanpa ganti hardware." Pernyataan itu BENAR atau SALAH?',
       options_json: JSON.stringify(['BENAR', 'SALAH']),
-      correct_config: JSON.stringify('SALAH'),
+      correct_config: JSON.stringify('BENAR'),
       bloom_level: 'C5 - Mengevaluasi',
-      topic: 'Filosofi & Teori Design',
-      explanation: 'SALAH! Simplicity adalah TOOL, bukan RULE. Design bagus adalah yang SOLVES PROBLEM, baik simple maupun ornamental. Setiap style punya konteks pakai. Efektivitas > estetika saja!'
+      topic: 'Stored-Program Concept',
+      explanation: 'BENAR! "Stored-Program Concept" adalah DNA Von Neumann — program & data sama-sama di memory. Ini revolusi karena software bisa diubah cukup dengan update data memory, tanpa ubah hardware fisik!'
     },
 
     // ─────────────────────────────────────────────────────
-    //  CHAPTER 10 ⚔️ UJIAN FINAL — 4 Project Design Besar
+    //  CHAPTER 10 ⚔️ UJIAN FINAL — Troubleshooting 4 PC
     // ─────────────────────────────────────────────────────
     {
       level_number: 10,
       type: 'MATCHING',
       story_json: JSON.stringify({
         scene: 'final_boss',
-        chapter: 'Chapter 10: Ujian Final — DESIGN CHAMPION! 🎨',
+        chapter: 'Chapter 10: Ujian Troubleshooting — FINAL BOSS! ⚔️',
         intro: [
-          S('NARASI', 'Sabtu pagi. Hari terakhir KP Ardi. Pak Budi duduk dengan empat folder project besar.'),
-          S('BUDI', 'Ardi, dua minggu ini kamu sudah buktikan skill design management-mu. Dari kelas, studio, percetakan...', 'normal'),
-          S('BUDI', 'Sekarang saatnya final exam. Empat klien berbeda, empat masalah design berbeda, DEADLINE HARI INI!', 'confident'),
-          S('ARDI', 'Empat sekaligus, Pak? Wah, beneran ujian terakhir nih!', 'panic'),
-          S('BUDI', 'Tapi kamu sudah siap. Jodohkan setiap PROBLEMA DESIGN dengan SOLUSI yang tepat!', 'confident'),
-          S('ARDI', 'Baik, Pak. Saya gunakan semua ilmu 2 minggu ini. Let\'s do this!', 'confident'),
-          S('BUDI', 'Go! Dengarkan keempat klien. Diagnosa. Solusi. Selesai!', 'confident'),
+          S('NARASI', 'Jumat sore. Ujian akhir semester. Pak Budi memberikan soal praktik troubleshooting akhir.'),
+          S('NPC', 'Reza! Selama berminggu-minggu kamu sudah belajar banyak!', 'happy', 'PAK BUDI'),
+          S('NPC', 'Lab Komputer, Storage, Processor, Memory, Siklus IPO, Register, Stored-Program Concept...', 'thinking', 'PAK BUDI'),
+          S('REZA', 'Terima kasih, Pak! Saya menikmati setiap pelajaran!', 'happy'),
+          S('NPC', 'Nah! Sekarang ada soal FINAL! Ada EMPAT laporan kerusakan PC dari empat klien berbeda!', 'confident', 'PAK BUDI'),
+          S('NPC', 'Kamu harus jodohkan GEJALA kerusakan dengan KOMPONEN Von Neumann yang paling bermasalah!', 'confident', 'PAK BUDI'),
+          S('REZA', 'Empat soal sekaligus? Wah! Permainan match yang menentukan!', 'confident'),
         ],
         outro: [
-          S('NARASI', 'Lima belas menit kemudian...'),
-          S('BUDI', 'SEMPURNA! Semua diagnosis benar dan solusi pas! ARDI LULUS!', 'happy'),
-          S('ARDI', 'LULUS! Alhamdulillah! Terima kasih, Pak Budi!', 'happy'),
-          S('BUDI', 'Dua minggu ini kamu belajar design bukan sekadar soal cantik, tapi problem solving!', 'happy'),
-          S('ARDI', 'Iya, Pak. Dari elemen warna, typography, process, hingga UX — semuanya connected!', 'happy'),
-          S('BUDI', 'Yup. Setiap keputusan design harus based on RESEARCH dan TUJUAN klien. Keep that in mind!', 'happy'),
-          S('NARASI', '🎉 SELAMAT! Ardi berhasil menyelesaikan tiga minggu KP dengan outstanding!'),
-          S('NARASI', 'Dari Kelas Design hingga Ujian Final — setiap challenge teratasi dengan ilmu yang solid!'),
-          S('NARASI', '🏆 Ardi adalah Designer Research-Driven sesungguhnya!'),
+          S('NPC', '✨ SEMPURNA! SEMUA BENAR, REZA! KAU LULUS DENGAN NILAI TINGGI!', 'happy', 'PAK BUDI'),
+          S('REZA', 'ALHAMDULILLAH! TERIMA KASIH, PAK BUDI!', 'happy'),
+          S('NPC', 'Kamu sudah membuktikan memahami arsitektur Von Neumann dengan REAL! Tidak hanya teori!', 'happy', 'PAK BUDI'),
+          S('REZA', 'Jadi Reza sudah "Von Neumann Expert" sekarang?', 'thinking'),
+          S('NPC', 'Lebih dari itu! Kamu siap untuk Kelas 11 dan belajar jauh lebih dalam lagi!', 'confident', 'PAK BUDI'),
+          S('NARASI', '🎉 SELAMAT! REZA BERHASIL MENYELESAIKAN SELURUH MISI DENGAN GEMILANG!'),
+          S('NARASI', '🏆 DARI LAB KOMPUTER → UJIAN FINAL — REZA ADALAH EXPERT VON NEUMANN!'),
         ]
       }),
-      question_text: '⚔️ UJIAN FINAL! Ardi dapat 4 brief klien besar dengan 4 masalah design berbeda. Jodohkan setiap PROBLEM dengan SOLUSI DESIGN yang paling tepat!',
+      question_text: '⚔️ UJIAN FINAL TROUBLESHOOTING! Jodohkan GEJALA PC yang bermasalah dengan KOMPONEN yang paling mungkin error!',
       options_json: JSON.stringify({
         left: [
-          'Klien A: "Logo kami tidak memorable, sering tertukar dengan kompetitor."',
-          'Klien B: "Poster event kami blank terasa, contrast jauh dengan poster kompetitor."',
-          'Klien C: "Website kami bounce rate tinggi, user tidak tahu harus klik apa dulu."',
-          'Klien D: "Packaging produk kami di rak tidak standout, tersembunyi di antara kompetitor."'
+          'PC menyala & BIOS tampil, tapi Windows gagal loading + bunyi "tik-tik-tik"',
+          'Komputer restart sendiri setiap membuka banyak aplikasi besar',
+          'Layar freeze, CPU 100% padahal hanya buka Notepad saja',
+          'File baru disimpan menghilang total setelah restart'
         ],
         right: [
-          'Clarity dan Hierarchy UX — redesign navigation dengan visual hierarchy jelas, CTA prominent.',
-          'Strong Contrast dan Emphasis — add bold elemen visual, color yang "pukul" mata, dominant imagery.',
-          'Distinctive Visual Identity — buat logo brand dengan unique style, memorable shape & color palette.',
-          'Packaging Design Impact — buat visual yang standout di rak (shelf impact), warna bold, typography besar.'
+          'Hard Disk / HDD — bad sector atau kerusakan piringan',
+          'RAM — kapasitas tidak cukup untuk aplikasi besar',
+          'CPU / Processor — overheating atau thermal throttling',
+          'SSD / File System — error saat penulisan ke storage'
         ]
       }),
       correct_config: JSON.stringify({
-        'Klien A: "Logo kami tidak memorable, sering tertukar dengan kompetitor."': 'Distinctive Visual Identity — buat logo brand dengan unique style, memorable shape & color palette.',
-        'Klien B: "Poster event kami blank terasa, contrast jauh dengan poster kompetitor."': 'Strong Contrast dan Emphasis — add bold elemen visual, color yang "pukul" mata, dominant imagery.',
-        'Klien C: "Website kami bounce rate tinggi, user tidak tahu harus klik apa dulu."': 'Clarity dan Hierarchy UX — redesign navigation dengan visual hierarchy jelas, CTA prominent.',
-        'Klien D: "Packaging produk kami di rak tidak standout, tersembunyi di antara kompetitor."': 'Packaging Design Impact — buat visual yang standout di rak (shelf impact), warna bold, typography besar.',
+        'PC menyala & BIOS tampil, tapi Windows gagal loading + bunyi "tik-tik-tik"': 'Hard Disk / HDD — bad sector atau kerusakan piringan',
+        'Komputer restart sendiri setiap membuka banyak aplikasi besar': 'RAM — kapasitas tidak cukup untuk aplikasi besar',
+        'Layar freeze, CPU 100% padahal hanya buka Notepad saja': 'CPU / Processor — overheating atau thermal throttling',
+        'File baru disimpan menghilang total setelah restart': 'SSD / File System — error saat penulisan ke storage',
       }),
       bloom_level: 'C6 - Mengkreasi',
-      topic: 'Design Problem Solving',
-      explanation: 'Logo ➜ Distinctive | Poster blank ➜ Contrast | Website confuse ➜ Clarity UX | Packaging invisible ➜ Shelf Impact. Setiap problem punya design principle solution spesifik!'
+      topic: 'Troubleshooting Arsitektur',
+      explanation: 'Bunyi "tik-tik" = HDD bad sector. Restart saat banyak aplikasi = RAM penuh. CPU 100% untuk Notepad = throttling/overheating. File hilang setelah restart = Non-Volatile storage error. Kamu sudah paham Von Neumann dengan sempurna!'
     },
   ];
 
   for (const q of questions) {
     await prisma.question.create({ data: q });
   }
-  console.log('✅ Seeded 10 DKV visual novel chapters!');
+  console.log('✅ Seeded 10 simplified chapters with high-school appropriate language!');
 }
 
 main()

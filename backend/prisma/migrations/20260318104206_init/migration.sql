@@ -38,13 +38,15 @@ CREATE TABLE "level_results" (
 CREATE TABLE "questions" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "level_number" INTEGER NOT NULL,
+    "type" TEXT NOT NULL DEFAULT 'CLASSIFICATION',
     "question_text" TEXT NOT NULL,
     "image_url" TEXT,
     "options_json" TEXT NOT NULL,
     "correct_config" TEXT NOT NULL,
     "bloom_level" TEXT NOT NULL,
     "topic" TEXT NOT NULL,
-    "explanation" TEXT
+    "explanation" TEXT,
+    "story_json" TEXT
 );
 
 -- CreateIndex
