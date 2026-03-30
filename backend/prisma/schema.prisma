@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int      @id @default(autoincrement())
+  name          String
+  email         String   @unique
+  password_hash String
+  created_at    DateTime @default(now())
+
+  @@map("users")
+}
+
+model Student {
+  id            Int           @id @default(autoincrement())
+  name          String
+  absen         String
+  session_id    String
+  total_poin    Int           @default(0)
+  total_bintang Int           @default(0)
+  total_waktu   Int?
+  is_complete   Boolean       @default(false)
+  created_at    DateTime      @default(now())
+  level_results LevelResult[]
+
+  @@map("students")
+}
+
+model LevelResult {
+  id           Int       @id @default(autoincrement())
+  student_id   Int
+  level_number Int
+  poin         Int       @default(0)
+  bintang      Int       @default(0)
+  waktu_detik  Int?
+  is_complete  Boolean   @default(false)
+  attempts     Int       @default(1)
+  completed_at DateTime?
+  student      Student   @relation(fields: [student_id], references: [id], onDelete: Cascade)
+
+  @@map("level_results")
+}
+
+model Question {
+  id             Int     @id @default(autoincrement())
+  level_number   Int
+  type           String  @default("CLASSIFICATION")
+  question_text  String
+  image_url      String?
+  options_json   String
+  correct_config String
+  bloom_level    String
+  topic          String
+  explanation    String?
+  story_json     String?
+
+  @@map("questions")
+}

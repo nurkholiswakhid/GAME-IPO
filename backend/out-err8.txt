@@ -1,0 +1,374 @@
+﻿[dotenv@17.3.1] injecting env (3) from .env -- tip: ΓÜÖ∩╕Å  write to custom object with { processEnv: myObject }
+node : C:\Users\Nurkhol
+is\Downloads\SKRIPSIT\g
+emeweb\gema\backend\nod
+e_modules\@prisma\clien
+t\runtime\client.js:66
+At line:1 char:64
++ ... 
+\gemeweb\gema\backend; 
+node prisma/seed.js > 
+out-err.txt 2>&1; 
+Get-Co ...
++                      
+      ~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: (C:\Users\Nurk   
+ ho...me\client.js:    
+66:String) [], Rem    
+oteException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
+Read more at https://pr
+is.ly/d/client-construc
+tor`),this.name="Prisma
+ClientConstructorValida
+tionError"}get[Symbol.t
+oStringTag](){return"Pr
+ismaClientConstructorVa
+lidationError"}};gt(R,"
+PrismaClientConstructor
+ValidationError");var _
+l=["errorFormat","adapt
+er","accelerateUrl","lo
+g","transactionOptions"
+,"omit","comments","__i
+nternal"],$l=["pretty",
+"colorless","minimal"],
+Ll=["info","query","war
+n","error"],Cm={adapter
+:()=>{},accelerateUrl:e
+=>{if(e!==void 
+0){if(typeof 
+e!="string")throw new 
+R(`Invalid value 
+${JSON.stringify(e)} 
+for "accelerateUrl" 
+provided to 
+PrismaClient constructo
+r.`);if(e.trim().length
+===0)throw new 
+R('"accelerateUrl" 
+provided to 
+PrismaClient 
+constructor must be a 
+non-empty string.')}},e
+rrorFormat:e=>{if(e){if
+(typeof 
+e!="string")throw new 
+R(`Invalid value 
+${JSON.stringify(e)} 
+for "errorFormat" 
+provided to 
+PrismaClient constructo
+r.`);if(!$l.includes(e)
+){let t=Ut(e,$l);throw 
+new R(`Invalid 
+errorFormat ${e} 
+provided to 
+PrismaClient constructo
+r.${t}`)}}},log:e=>{if(
+!e)return;if(!Array.isA
+rray(e))throw new 
+R(`Invalid value 
+${JSON.stringify(e)} 
+for "log" provided to 
+PrismaClient constructo
+r.`);function 
+t(r){if(typeof r=="stri
+ng"&&!Ll.includes(r)){l
+et n=Ut(r,Ll);throw 
+new R(`Invalid log 
+level "${r}" provided 
+to PrismaClient constru
+ctor.${n}`)}}for(let r 
+of e){t(r);let n={level
+:t,emit:i=>{let o=["std
+out","event"];if(!o.inc
+ludes(i)){let 
+s=Ut(i,o);throw new 
+R(`Invalid value 
+${JSON.stringify(i)} 
+for "emit" in logLevel 
+provided to 
+PrismaClient constructo
+r.${s}`)}}};if(r&&typeo
+f r=="object")for(let[i
+,o]of Object.entries(r)
+)if(n[i])n[i](o);else 
+throw new R(`Invalid 
+property ${i} for 
+"log" provided to 
+PrismaClient constructo
+r`)}},transactionOption
+s:e=>{if(!e)return;let 
+t=e.maxWait;if(t!=null&
+&t<=0)throw new 
+R(`Invalid value ${t} 
+for maxWait in 
+"transactionOptions" 
+provided to 
+PrismaClient 
+constructor. maxWait 
+needs to be greater 
+than 0`);let r=e.timeou
+t;if(r!=null&&r<=0)thro
+w new R(`Invalid value 
+${r} for timeout in 
+"transactionOptions" 
+provided to 
+PrismaClient 
+constructor. timeout 
+needs to be greater 
+than 0`)},omit:(e,t)=>{
+if(typeof 
+e!="object")throw new 
+R('"omit" option is 
+expected to be an objec
+t.');if(e===null)throw 
+new R('"omit" option 
+can not be 
+`null`');let 
+r=[];for(let[n,i]of 
+Object.entries(e)){let 
+o=Im(n,t.runtimeDataMod
+el);if(!o){r.push({kind
+:"UnknownModel",modelKe
+y:n});continue}for(let[
+s,a]of 
+Object.entries(i)){let 
+l=o.fields.find(u=>u.na
+me===s);if(!l){r.push({
+kind:"UnknownField",mod
+elKey:n,fieldName:s});c
+ontinue}if(l.relationNa
+me){r.push({kind:"Relat
+ionInOmit",modelKey:n,f
+ieldName:s});continue}t
+ypeof a!="boolean"&&r.p
+ush({kind:"InvalidField
+Value",modelKey:n,field
+Name:s})}}if(r.length>0
+)throw new R(Om(e,r))},
+comments:e=>{if(e!==voi
+d 0){if(!Array.isArray(
+e))throw new 
+R(`Invalid value 
+${JSON.stringify(e)} 
+for "comments" 
+provided to 
+PrismaClient 
+constructor. Expected 
+an array of SQL 
+commenter 
+plugins.`);for(let t=0;
+t<e.length;t++)if(typeo
+f 
+e[t]!="function")throw 
+new R(`Invalid value 
+at index ${t} for 
+"comments" provided to 
+PrismaClient 
+constructor. Each 
+plugin must be a functi
+on.`)}},__internal:e=>{
+if(!e)return;let t=["de
+bug","engine","configOv
+erride"];if(typeof 
+e!="object")throw new 
+R(`Invalid value 
+${JSON.stringify(e)} 
+for "__internal" to 
+PrismaClient constructo
+r`);for(let[r]of Object
+.entries(e))if(!t.inclu
+des(r)){let 
+n=Ut(r,t);throw new 
+R(`Invalid property 
+${JSON.stringify(r)} 
+for "__internal" 
+provided to 
+PrismaClient constructo
+r.${n}`)}}};function 
+Rm(e){let 
+t=e.adapter!==void 0,r=
+e.accelerateUrl!==void 
+0;if(t&&r)throw new 
+R('The "adapter" and 
+"accelerateUrl" 
+options are mutually 
+exclusive. Please 
+provide only one of the
+m.');if(!t&&!r)throw 
+new R('Using engine 
+type "client" requires 
+either "adapter" or 
+"accelerateUrl" to be 
+provided to 
+PrismaClient constructo
+r.')}function 
+jl(e,t){for(let[r,n]of 
+Object.entries(e)){if(!
+_l.includes(r)){let 
+i=Ut(r,_l);throw new 
+R(`Unknown property 
+${r} provided to 
+PrismaClient constructo
+r.${i}`)}Cm[r](n,t)}Rm(
+e)}function Ut(e,t){if(
+t.length===0||typeof e!
+="string")return"";let 
+r=km(e,t);return r?` 
+Did you mean 
+"${r}"?`:""}function km
+(e,t){if(t.length===0)r
+eturn null;let r=t.map(
+i=>({value:i,distance:(
+0,ql.default)(e,i)}));r
+.sort((i,o)=>i.distance
+<o.distance?-1:1);let 
+n=r[0];return n.distanc
+e<3?n.value:null}functi
+on Im(e,t){return Vl(t.
+models,e)??Vl(t.types,e
+)}function Vl(e,t){let 
+r=Object.keys(e).find(n
+=>pe(n)===t);if(r)retur
+n e[r]}function 
+Om(e,t){let 
+r=Be(e);for(let o of t)
+switch(o.kind){case"Unk
+nownModel":r.arguments.
+getField(o.modelKey)?.m
+arkAsError(),r.addError
+Message(()=>`Unknown 
+model name: ${o.modelKe
+y}.`);break;case"Unknow
+nField":r.arguments.get
+DeepField([o.modelKey,o
+.fieldName])?.markAsErr
+or(),r.addErrorMessage(
+()=>`Model 
+"${o.modelKey}" does 
+not have a field named 
+"${o.fieldName}".`);bre
+ak;case"RelationInOmit"
+:r.arguments.getDeepFie
+ld([o.modelKey,o.fieldN
+ame])?.markAsError(),r.
+addErrorMessage(()=>'Re
+lations are already 
+excluded by default 
+and can not be 
+specified in "omit".');
+break;case"InvalidField
+Value":r.arguments.getD
+eepFieldValue([o.modelK
+ey,o.fieldName])?.markA
+sError(),r.addErrorMess
+age(()=>"Omit field 
+option value must be a 
+boolean.");break}let{me
+ssage:n,args:i}=sr(r,"c
+olorless");return`Error
+ validating "omit" 
+option:
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+        
+
+PrismaClientConstructor
+ValidationError: 
+Unknown property 
+datasourceUrl provided 
+to PrismaClient 
+constructor.
+Read more at https://pr
+is.ly/d/client-construc
+tor
+    at jl (C:\Users\Nur
+kholis\Downloads\SKRIPS
+IT\gemeweb\gema\backend
+\node_modules\@prisma\c
+lient\runtime\client.js
+:66:3832)
+    at new t (C:\Users\
+Nurkholis\Downloads\SKR
+IPSIT\gemeweb\gema\back
+end\node_modules\@prism
+a\client\runtime\client
+.js:70:1808)
+    at 
+Object.<anonymous> (C:\
+Users\Nurkholis\Downloa
+ds\SKRIPSIT\gemeweb\gem
+a\backend\db.js:5:16)
+    at Module._compile 
+(node:internal/modules/
+cjs/loader:1730:14)
+    at Object..js (node
+:internal/modules/cjs/l
+oader:1895:10)
+    at Module.load (nod
+e:internal/modules/cjs/
+loader:1465:32)
+    at Function._load (
+node:internal/modules/c
+js/loader:1282:12)
+    at TracingChannel.t
+raceSync (node:diagnost
+ics_channel:322:14)
+    at wrapModuleLoad (
+node:internal/modules/c
+js/loader:235:24)
+    at Module.require (
+node:internal/modules/c
+js/loader:1487:12)
+
+Node.js v22.17.1
