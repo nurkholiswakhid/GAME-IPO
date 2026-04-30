@@ -57,8 +57,9 @@ model Question {
   correct_config String
   bloom_level    String
   topic          String
-  explanation    String?
-  story_json     String?
+  explanation       String?
+  failure_message   String?
+  story_json        String?
 
   @@map("questions")
 }

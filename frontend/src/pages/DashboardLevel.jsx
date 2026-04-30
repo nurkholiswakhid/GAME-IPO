@@ -1,19 +1,19 @@
 import React, { useContext, useState } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { GameContext } from '../context/GameContext';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 const LEVEL_META = {
-  1:  { icon: '🖥️', name: 'Lab Komputer',    color: 'from-sky-500 to-indigo-600',     glow: 'rgba(99,102,241,0.6)',  mechanic: 'KLASIFIKASI' },
-  2:  { icon: '⚙️', name: 'Ruang Server',    color: 'from-violet-500 to-purple-700',  glow: 'rgba(139,92,246,0.6)', mechanic: 'URUTAN' },
-  3:  { icon: '💼', name: 'Kantor IT',        color: 'from-amber-400 to-orange-600',   glow: 'rgba(251,146,60,0.6)', mechanic: 'ANALISIS' },
-  4:  { icon: '🏠', name: 'Rumah Pengguna',   color: 'from-rose-500 to-red-700',       glow: 'rgba(239,68,68,0.6)',  mechanic: 'BENAR/SALAH' },
-  5:  { icon: '🏭', name: 'Data Center',      color: 'from-emerald-400 to-teal-600',   glow: 'rgba(52,211,153,0.6)', mechanic: 'MENJODOHKAN' },
-  6:  { icon: '🗄️', name: 'Ruang Storage',   color: 'from-cyan-400 to-blue-600',      glow: 'rgba(34,211,238,0.6)', mechanic: 'KLASIFIKASI' },
-  7:  { icon: '🎓', name: 'Kelas SMK',        color: 'from-fuchsia-400 to-pink-600',   glow: 'rgba(232,121,249,0.6)',mechanic: 'URUTAN' },
-  8:  { icon: '🔬', name: 'Lab Riset CPU',    color: 'from-blue-400 to-indigo-600',    glow: 'rgba(96,165,250,0.6)', mechanic: 'ANALISIS' },
-  9:  { icon: '📚', name: 'Perpustakaan',     color: 'from-slate-400 to-slate-600',    glow: 'rgba(148,163,184,0.6)',mechanic: 'BENAR/SALAH' },
-  10: { icon: '🔥', name: 'FINAL BOSS',       color: 'from-orange-500 to-red-700',     glow: 'rgba(239,68,68,0.8)',  mechanic: 'MENJODOHKAN' },
+  1:  { icon: '⌨️', name: 'Pusat Input',        color: 'from-blue-100 to-cyan-100 text-blue-700',       mechanic: 'KLASIFIKASI' },
+  2:  { icon: '🚦', name: 'Jalur Distribusi',   color: 'from-emerald-100 to-green-100 text-green-700',  mechanic: 'URUTAN' },
+  3:  { icon: '🧠', name: 'Pusat Proses (CPU)', color: 'from-pink-100 to-rose-100 text-pink-700',       mechanic: 'ANALISIS' },
+  4:  { icon: '🖥️', name: 'Terminal Output',    color: 'from-orange-100 to-amber-100 text-orange-700',  mechanic: 'BENAR/SALAH' },
+  5:  { icon: '🏭', name: 'Pabrik Perangkat',   color: 'from-amber-100 to-yellow-100 text-amber-700',   mechanic: 'MENJODOHKAN' },
+  6:  { icon: '🗄️', name: 'Gudang Storage',     color: 'from-cyan-100 to-sky-100 text-sky-700',         mechanic: 'KLASIFIKASI' },
+  7:  { icon: '🏫', name: 'Akademi Sistem',     color: 'from-fuchsia-100 to-purple-100 text-purple-700',mechanic: 'URUTAN' },
+  8:  { icon: '🔬', name: 'Lab Inovasi IT',     color: 'from-indigo-100 to-violet-100 text-violet-700', mechanic: 'ANALISIS' },
+  9:  { icon: '🌐', name: 'Jaringan Kota',      color: 'from-stone-200 to-stone-300 text-stone-700',    mechanic: 'BENAR/SALAH' },
+  10: { icon: '👑', name: 'Ujian Arsitektur',   color: 'from-amber-200 to-yellow-300 text-amber-800',   mechanic: 'MENJODOHKAN' },
 };
 
 // XP progression — setiap level memberi +10 XP dari total 100
@@ -22,13 +22,13 @@ const MAX_XP = 100;
 export default function DashboardLevel() {
   const { student, loading, logoutStudent } = useContext(GameContext);
   const navigate = useNavigate();
-  const [hoveredLevel, setHoveredLevel] = useState(null);
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-950">
-      <div className="text-center text-white">
-        <div className="text-5xl mb-4 animate-bounce">🎮</div>
-        <p className="font-game text-indigo-400 text-sm tracking-widest animate-pulse">MEMUAT DATA HERO...</p>
+    <div className="min-h-screen flex items-center justify-center p-4 city-bg font-sans">
+      <div className="text-center glass rounded-3xl px-12 py-10 shadow-xl">
+        <div className="w-16 h-16 border-4 border-amber-200 border-t-amber-500 rounded-full animate-spin mb-6 mx-auto"></div>
+        <h2 className="text-2xl font-black text-stone-800 tracking-tight">MEMUAT PETA</h2>
+        <p className="font-bold text-stone-500 text-sm tracking-widest animate-pulse mt-2 uppercase">Menyiapkan Petualangan...</p>
       </div>
     </div>
   );
@@ -49,62 +49,64 @@ export default function DashboardLevel() {
   const heroLevel = Math.max(1, Math.ceil(completedCount / 2));
 
   return (
-    <div className="min-h-screen text-white relative overflow-hidden">
-      {/* BG Stars */}
-      <div className="stars-bg" />
-      <div className="scanlines" />
+    <div className="min-h-screen text-stone-800 relative xl:overflow-hidden city-bg bg-network font-sans">
 
-      {/* Ambient Color Blobs */}
-      <div className="fixed top-10 left-10 w-96 h-96 rounded-full bg-indigo-600/10 blur-3xl pointer-events-none" />
-      <div className="fixed bottom-20 right-10 w-96 h-96 rounded-full bg-purple-600/10 blur-3xl pointer-events-none" />
-
-      <div className="relative z-10 max-w-5xl mx-auto px-4 py-6">
+      <div className="relative z-10 max-w-5xl mx-auto px-4 py-8 md:py-12">
 
         {/* ── HERO CARD / PLAYER HUD ── */}
-        <motion.div initial={{ y: -30, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
-          className="glass rounded-3xl p-5 md:p-6 mb-8 border border-indigo-500/20 glow-indigo">
-          <div className="flex flex-col sm:flex-row items-center gap-5">
+        <motion.div initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
+          className="glass rounded-3xl p-6 md:p-8 mb-12 shadow-md hover:shadow-lg transition-all">
+          <div className="flex flex-col md:flex-row items-center gap-8">
 
             {/* Avatar */}
             <div className="relative shrink-0">
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-4xl font-black shadow-xl glow-indigo">
+              <div className="w-24 h-24 md:w-32 md:h-32 rounded-[2rem] bg-amber-100 flex items-center justify-center text-5xl md:text-6xl font-black text-amber-700 shadow-inner border-[6px] border-white">
                 {student.name.charAt(0).toUpperCase()}
               </div>
-              <div className="absolute -bottom-2 -right-2 bg-amber-500 text-black text-xs font-black px-2 py-0.5 rounded-lg font-game shadow">
-                LV{heroLevel}
+              <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-emerald-500 text-white text-sm font-bold px-4 py-1 rounded-full shadow-md border-2 border-white whitespace-nowrap">
+                LEVEL {heroLevel}
               </div>
             </div>
 
             {/* Info */}
             <div className="flex-1 w-full">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
-                <div>
-                  <h1 className="text-2xl font-black text-glow-white">{student.name}</h1>
-                  <p className="text-slate-400 text-xs font-mono">ABSEN #{student.absen} · SESSION {student.session_id.slice(0,8).toUpperCase()}</p>
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-6">
+                <div className="text-center md:text-left">
+                  <h1 className="text-3xl md:text-4xl font-serif font-black text-stone-800 tracking-tight mb-1">{student.name}</h1>
+                  <p className="text-stone-500 text-sm font-bold uppercase tracking-wider">
+                    Warga Kota #{student.absen} <span className="mx-2 opacity-50">|</span> Sesi {student.session_id.slice(0,8)}
+                  </p>
                 </div>
-                <div className="flex gap-3">
-                  <div className="glass px-4 py-2 rounded-xl text-center border border-blue-500/30">
-                    <p className="text-[10px] text-blue-400 font-black uppercase tracking-widest">POIN</p>
-                    <p className="text-xl font-black text-blue-300 font-game">{student.total_poin}</p>
+                
+                <div className="flex justify-center md:justify-start gap-3 md:gap-4">
+                  <div className="bg-white px-5 py-3 rounded-2xl text-center border border-stone-100 shadow-sm min-w-[80px]">
+                    <p className="text-[10px] text-blue-500 font-bold uppercase tracking-widest mb-1">POIN</p>
+                    <p className="text-2xl font-black text-blue-700 leading-none">{student.total_poin}</p>
                   </div>
-                  <div className="glass px-4 py-2 rounded-xl text-center border border-amber-500/30">
-                    <p className="text-[10px] text-amber-400 font-black uppercase tracking-widest">BINTANG</p>
-                    <p className="text-xl font-black text-amber-300 text-glow-amber font-game">★ {student.total_bintang}</p>
+                  <div className="bg-white px-5 py-3 rounded-2xl text-center border border-stone-100 shadow-sm min-w-[80px]">
+                    <p className="text-[10px] text-amber-500 font-bold uppercase tracking-widest mb-1">BINTANG</p>
+                    <p className="text-2xl font-black text-amber-600 leading-none">★ {student.total_bintang}</p>
                   </div>
-                  <div className="glass px-4 py-2 rounded-xl text-center border border-emerald-500/30">
-                    <p className="text-[10px] text-emerald-400 font-black uppercase tracking-widest">STAGE</p>
-                    <p className="text-xl font-black text-emerald-300 font-game">{completedCount}/10</p>
+                  <div className="bg-white px-5 py-3 rounded-2xl text-center border border-stone-100 shadow-sm min-w-[80px]">
+                    <p className="text-[10px] text-emerald-500 font-bold uppercase tracking-widest mb-1">PROGRES</p>
+                    <p className="text-2xl font-black text-emerald-700 leading-none">{completedCount}<span className="text-lg opacity-50">/10</span></p>
                   </div>
                 </div>
               </div>
 
               {/* XP Bar */}
-              <div>
-                <div className="flex justify-between text-[10px] text-slate-400 mb-1 font-black uppercase tracking-widest">
-                  <span>EXPERIENCE POINTS</span><span className="text-indigo-400">{xp} / {MAX_XP} XP</span>
+              <div className="bg-white p-4 rounded-2xl border border-stone-100 shadow-sm">
+                <div className="flex justify-between text-[10px] text-stone-400 mb-2 font-bold uppercase tracking-widest">
+                  <span>PENGALAMAN (XP)</span>
+                  <span className="text-amber-600 bg-amber-100 px-2 py-0.5 rounded-md">{xp} / {MAX_XP} XP</span>
                 </div>
-                <div className="h-3 bg-slate-800 rounded-full overflow-hidden border border-white/10">
-                  <div className="xp-bar h-full" style={{ width: `${xp}%` }} />
+                <div className="h-4 bg-stone-100 rounded-full overflow-hidden border border-stone-200">
+                  <motion.div 
+                    initial={{width:0}} animate={{width:`${xp}%`}} transition={{duration:1, ease:'easeOut'}} 
+                    className="h-full bg-gradient-to-r from-amber-400 to-amber-300 relative"
+                  >
+                    <div className="absolute inset-0 bg-white/20" style={{ backgroundImage: 'linear-gradient(45deg, rgba(255,255,255,.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.15) 50%, rgba(255,255,255,.15) 75%, transparent 75%, transparent)', backgroundSize: '1rem 1rem' }} />
+                  </motion.div>
                 </div>
               </div>
             </div>
@@ -112,14 +114,21 @@ export default function DashboardLevel() {
         </motion.div>
 
         {/* ── WORLD MAP TITLE ── */}
-        <div className="text-center mb-8">
-          <p className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.4em] mb-1">SELECT STAGE</p>
-          <h2 className="text-3xl md:text-4xl font-black font-game text-glow-white">PETA DUNIA</h2>
-          <p className="text-slate-400 text-sm mt-2">Selesaikan level untuk membuka stage berikutnya!</p>
+        <div className="text-center mb-16">
+          <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2, type: 'spring' }} className="inline-block mb-3">
+            <span className="bg-amber-100 text-amber-700 font-bold text-xs px-4 py-1.5 rounded-full uppercase tracking-widest shadow-sm border border-amber-200">
+              Jelajahi Sistem
+            </span>
+          </motion.div>
+          <h2 className="text-4xl md:text-6xl font-serif font-black text-stone-800 tracking-tight">Peta Kota Digital</h2>
+          <p className="text-stone-600 text-base md:text-lg mt-4 max-w-lg mx-auto font-medium">Bantu kelola aliran data dan proses di kota modern ini sesuai prinsip Von Neumann!</p>
         </div>
 
-        {/* ── LEVEL GRID ── */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        {/* ── ELEGANT ZIGZAG LEVEL TIMELINE ── */}
+        <div className="relative w-full max-w-4xl mx-auto py-4">
+          {/* The central dashed line */}
+          <div className="absolute top-0 bottom-0 left-[40px] md:left-1/2 md:-ml-[2px] w-0 border-l-4 border-dashed border-stone-300/60 z-0" />
+
           {[...Array(10)].map((_, i) => {
             const level = i + 1;
             const status = getLevelStatus(level);
@@ -128,94 +137,102 @@ export default function DashboardLevel() {
             const isLocked = status === 'LOCKED';
             const isDone = status === 'COMPLETED';
             const isBoss = level === 10;
+            const isRight = i % 2 !== 0; // Zigzag logic for desktop
 
             return (
-              <motion.div key={level}
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: i * 0.04, type: 'spring', stiffness: 300, damping: 22 }}
-                whileHover={!isLocked ? { y: -8, scale: 1.04 } : {}}
-                whileTap={!isLocked ? { scale: 0.95 } : {}}
-                onHoverStart={() => !isLocked && setHoveredLevel(level)}
-                onHoverEnd={() => setHoveredLevel(null)}
-                onClick={() => !isLocked && navigate(`/game/${level}`)}
-                className={`relative flex flex-col items-center justify-between p-4 rounded-3xl border-2 cursor-pointer min-h-[170px] transition-all duration-300 overflow-hidden
-                  ${isLocked  ? 'bg-slate-900/60 border-slate-700/50 cursor-not-allowed opacity-50 grayscale'
-                  : isDone    ? 'bg-emerald-950/60 border-emerald-500/50 glow-emerald'
-                  : isBoss    ? 'bg-red-950/70 border-orange-500 boss-glow'
-                  : 'glass border-indigo-500/40 hover:border-indigo-400'}`}
-                style={!isLocked ? { boxShadow: `0 0 20px ${meta.glow}40` } : {}}
-              >
-                {/* Particle effect for active/completed */}
-                {!isLocked && hoveredLevel === level && (
-                  <>
-                    {[...Array(6)].map((_, p) => (
-                      <div key={p} className="particle"
-                        style={{
-                          background: meta.glow,
-                          left: `${10 + p * 15}%`,
-                          bottom: '0',
-                          animationDuration: `${1 + p * 0.3}s`,
-                          animationDelay: `${p * 0.15}s`,
-                        }} />
-                    ))}
-                  </>
-                )}
+              <div key={level} className={`relative flex items-center w-full mb-10 md:mb-16 ${isRight ? 'md:justify-end' : 'md:justify-start'}`}>
+                
+                {/* Node Milestone on the line */}
+                <motion.div 
+                  initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: i * 0.1, type: 'spring' }}
+                  className={`absolute left-[40px] md:left-1/2 -translate-x-1/2 w-12 h-12 rounded-full border-4 flex items-center justify-center z-10 shadow-sm
+                  ${isDone ? 'bg-emerald-100 border-emerald-400 text-emerald-600' 
+                    : isLocked ? 'bg-stone-100 border-stone-200 text-stone-400' 
+                    : 'bg-amber-100 border-amber-400 text-amber-600 shadow-[0_0_20px_rgba(251,191,36,0.3)] animate-bounce'}`}
+                >
+                  {isBoss ? '👑' : isDone ? '✓' : isLocked ? '🔒' : '⭐'}
+                </motion.div>
 
-                {/* Top: Level number + mechanic tag */}
-                <div className="w-full">
-                  <div className="flex items-start justify-between mb-1">
-                    <span className={`text-[9px] font-black px-1.5 py-0.5 rounded font-game ${isDone ? 'bg-emerald-500/30 text-emerald-300' : isBoss ? 'bg-orange-500/30 text-orange-300' : 'bg-indigo-500/30 text-indigo-300'}`}>
-                      {isLocked ? 'LOCKED' : isDone ? 'CLEAR ✓' : `LV ${level}`}
-                    </span>
-                    {isBoss && !isLocked && (
-                      <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-red-500/40 text-red-300 animate-pulse">BOSS</span>
-                    )}
-                  </div>
-                  <p className={`text-[8px] font-black uppercase tracking-wider ${isLocked ? 'text-slate-600' : 'text-white/40'}`}>
-                    {meta.mechanic}
-                  </p>
-                </div>
+                {/* Level Card Container */}
+                <div className={`w-full pl-[90px] md:pl-0 md:w-1/2 ${isRight ? 'md:pl-14 lg:pl-20' : 'md:pr-14 lg:pr-20'}`}>
+                  <motion.div 
+                    initial={{ opacity: 0, x: isRight ? 40 : -40 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.1 + 0.2, type: 'spring', stiffness: 100 }}
+                    whileHover={!isLocked ? { scale: 1.03, y: -4 } : {}}
+                    whileTap={!isLocked ? { scale: 0.97 } : {}}
+                    onClick={() => !isLocked && navigate(`/game/${level}`)}
+                    className={`relative flex flex-col sm:flex-row items-center sm:items-start gap-4 p-5 md:p-6 rounded-[2rem] border shadow-sm transition-all duration-300 group
+                      ${isLocked ? 'bg-white/50 border-stone-200 opacity-60 grayscale cursor-not-allowed'
+                      : isDone ? 'bg-white border-emerald-200 hover:border-emerald-400 hover:shadow-lg cursor-pointer'
+                      : isBoss ? 'bg-gradient-to-br from-amber-50 to-orange-50 border-amber-300 hover:border-amber-500 hover:shadow-xl cursor-pointer shadow-amber-100/50'
+                      : 'bg-white border-stone-200 hover:border-amber-400 hover:shadow-xl cursor-pointer ring-4 ring-transparent hover:ring-amber-50'}`}
+                  >
+                    {/* Level Icon */}
+                    <div className={`w-16 h-16 shrink-0 rounded-2xl flex items-center justify-center text-3xl shadow-inner border border-white/50
+                      ${isLocked ? 'bg-stone-200 text-stone-400' : `bg-gradient-to-br ${meta.color}`}`}>
+                      {meta.icon}
+                    </div>
 
-                {/* Center Icon */}
-                <div className="relative my-1">
-                  {!isLocked && isDone && <div className="pulse-ring text-emerald-400" />}
-                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shadow-lg relative z-10
-                    ${isLocked ? 'bg-slate-800' : `bg-gradient-to-br ${meta.color}`}`}
-                    style={!isLocked ? { boxShadow: `0 4px 20px ${meta.glow}` } : {}}>
-                    {isLocked ? '🔒' : meta.icon}
-                  </div>
-                </div>
+                    {/* Level Info */}
+                    <div className="flex-1 w-full text-center sm:text-left">
+                      <div className="flex items-center justify-center sm:justify-start gap-2 mb-1.5">
+                        <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-lg ${isDone ? 'bg-emerald-100 text-emerald-700' : isBoss ? 'bg-amber-500 text-white shadow-sm' : isLocked ? 'bg-stone-200 text-stone-500' : 'bg-amber-100 text-amber-700 border border-amber-200'}`}>
+                          BAB {level}
+                        </span>
+                        {isBoss && !isLocked && <span className="text-[10px] font-bold px-2 py-0.5 rounded-lg bg-red-100 text-red-600 animate-pulse border border-red-200">UJIAN</span>}
+                      </div>
+                      <h3 className={`font-serif font-black text-lg md:text-xl leading-tight mb-1 ${isLocked ? 'text-stone-500' : 'text-stone-800'}`}>
+                        {meta.name}
+                      </h3>
+                      <p className={`text-[10px] font-bold uppercase tracking-widest ${isLocked ? 'text-stone-400' : 'text-stone-500'}`}>
+                        {meta.mechanic}
+                      </p>
+                    </div>
 
-                {/* Bottom: Name + Stars */}
-                <div className="w-full text-center">
-                  <p className={`text-[10px] font-bold mb-1.5 leading-tight ${isLocked ? 'text-slate-600' : 'text-white/80'}`}>
-                    {meta.name}
-                  </p>
-                  <div className="flex justify-center gap-0.5">
-                    {[1,2,3].map(s => (
-                      <span key={s} className={`text-base leading-none ${s <= stars ? 'text-amber-400 text-glow-amber' : 'text-slate-700'}`}>★</span>
-                    ))}
-                  </div>
+                    {/* Actions / Stars */}
+                    <div className="flex sm:flex-col justify-between items-center sm:items-end w-full sm:w-auto shrink-0 mt-2 sm:mt-0 pt-3 sm:pt-0 border-t sm:border-t-0 border-stone-100">
+                      <div className="flex gap-0.5">
+                        {[1,2,3].map(s => (
+                          <span key={s} className={`text-xl ${s <= stars ? 'text-amber-400 drop-shadow-sm' : 'text-stone-200'}`}>★</span>
+                        ))}
+                      </div>
+                      {!isLocked && !isDone && (
+                        <span className="text-[10px] font-bold bg-amber-400 text-white shadow-sm px-3 py-1.5 rounded-xl sm:mt-2 group-hover:bg-amber-500 transition-colors uppercase tracking-widest">
+                          MAIN ▶
+                        </span>
+                      )}
+                      {isDone && (
+                        <span className="text-[10px] font-bold bg-stone-100 text-stone-500 px-3 py-1.5 rounded-xl sm:mt-2 group-hover:bg-amber-100 group-hover:text-amber-700 transition-colors uppercase tracking-widest hidden sm:inline-block">
+                          ULANGI ↺
+                        </span>
+                      )}
+                    </div>
+                  </motion.div>
                 </div>
-              </motion.div>
+              </div>
             );
           })}
         </div>
 
         {/* ── FOOTER ACTIONS ── */}
-        <div className="mt-10 flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-white/10">
-          <button onClick={() => { logoutStudent(); navigate('/'); }}
-            className="text-slate-500 hover:text-red-400 transition text-sm font-bold px-4 py-2 rounded-xl hover:bg-red-500/10">
-            ⏻ Keluar Sesi
-          </button>
+        <div className="mt-16 glass rounded-3xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+            <button onClick={() => { logoutStudent(); navigate('/'); }}
+              className="text-red-500 hover:text-red-700 bg-red-50 border border-red-100 transition-colors text-sm font-bold px-6 py-3 rounded-2xl hover:bg-red-100 w-full sm:w-auto">
+              KELUAR SESI
+            </button>
 
-          <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-            onClick={() => navigate('/leaderboard')}
-            className="flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-black font-black rounded-2xl shadow-xl hover:shadow-amber-500/30 text-sm font-game glow-amber">
-            🏆 LEADERBOARD KELAS
+          </div>
+
+          <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+             onClick={() => navigate('/leaderboard')}
+            className="flex items-center justify-center gap-3 px-8 py-3 bg-amber-400 hover:bg-amber-500 border-2 border-amber-400 hover:border-amber-500 text-white font-bold rounded-2xl shadow-sm hover:shadow-md text-sm tracking-wide transition-colors w-full sm:w-auto">
+            🏆 PAPAN PERINGKAT
           </motion.button>
         </div>
+
+
       </div>
     </div>
   );

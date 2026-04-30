@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=M+PLUS+Rounded+1c:wght@400;500;700;800&display=swap');
 @import "tailwindcss";
 
 
@@ -7,69 +7,92 @@
 
 body {
   margin: 0;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+  background-color: #F0F4F8;
+  color: #334155;
 }
 
-.font-game { font-family: 'Orbitron', monospace; }
+.font-game { font-family: 'M PLUS Rounded 1c', sans-serif; }
 
 /* ── Scrollbar ── */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: #0f172a; }
-::-webkit-scrollbar-thumb { background: #334155; border-radius: 99px; }
-::-webkit-scrollbar-thumb:hover { background: #6366f1; }
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #f1f5f9; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: #60a5fa; }
 
-/* ── STAR / PARTICLE BACKGROUND ── */
-.stars-bg {
+/* ── DAYTIME CITY BACKGROUND ── */
+/* Used as a fixed fullscreen background layer */
+.city-bg-layer {
   position: fixed;
   inset: 0;
-  z-index: 0;
-  background: radial-gradient(ellipse at 20% 20%, rgba(99,102,241,0.15) 0%, transparent 60%),
-              radial-gradient(ellipse at 80% 80%, rgba(139,92,246,0.1) 0%, transparent 60%),
-              #050914;
+  z-index: -1;
+  background-image: url('/bg_home_kodomo.png');
+  background-size: cover;
+  background-position: center bottom;
   pointer-events: none;
 }
-.stars-bg::before {
+.city-bg-layer::before {
   content: '';
   position: absolute;
   inset: 0;
-  background-image:
-    radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px),
-    radial-gradient(circle, rgba(255,255,255,0.5) 1px, transparent 1px),
-    radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 1px);
-  background-size: 150px 150px, 100px 100px, 200px 200px;
-  background-position: 0 0, 40px 80px, 100px 20px;
-  animation: twinkle 8s ease-in-out infinite alternate;
-}
-@keyframes twinkle {
-  0%   { opacity: 0.4; }
-  100% { opacity: 1; }
+  background: linear-gradient(135deg, rgba(135,206,235,0.2) 0%, rgba(255,255,255,0.4) 100%);
+  pointer-events: none;
 }
 
-/* ── GLOW EFFECTS ── */
-.glow-indigo  { box-shadow: 0 0 20px rgba(99,102,241,0.5), 0 0 60px rgba(99,102,241,0.2); }
-.glow-emerald { box-shadow: 0 0 20px rgba(52,211,153,0.5), 0 0 60px rgba(52,211,153,0.2); }
-.glow-amber   { box-shadow: 0 0 20px rgba(251,191,36,0.5), 0 0 60px rgba(251,191,36,0.2); }
-.glow-red     { box-shadow: 0 0 20px rgba(239,68,68,0.5),  0 0 60px rgba(239,68,68,0.2); }
-.text-glow-white { text-shadow: 0 0 20px rgba(255,255,255,0.8), 0 0 40px rgba(99,102,241,0.6); }
-.text-glow-amber { text-shadow: 0 0 15px rgba(251,191,36,0.9); }
-.text-glow-red   { text-shadow: 0 0 15px rgba(239,68,68,0.9); }
+/* Applied directly to page wrappers — shows city bg via this class */
+.city-bg {
+  position: relative;
+  background-image: url('/bg_home_kodomo.png');
+  background-size: cover;
+  background-position: center bottom;
+  background-attachment: fixed;
+}
+.bg-academy { background-image: url('/bg_academy_kodomo.png') !important; }
+.bg-hardware { background-image: url('/bg_hardware_kodomo.png') !important; }
+.bg-core { background-image: url('/bg_core_kodomo.png') !important; }
+.bg-network { background-image: url('/bg_network_kodomo.png') !important; }
+.city-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(135,206,235,0.18) 0%, rgba(255,255,255,0.38) 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+/* Make direct children of city-bg sit above the ::before overlay */
+.city-bg > * {
+  position: relative;
+  z-index: 1;
+}
 
-/* ── XP BAR ── */
+
+/* ── GLOW EFFECTS (KODOMO PASTEL) ── */
+.glow-indigo  { box-shadow: 0 0 20px rgba(135,206,235,0.6), 0 0 40px rgba(135,206,235,0.3); } /* Light Blue */
+.glow-emerald { box-shadow: 0 0 20px rgba(152,251,152,0.6), 0 0 40px rgba(152,251,152,0.3); } /* Pastel Green */
+.glow-amber   { box-shadow: 0 0 20px rgba(255,215,0,0.6),   0 0 40px rgba(255,215,0,0.3); }   /* Bright Yellow */
+.glow-red     { box-shadow: 0 0 20px rgba(255,182,193,0.6), 0 0 40px rgba(255,182,193,0.3); } /* Pastel Pink */
+
+.text-glow-white { text-shadow: 0 0 10px rgba(255,255,255,1), 0 0 20px rgba(135,206,235,0.8); }
+.text-glow-amber { text-shadow: 0 0 15px rgba(255,215,0,0.9); }
+.text-glow-red   { text-shadow: 0 0 15px rgba(255,182,193,0.9); color: #ec4899; }
+
+/* ── XP BAR (KODOMO GRADIENT) ── */
 .xp-bar {
-  background: linear-gradient(90deg, #6366f1, #8b5cf6, #a855f7);
+  background: linear-gradient(90deg, #60a5fa, #34d399, #fde047);
   border-radius: 99px;
   height: 100%;
   transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
   position: relative;
   overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(255,255,255,0.5);
 }
 .xp-bar::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.6) 50%, transparent 100%);
   animation: shimmer 2s linear infinite;
 }
 @keyframes shimmer {
@@ -84,55 +107,58 @@ body {
   top: 50%;
   right: -16px;
   width: 16px;
-  height: 3px;
-  background: rgba(99,102,241,0.4);
+  height: 4px;
+  background: rgba(135,206,235,0.6);
+  border-radius: 4px;
   z-index: 0;
 }
 
-/* ── FLOATING PARTICLE ── */
+/* ── FLOATING PARTICLE & CLOUDS ── */
 @keyframes float-particle {
-  0%   { transform: translateY(0px) rotate(0deg); opacity: 0; }
-  20%  { opacity: 1; }
-  80%  { opacity: 1; }
-  100% { transform: translateY(-120px) rotate(360deg); opacity: 0; }
+  0%   { transform: translateY(0px) scale(0.8); opacity: 0; }
+  20%  { opacity: 0.8; }
+  80%  { opacity: 0.8; }
+  100% { transform: translateY(-80px) scale(1.2); opacity: 0; }
 }
 .particle {
   position: absolute;
-  width: 4px;
-  height: 4px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
+  background-color: rgba(255,255,255,0.8);
+  box-shadow: 0 0 8px rgba(255,255,255,1);
   animation: float-particle linear infinite;
   pointer-events: none;
 }
 
 /* ── PULSE RING ── */
 @keyframes pulse-ring {
-  0%   { transform: scale(1);   opacity: 0.6; }
-  100% { transform: scale(1.8); opacity: 0; }
+  0%   { transform: scale(1);   opacity: 0.8; }
+  100% { transform: scale(1.5); opacity: 0; }
 }
 .pulse-ring {
   position: absolute;
   inset: -6px;
   border-radius: 50%;
-  border: 2px solid currentColor;
+  border: 3px solid currentColor;
   animation: pulse-ring 1.5s ease-out infinite;
 }
 
 /* ── BLINK ── */
 @keyframes blink-anim {
   0%, 100% { opacity: 1; }
-  50%       { opacity: 0.3; }
+  50%       { opacity: 0.5; }
 }
 .blink { animation: blink-anim 1s step-start infinite; }
 
-/* ── FIRE BOSS GLOW ── */
+/* ── BOSS / TARGET GLOW ── */
 @keyframes fire-glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(239,68,68,0.6), 0 0 60px rgba(251,146,60,0.4); }
-  50%       { box-shadow: 0 0 40px rgba(251,146,60,0.9), 0 0 80px rgba(239,68,68,0.5); }
+  0%, 100% { box-shadow: 0 0 20px rgba(255,182,193,0.8), 0 0 40px rgba(255,160,122,0.5); }
+  50%       { box-shadow: 0 0 30px rgba(255,160,122,1), 0 0 60px rgba(255,182,193,0.7); }
 }
 .boss-glow { animation: fire-glow 2s ease-in-out infinite; }
 
-/* ── SCANLINE OVERLAY ── */
+/* ── DATA STREAM OVERLAY (Instead of Scanlines) ── */
 .scanlines {
   position: fixed;
   inset: 0;
@@ -141,18 +167,21 @@ body {
   background: repeating-linear-gradient(
     0deg,
     transparent,
-    transparent 2px,
-    rgba(0,0,0,0.03) 2px,
-    rgba(0,0,0,0.03) 4px
+    transparent 4px,
+    rgba(255,255,255,0.15) 4px,
+    rgba(255,255,255,0.15) 6px
   );
+  mix-blend-mode: overlay;
 }
 
-/* ── GLASS PANEL ── */
+/* ── BRIGHT GLASS PANEL ── */
 .glass {
-  background: rgba(255,255,255,0.04);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+  color: #1e293b;
 }
 
 /* ── SMOOTH FADE IN ── */

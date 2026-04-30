@@ -80,7 +80,7 @@ process.on('unhandledRejection', (reason, promise) => {
 
 // Graceful error handling for port conflicts
 server.on('error', (err) => {
-  if (err.code === 'EADDRINUSE') {
+  if (err.code === 'EADDRINUSE') {  
     console.error(`Port ${PORT} is already in use. Please close the other process or change the PORT in .env`);
     process.exit(1);
   }

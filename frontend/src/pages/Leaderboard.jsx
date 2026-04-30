@@ -4,9 +4,9 @@ import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const RANK_STYLE = [
-  { bg: 'from-yellow-500 to-amber-600', text: 'text-black', label: '🥇', glow: 'glow-amber' },
-  { bg: 'from-slate-300 to-slate-500',  text: 'text-black', label: '🥈', glow: '' },
-  { bg: 'from-orange-400 to-orange-600',text: 'text-black', label: '🥉', glow: '' },
+  { bg: 'from-amber-300 to-yellow-400', text: 'text-amber-900', label: '🏆', glow: 'shadow-md' },
+  { bg: 'from-stone-200 to-stone-300',  text: 'text-stone-700', label: '🥈', glow: 'shadow-sm' },
+  { bg: 'from-orange-200 to-orange-300',text: 'text-orange-900', label: '🥉', glow: 'shadow-sm' },
 ];
 
 export default function Leaderboard() {
@@ -29,91 +29,81 @@ export default function Leaderboard() {
   }, []);
 
   return (
-    <div className="min-h-screen relative overflow-hidden text-white">
-      <div className="stars-bg" />
-      <div className="scanlines" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[400px] rounded-full bg-amber-600/10 blur-3xl pointer-events-none" />
-
+    <div className="min-h-screen text-stone-800 city-bg bg-academy">
       <div className="relative z-10 max-w-4xl mx-auto px-4 py-8">
 
         {/* Header */}
-        <motion.div initial={{ y: -30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="text-center mb-10">
-          <motion.div
-            initial={{ scale: 0 }} animate={{ scale: 1 }}
-            transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.1 }}
-            className="inline-flex items-center justify-center w-24 h-24 rounded-3xl bg-gradient-to-br from-amber-400 to-orange-500 text-5xl mb-5 shadow-2xl glow-amber"
-          >
-            🏆
-          </motion.div>
-          <p className="text-[10px] text-amber-400/80 font-black tracking-[0.5em] uppercase mb-2 font-game">◈ HALL OF FAME ◈</p>
-          <h1 className="font-game font-black text-4xl md:text-5xl text-glow-white mb-2">LEADERBOARD</h1>
-          <p className="text-slate-400 text-sm">Ranking kelas diperbarui otomatis setiap 8 detik</p>
+        <motion.div initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="text-center mb-10">
+
+          <p className="text-xs text-amber-600 font-bold tracking-[0.3em] uppercase mb-2">◈ Papan Prestasi ◈</p>
+          <h1 className="font-serif font-black text-4xl md:text-5xl text-stone-800 mb-2">PAPAN PERINGKAT</h1>
+          <p className="text-stone-500 text-sm font-bold">Peringkat kelas diperbarui otomatis setiap 8 detik</p>
         </motion.div>
 
         {/* Table */}
-        <div className="glass rounded-3xl overflow-hidden border border-white/10 glow-indigo">
+        <div className="bg-white rounded-3xl overflow-hidden border border-stone-200 shadow-md">
           {/* Table Header */}
-          <div className="bg-white/5 px-6 py-4 border-b border-white/10 flex items-center justify-between">
-            <h3 className="font-black text-sm text-white/70 uppercase tracking-widest font-game">Player Rankings</h3>
-            <div className="flex items-center gap-2 text-xs text-emerald-400 font-bold">
-              <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />LIVE
+          <div className="bg-stone-50 px-6 py-4 border-b border-stone-200 flex items-center justify-between">
+            <h3 className="font-bold text-sm text-stone-600 uppercase tracking-widest">Peringkat Pemain</h3>
+            <div className="flex items-center gap-2 text-xs text-emerald-600 font-bold border border-emerald-200 bg-emerald-50 px-2 py-1 rounded-md">
+              <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />LANGSUNG
             </div>
           </div>
 
           {isLoading ? (
-            <div className="p-20 flex flex-col items-center justify-center text-slate-400">
-              <div className="text-5xl mb-4 animate-bounce">⏳</div>
-              <p className="font-game text-sm tracking-widest animate-pulse">LOADING RANKINGS...</p>
+            <div className="p-20 flex flex-col items-center justify-center text-stone-500">
+              <div className="w-12 h-12 border-4 border-stone-200 border-t-amber-400 rounded-full animate-spin mb-4"></div>
+              <p className="font-bold text-sm tracking-widest animate-pulse">MEMUAT PERINGKAT...</p>
             </div>
           ) : students.length === 0 ? (
             <div className="p-20 text-center">
-              <div className="text-5xl mb-4">😴</div>
-              <p className="text-slate-500">Belum ada pemain yang menyelesaikan level apapun.</p>
+              <div className="text-5xl mb-4 text-stone-300">...</div>
+              <p className="text-stone-500 font-bold">Belum ada pemain yang menyelesaikan level apapun.</p>
             </div>
           ) : (
-            <div className="divide-y divide-white/5">
+            <div className="divide-y divide-stone-100">
               <AnimatePresence>
                 {students.map((std, i) => {
                   const rs = RANK_STYLE[i] || null;
                   return (
                     <motion.div key={std.id}
-                      initial={{ opacity: 0, x: -20 }}
+                      initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: i * 0.04 }}
-                      className={`flex items-center gap-4 px-6 py-4 hover:bg-white/5 transition-colors ${i === 0 ? 'bg-amber-500/5' : ''}`}
+                      className={`flex items-center gap-4 px-6 py-4 hover:bg-stone-50 transition-colors ${i === 0 ? 'bg-amber-50' : 'bg-white'}`}
                     >
                       {/* Rank badge */}
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm shrink-0 ${rs ? `bg-gradient-to-br ${rs.bg} ${rs.text} shadow-lg` : 'bg-white/10 text-slate-400'}`}>
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm shrink-0 border ${rs ? `bg-gradient-to-br border-white ${rs.bg} ${rs.text} ${rs.glow}` : 'bg-stone-100 border-stone-200 text-stone-500'}`}>
                         {rs ? rs.label : i + 1}
                       </div>
 
                       {/* Avatar */}
-                      <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${i === 0 ? 'from-amber-400 to-orange-500' : i === 1 ? 'from-slate-300 to-slate-500' : i === 2 ? 'from-orange-400 to-orange-600' : 'from-indigo-600 to-purple-700'} flex items-center justify-center font-black text-base shrink-0`}>
+                      <div className={`w-10 h-10 rounded-xl ${i === 0 ? 'bg-amber-200 text-amber-800' : i === 1 ? 'bg-stone-200 text-stone-700' : i === 2 ? 'bg-orange-200 text-orange-800' : 'bg-blue-100 text-blue-700'} flex items-center justify-center font-black text-base shrink-0 shadow-sm border border-white`}>
                         {std.name.charAt(0).toUpperCase()}
                       </div>
 
                       {/* Name + Status */}
                       <div className="flex-1 min-w-0">
-                        <p className={`font-black text-base truncate ${i === 0 ? 'text-amber-300 text-glow-amber' : 'text-white'}`}>{std.name}</p>
-                        <p className="text-xs text-slate-500 font-mono">ABSEN #{std.absen}</p>
+                        <p className={`font-black text-base truncate ${i === 0 ? 'text-amber-700' : 'text-stone-800'}`}>{std.name}</p>
+                        <p className="text-xs text-stone-500 font-bold uppercase">Absen #{std.absen}</p>
                       </div>
 
                       {/* Status badge */}
-                      <div className={`hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-black border ${std.is_complete ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-300' : 'bg-amber-500/15 border-amber-500/40 text-amber-300'}`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${std.is_complete ? 'bg-emerald-400' : 'bg-amber-400 animate-pulse'}`} />
-                        {std.is_complete ? 'LULUS' : 'BERMAIN'}
+                      <div className={`hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold border ${std.is_complete ? 'bg-emerald-100 border-emerald-200 text-emerald-700' : 'bg-amber-100 border-amber-200 text-amber-700'}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${std.is_complete ? 'bg-emerald-500' : 'bg-amber-500 animate-pulse'}`} />
+                        {std.is_complete ? 'LULUS' : 'BERMING'}
                       </div>
 
                       {/* Stars */}
                       <div className="text-center hidden sm:block w-16">
-                        <p className="text-amber-400 font-black text-sm text-glow-amber">★ {std.total_bintang}</p>
-                        <p className="text-[10px] text-slate-500 font-game">BINTANG</p>
+                        <p className="text-amber-500 font-black text-sm drop-shadow-sm">★ {std.total_bintang}</p>
+                        <p className="text-[10px] text-stone-400 font-bold uppercase tracking-wider">BINTANG</p>
                       </div>
 
                       {/* Points */}
                       <div className="text-right w-20">
-                        <p className={`font-black text-xl font-game ${i === 0 ? 'text-amber-300 text-glow-amber' : 'text-indigo-300'}`}>{std.total_poin}</p>
-                        <p className="text-[10px] text-slate-500 font-game uppercase">PTS</p>
+                        <p className={`font-black text-xl font-serif ${i === 0 ? 'text-amber-600' : 'text-stone-700'}`}>{std.total_poin}</p>
+                        <p className="text-[10px] text-stone-400 font-bold uppercase tracking-wider">POIN</p>
                       </div>
                     </motion.div>
                   );
@@ -123,11 +113,11 @@ export default function Leaderboard() {
           )}
         </div>
 
-        <div className="mt-8 flex justify-center">
-          <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.95 }}
+        <div className="mt-10 flex justify-center">
+          <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
             onClick={() => navigate('/dashboard')}
-            className="px-10 py-4 glass border border-white/20 text-white font-black rounded-2xl font-game tracking-wider hover:border-indigo-400/60 transition text-sm">
-            ← KEMBALI KE DUNIA
+            className="px-10 py-4 bg-white border border-stone-200 shadow-sm text-stone-600 font-bold rounded-2xl hover:border-amber-300 hover:text-amber-600 transition-colors text-sm uppercase tracking-wide">
+            ← Kembali Petualangan
           </motion.button>
         </div>
       </div>

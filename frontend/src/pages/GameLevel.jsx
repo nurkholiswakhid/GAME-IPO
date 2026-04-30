@@ -8,20 +8,13 @@ import { GameContext } from '../context/GameContext';
 //  CHARACTER DEFINITIONS & MOODS
 // ─────────────────────────────────────────────────────────────
 const CHARS = {
-  ARDI:         { img: '/char_ardi.png',       name: 'Ardi',          color: '#60a5fa', side: 'right', emoji: '👦🏻' },
-  BUDI:         { img: '/char_budi.png',        name: 'Pak Budi',     color: '#34d399', side: 'left',  emoji: '👨‍🏫' },
-  NARASI:       { img: null,                    name: 'SYSTEM',       color: '#94a3b8', side: 'center',emoji: '⚙️'  },
-  NPC:          { img: '/char_npc_female.png',  name: 'NPC',          color: '#10b981', side: 'left',  emoji: '🧑'  },
-  'PAK DARMO':  { img: '/char_npc_male.png',    name: 'Pak Darmo',    color: '#fb923c', side: 'left',  emoji: '🧓'  },
-  REZA:         { img: '/char_npc_male.png',    name: 'Reza',         color: '#2dd4bf', side: 'right', emoji: '👨‍🎓' },
-  'SARI':       { img: '/char_npc_female.png',  name: 'Mbak Sari',    color: '#fbbf24', side: 'left',  emoji: '👩‍🎨' },
-  'WIRA':       { img: '/char_npc_male.png',    name: 'Wira',         color: '#4ade80', side: 'left',  emoji: '👷'  },
-  'DITO':       { img: '/char_npc_male.png',    name: 'Dito',         color: '#22d3ee', side: 'left',  emoji: '🧑‍🔧' },
-  'BU AINI':    { img: '/char_npc_female.png',  name: 'Bu Aini',      color: '#f472b6', side: 'left',  emoji: '👩‍🏫' },
-  'DR. FANDI':  { img: '/char_npc_male.png',    name: 'Dr. Fandi',    color: '#a78bfa', side: 'left',  emoji: '🔬'  },
-  'PUSTAKAWAN': { img: '/char_npc_female.png',  name: 'Pustakawan',   color: '#94a3b8', side: 'left',  emoji: '📚'  },
-  'SISWA RINA': { img: '/char_npc_female.png',  name: 'Siswa Rina',   color: '#fb7185', side: 'left',  emoji: '🙋'  },
-  'JURNALIS':   { img: '/char_npc_female.png',  name: 'Jurnalis',     color: '#fbbf24', side: 'left',  emoji: '📝'  },
+  NARASI:       { img: null,              name: 'SYSTEM', color: '#94a3b8', side: 'center', emoji: '⚙️' },
+  ARKA:         { img: '/char_arka.png',  name: 'Arka',   color: '#3b82f6', side: 'left',   emoji: '🧑‍🔧' },
+  NEXA:         { img: '/char_nexa.png',  name: 'Nexa',   color: '#8b5cf6', side: 'right',  emoji: '👩‍💻' },
+  DIRA:         { img: '/char_dira.png',  name: 'Dira',   color: '#10b981', side: 'left',   emoji: '👩‍🎨' },
+  RIVO:         { img: '/char_rivo.png',  name: 'Rivo',   color: '#f97316', side: 'right',  emoji: '👨‍✈️' },
+  ZENO:         { img: '/char_zeno.png',  name: 'Zeno',   color: '#06b6d4', side: 'left',   emoji: '🤖' },
+  NPC:          { img: null,              name: 'NPC',    color: '#94a3b8', side: 'left',   emoji: '🧑'  },
 };
 
 const MOOD = {
@@ -37,64 +30,64 @@ const MOOD = {
 
 const SCENES = {
   lab_komputer: {
-    bg: 'linear-gradient(160deg, #020c1b 0%, #010810 60%, #001524 100%)',
-    glow: '#3b82f6', label: 'Lab Komputer', icon: '🖥️',
-    accent: 'from-blue-900/40 to-blue-950/20',
-    grid: 'rgba(59,130,246,0.08)',
+    bg: 'transparent',
+    glow: '#87ceeb', label: 'Pusat Input Data', icon: '⌨️',
+    accent: 'from-blue-100/40 to-blue-50/20',
+    grid: 'rgba(135,206,235,0.1)',
   },
   server_room: {
-    bg: 'linear-gradient(160deg, #0f0518 0%, #08010e 60%, #130422 100%)',
-    glow: '#8b5cf6', label: 'Server Room', icon: '⚙️',
-    accent: 'from-purple-900/40 to-purple-950/20',
-    grid: 'rgba(139,92,246,0.08)',
+    bg: 'transparent',
+    glow: '#98fb98', label: 'Jalur Distribusi', icon: '🚦',
+    accent: 'from-green-100/40 to-green-50/20',
+    grid: 'rgba(152,251,152,0.1)',
   },
   studio_it: {
-    bg: 'linear-gradient(160deg, #170c02 0%, #0d0a01 60%, #1f1000 100%)',
-    glow: '#f59e0b', label: 'Studio IT', icon: '💼',
-    accent: 'from-amber-900/30 to-amber-950/15',
-    grid: 'rgba(245,158,11,0.06)',
+    bg: 'transparent',
+    glow: '#ffb6c1', label: 'Pusat Proses (CPU)', icon: '🧠',
+    accent: 'from-pink-100/40 to-pink-50/20',
+    grid: 'rgba(255,182,193,0.1)',
   },
   rumah_user: {
-    bg: 'linear-gradient(160deg, #170505 0%, #100202 60%, #1d0404 100%)',
-    glow: '#ef4444', label: 'Rumah User', icon: '🏠',
-    accent: 'from-red-900/30 to-red-950/15',
-    grid: 'rgba(239,68,68,0.06)',
+    bg: 'transparent',
+    glow: '#ffa07a', label: 'Terminal Output', icon: '🖥️',
+    accent: 'from-orange-100/40 to-orange-50/20',
+    grid: 'rgba(255,160,122,0.1)',
   },
   data_center: {
-    bg: 'linear-gradient(160deg, #021008 0%, #010c05 60%, #001205 100%)',
-    glow: '#10b981', label: 'Data Center', icon: '🏭',
-    accent: 'from-emerald-900/30 to-emerald-950/15',
-    grid: 'rgba(16,185,129,0.07)',
+    bg: 'transparent',
+    glow: '#ffd700', label: 'Pabrik Perangkat', icon: '🏭',
+    accent: 'from-amber-100/40 to-amber-50/20',
+    grid: 'rgba(255,215,0,0.1)',
   },
   lab_storage: {
-    bg: 'linear-gradient(160deg, #021217 0%, #010e12 60%, #001520 100%)',
-    glow: '#06b6d4', label: 'Lab Storage', icon: '🗄️',
-    accent: 'from-cyan-900/30 to-cyan-950/15',
-    grid: 'rgba(6,182,212,0.07)',
+    bg: 'transparent',
+    glow: '#a7f3d0', label: 'Gudang Storage', icon: '🗄️',
+    accent: 'from-emerald-100/40 to-emerald-50/20',
+    grid: 'rgba(167,243,208,0.1)',
   },
   kelas_smk: {
-    bg: 'linear-gradient(160deg, #15051a 0%, #0f0212 60%, #1a0420 100%)',
-    glow: '#d946ef', label: 'Kelas SMK', icon: '🎓',
-    accent: 'from-fuchsia-900/30 to-fuchsia-950/15',
-    grid: 'rgba(217,70,239,0.07)',
+    bg: 'transparent',
+    glow: '#e9d5ff', label: 'Akademi Sistem', icon: '🏫',
+    accent: 'from-purple-100/40 to-purple-50/20',
+    grid: 'rgba(233,213,255,0.1)',
   },
   lab_riset: {
-    bg: 'linear-gradient(160deg, #020b1f 0%, #010815 60%, #020e2a 100%)',
-    glow: '#60a5fa', label: 'Lab Riset', icon: '🔬',
-    accent: 'from-blue-900/30 to-blue-950/15',
-    grid: 'rgba(96,165,250,0.07)',
+    bg: 'transparent',
+    glow: '#c7d2fe', label: 'Lab Inovasi IT', icon: '🔬',
+    accent: 'from-indigo-100/40 to-indigo-50/20',
+    grid: 'rgba(199,210,254,0.1)',
   },
   perpustakaan: {
-    bg: 'linear-gradient(160deg, #09090b 0%, #06060a 60%, #0b0b10 100%)',
-    glow: '#94a3b8', label: 'Perpustakaan', icon: '📚',
-    accent: 'from-slate-800/30 to-slate-950/15',
-    grid: 'rgba(148,163,184,0.05)',
+    bg: 'transparent',
+    glow: '#cbd5e1', label: 'Jaringan Kota', icon: '🌐',
+    accent: 'from-slate-100/40 to-slate-50/20',
+    grid: 'rgba(203,213,225,0.1)',
   },
   final_boss: {
-    bg: 'linear-gradient(160deg, #1a0400 0%, #120200 60%, #200500 100%)',
-    glow: '#f97316', label: 'Final Boss', icon: '⚔️',
-    accent: 'from-orange-900/40 to-orange-950/20',
-    grid: 'rgba(249,115,22,0.08)',
+    bg: 'transparent',
+    glow: '#fef08a', label: 'Ujian Arsitektur', icon: '👑',
+    accent: 'from-yellow-100/40 to-yellow-50/20',
+    grid: 'rgba(254,240,138,0.1)',
   },
 };
 
@@ -126,9 +119,9 @@ function CharacterSprite({ charKey, isActive, side, mood }) {
   if (!def || !def.img) return null;
   const moodDef = MOOD[mood] || MOOD.normal;
 
-  // Combined filter: mood-based color shift + active/inactive brightness + glow
-  const activeFilter = `brightness(1.05) ${moodDef.filter} drop-shadow(0 0 28px ${def.color}80) drop-shadow(0 0 8px ${def.color}40)`;
-  const inactiveFilter = 'brightness(0.25) saturate(0.15) blur(1.5px)';
+  // Combined filter: mood-based brightness adjustments + soft drop-shadow
+  const activeFilter = `brightness(1.05) ${moodDef.filter} drop-shadow(0 10px 15px rgba(0,0,0,0.2))`;
+  const inactiveFilter = 'brightness(0.7) saturate(0.8) blur(1px)';
 
   return (
     <motion.div
@@ -136,47 +129,40 @@ function CharacterSprite({ charKey, isActive, side, mood }) {
       initial={{ x: side === 'left' ? -150 : 150, opacity: 0, scale: 0.9 }}
       animate={{
         x: 0,
-        opacity: isActive ? 1 : 0.55,
-        scale: isActive ? 1.04 : 0.96,
-        y: isActive ? [0, -6, 0] : 0,
+        opacity: isActive ? 1 : 0.8,
+        scale: isActive ? 1.02 : 0.96,
+        y: isActive ? [0, -4, 0] : 0,
       }}
       exit={{ x: side === 'left' ? -150 : 150, opacity: 0, scale: 0.9 }}
       transition={{
-        x: { type: 'spring', stiffness: 200, damping: 22 },
-        opacity: { duration: 0.35 },
-        scale: { duration: 0.35 },
-        y: isActive ? { duration: 0.5, ease: 'easeInOut', repeat: 0 } : { duration: 0 },
+        x: { type: 'spring', stiffness: 150, damping: 20 },
+        opacity: { duration: 0.4 },
+        scale: { duration: 0.4 },
+        y: isActive ? { duration: 2, ease: 'easeInOut', repeat: Infinity } : { duration: 0 },
       }}
-      className="absolute bottom-0 flex items-end"
+      className="absolute bottom-0 flex items-end drop-shadow-xl"
       style={{
-        [side]: side === 'left' ? '3%' : '3%',
-        height: '82%',
+        [side]: side === 'left' ? '5%' : '5%',
+        height: '85%',
         filter: isActive ? activeFilter : inactiveFilter,
-        transition: 'filter 0.45s ease, opacity 0.35s ease',
+        transition: 'filter 0.5s ease',
         zIndex: isActive ? 40 : 10,
         transformOrigin: 'bottom center',
       }}
     >
-      {/* Mood emoji floating at shoulder/chest area */}
+      {/* Mood emoji floating at shoulder area */}
       {isActive && moodDef.emoji && (
         <motion.div
           initial={{ y: 0, opacity: 0, scale: 0 }}
-          animate={{ y: [0, -8, 0], opacity: 1, scale: 1 }}
+          animate={{ y: [0, -5, 0], opacity: 1, scale: 1 }}
           exit={{ y: 0, opacity: 0, scale: 0 }}
-          transition={{ y: { duration: 1.5, repeat: Infinity, ease: 'easeInOut' }, opacity: { duration: 0.3 }, scale: { duration: 0.3 } }}
-          className="absolute top-1/3 left-1/2 -translate-x-1/2 text-5xl z-50 drop-shadow-lg pointer-events-none"
+          transition={{ y: { duration: 2, repeat: Infinity, ease: 'easeInOut' }, opacity: { duration: 0.3 }, scale: { duration: 0.3 } }}
+          className="absolute top-[25%] left-1/2 -translate-x-1/2 text-4xl z-50 drop-shadow-sm pointer-events-none"
         >
           {moodDef.emoji}
         </motion.div>
       )}
 
-      {/* Glow pedestal under active character */}
-      {isActive && (
-        <div
-          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-48 h-8 rounded-full blur-2xl opacity-60 pointer-events-none"
-          style={{ background: def.color }}
-        />
-      )}
       <img
         src={def.img}
         alt={def.name}
@@ -186,6 +172,7 @@ function CharacterSprite({ charKey, isActive, side, mood }) {
           maxWidth: '320px',
           objectFit: 'contain',
           objectPosition: 'bottom',
+          mixBlendMode: 'multiply',
           transform: side === 'right' ? 'scaleX(-1)' : 'none',
         }}
         onError={(e) => { e.target.style.display = 'none'; }}
@@ -217,50 +204,39 @@ function DialogBox({ dialog, onNext, isLast, sceneGlow }) {
         animate={{ y: 0, opacity: 1, scale: 1 }}
         exit={{ y: -10, opacity: 0, scale: 0.98 }}
         transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-        className="relative overflow-hidden rounded-2xl backdrop-blur-2xl shadow-2xl border"
+        className="relative overflow-hidden rounded-3xl shadow-xl border bg-white/90 backdrop-blur-md"
         style={{
-          background: isNarrator
-            ? 'linear-gradient(135deg, rgba(2,6,23,0.96) 0%, rgba(10,12,30,0.92) 100%)'
-            : `linear-gradient(135deg, rgba(2,6,23,0.97) 0%, ${def.color}18 70%, ${def.color}08 100%)`,
-          borderColor: isNarrator ? 'rgba(148,163,184,0.15)' : `${def.color}60`,
-          boxShadow: isNarrator
-            ? '0 20px 60px -15px rgba(0,0,0,0.7)'
-            : `0 20px 60px -15px ${def.color}25, 0 0 0 1px ${def.color}15 inset`,
+          borderColor: isNarrator ? 'rgba(148,163,184,0.4)' : `${def.color}80`,
+          boxShadow: `0 15px 40px -10px rgba(0,0,0,0.1)`,
         }}
       >
         {/* Top accent bar - color of character */}
         <div
-          className="absolute top-0 left-0 right-0 h-[2px]"
-          style={{ background: isNarrator ? 'rgba(148,163,184,0.3)' : `linear-gradient(90deg, transparent, ${def.color}, transparent)` }}
+          className="absolute top-0 left-0 right-0 h-1.5"
+          style={{ background: isNarrator ? '#cbd5e1' : def.color }}
         />
-        {/* Corner decorations */}
-        <div className="absolute top-2 left-2 w-6 h-6 border-t border-l opacity-40 rounded-tl-lg" style={{ borderColor: isNarrator ? '#94a3b8' : def.color }} />
-        <div className="absolute bottom-2 right-2 w-6 h-6 border-b border-r opacity-40 rounded-br-lg" style={{ borderColor: isNarrator ? '#94a3b8' : def.color }} />
 
         {isNarrator ? (
-          <div className="px-8 py-5 text-center">
-            <p className="text-slate-300 italic text-sm md:text-base leading-relaxed font-mono">
-              <span className="text-slate-500/80 mr-2 font-bold text-xs tracking-widest not-italic">[SYSTEM]</span>
+          <div className="px-8 py-6 text-center">
+            <p className="text-slate-700 italic text-base md:text-lg leading-relaxed font-serif">
+              <span className="text-slate-500 font-bold text-xs tracking-widest not-italic block mb-2">[SYSTEM]</span>
               {typedText}
-              {!done && <span className="inline-block w-1.5 h-4 bg-slate-400/80 ml-1 align-middle animate-pulse rounded-sm" />}
+              {!done && <span className="inline-block w-1.5 h-4 bg-slate-400 ml-1 align-middle animate-pulse rounded-full" />}
             </p>
-            {done && <p className="text-white/15 text-[9px] uppercase font-bold tracking-[0.4em] mt-3 animate-pulse">▼ klik untuk lanjut</p>}
+            {done && <p className="text-slate-400 text-[10px] uppercase font-bold tracking-[0.2em] mt-4 animate-pulse">▼ klik untuk lanjut</p>}
           </div>
         ) : (
           <div>
             {/* Name plate */}
             <div
-              className="flex items-center gap-3 px-5 pt-4 pb-2.5 border-b"
-              style={{ borderColor: `${def.color}20` }}
+              className="flex items-center gap-4 px-6 pt-5 pb-3 border-b"
+              style={{ borderColor: `${def.color}30` }}
             >
               {/* Avatar badge */}
               <motion.div
-                animate={{ boxShadow: [`0 0 8px ${def.color}50`, `0 0 20px ${def.color}80`, `0 0 8px ${def.color}50`] }}
-                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-                className="w-11 h-11 rounded-xl flex items-center justify-center text-2xl shrink-0 shadow-lg"
+                className="w-14 h-14 rounded-full flex items-center justify-center text-3xl shrink-0 shadow-sm border-2 bg-white"
                 style={{
-                  background: `linear-gradient(135deg, ${def.color}30, ${def.color}10)`,
-                  border: `1px solid ${def.color}70`,
+                  borderColor: def.color,
                 }}
               >
                 {def.emoji}
@@ -269,7 +245,7 @@ function DialogBox({ dialog, onNext, isLast, sceneGlow }) {
                 <span className="block text-[10px] font-mono font-bold tracking-[0.25em] uppercase opacity-60 mb-0.5" style={{ color: def.color }}>
                   {speakerKey} · {moodDef.label}
                 </span>
-                <span className="font-black text-base md:text-lg font-sans tracking-wide text-white truncate block">
+                <span className="font-black text-base md:text-lg font-sans tracking-wide text-stone-800 truncate block">
                   {def.name || speakerKey}
                 </span>
               </div>
@@ -277,17 +253,17 @@ function DialogBox({ dialog, onNext, isLast, sceneGlow }) {
 
             {/* Text area */}
             <div className="px-6 pb-5 pt-4 min-h-[100px] flex flex-col justify-between">
-              <p className="text-white/92 text-sm md:text-[1.05rem] leading-relaxed font-medium">
+              <p className="text-stone-700 text-sm md:text-[1.05rem] leading-relaxed font-medium">
                 {typedText}
-                {!done && <span className="inline-block w-2 h-[1.1em] bg-white/60 ml-1 align-middle animate-pulse rounded-sm" />}
+                {!done && <span className="inline-block w-2 h-[1.1em] bg-stone-500/60 ml-1 align-middle animate-pulse rounded-sm" />}
               </p>
               {done && (
                 <div className="flex items-center justify-between mt-3">
-                  <div className="h-px flex-1 bg-gradient-to-r from-transparent" style={{ backgroundImage: `linear-gradient(90deg, transparent, ${def.color}30)` }} />
+                  <div className="h-px flex-1 bg-gradient-to-r from-transparent" style={{ backgroundImage: `linear-gradient(90deg, transparent, ${def.color}20)` }} />
                   <motion.div
-                    animate={{ opacity: [0.5, 1, 0.5] }}
-                    transition={{ duration: 1.2, repeat: Infinity }}
-                    className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.3em] ml-3"
+                    animate={{ opacity: [0.6, 1, 0.6] }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                    className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.2em] ml-3"
                     style={{ color: def.color }}
                   >
                     {isLast ? <><span>MULAI MISI</span><span>▶</span></> : <><span>lanjut</span><span>▼</span></>}
@@ -338,12 +314,11 @@ function MultipleChoice({ options, onAnswer }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       {options.map((opt, i) => (
-        <motion.button key={i} whileHover={{ scale: 1.02, backgroundColor: 'rgba(255,255,255,0.1)' }} whileTap={{ scale: 0.98 }}
+        <motion.button key={i} whileHover={{ scale: 1.02, backgroundColor: 'rgba(16, 185, 129, 0.05)' }} whileTap={{ scale: 0.98 }}
           onClick={() => onAnswer(opt)}
-          className="relative overflow-hidden p-5 bg-black/40 border border-white/10 hover:border-cyan-400/60 rounded-xl text-left text-white text-sm md:text-base leading-relaxed transition-all shadow-lg group">
-          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 via-cyan-500/0 to-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+          className="relative overflow-hidden p-5 bg-white border border-stone-200 hover:border-emerald-400/60 hover:shadow-md rounded-xl text-left text-stone-700 font-medium text-sm md:text-base leading-relaxed transition-all shadow-sm group">
           <div className="relative z-10 flex items-start">
-            <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-white/10 text-xs font-mono font-bold text-cyan-300 mr-3 shrink-0 shadow-inner">
+            <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-emerald-100 text-xs font-bold text-emerald-700 mr-3 shrink-0">
               {String.fromCharCode(65+i)}
             </span>
             <span className="mt-0.5">{opt}</span>
@@ -360,15 +335,14 @@ function TrueFalse({ onAnswer }) {
       {['BENAR','SALAH'].map(opt => (
         <motion.button key={opt} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.95 }}
           onClick={() => onAnswer(opt)}
-          className={`relative overflow-hidden flex-1 py-8 text-2xl font-black rounded-2xl border-2 transition-all shadow-xl group ${
+          className={`relative overflow-hidden flex-1 py-8 text-2xl font-black rounded-2xl border-2 transition-all shadow-md group ${
             opt==='BENAR'
-              ? 'bg-emerald-950/60 border-emerald-500/50 text-emerald-300 hover:border-emerald-400 hover:shadow-[0_0_30px_rgba(16,185,129,0.3)]'
-              : 'bg-rose-950/60 border-rose-500/50 text-rose-300 hover:border-rose-400 hover:shadow-[0_0_30px_rgba(244,63,94,0.3)]'
+              ? 'bg-emerald-50 border-emerald-300 text-emerald-700 hover:border-emerald-500 hover:bg-emerald-100'
+              : 'bg-rose-50 border-rose-300 text-rose-700 hover:border-rose-500 hover:bg-rose-100'
           }`}>
-          <div className={`absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity ${opt==='BENAR'?'bg-emerald-500':'bg-rose-500'}`} />
           <span className="relative z-10 flex items-center justify-center gap-3">
             <span className="text-3xl">{opt === 'BENAR' ? '✓' : '✕'}</span>
-            {opt === 'BENAR' ? 'TRUE' : 'FALSE'}
+            {opt === 'BENAR' ? 'BENAR' : 'SALAH'}
           </span>
         </motion.button>
       ))}
@@ -381,41 +355,41 @@ function Sequence({ options, userAnswer, setUserAnswer }) {
   const rem = (i) => setUserAnswer(p=>p.filter((_,idx)=>idx!==i));
   return (
     <div className="space-y-6">
-      <div className="space-y-3 min-h-[6rem] p-4 rounded-xl border border-dashed border-white/20 bg-black/20">
-        <p className="text-xs font-mono text-cyan-400/80 uppercase tracking-widest mb-2">» Sequence Array [Execution Order]</p>
+      <div className="space-y-3 min-h-[6rem] p-4 rounded-xl border border-dashed border-stone-300 bg-white shadow-inner">
+        <p className="text-xs font-bold text-stone-500 uppercase tracking-widest mb-2">» Urutan Solusi [Execution Order]</p>
         
         {userAnswer.length===0 && (
-          <div className="flex flex-col items-center justify-center py-6 opacity-30">
+          <div className="flex flex-col items-center justify-center py-6 opacity-40 text-stone-600">
             <span className="text-3xl mb-2">⬇️</span>
-            <p className="text-sm font-mono">AWAITING_SEQUENCE_INPUT</p>
+            <p className="text-sm font-medium">AREA KOSONG</p>
           </div>
         )}
 
         {userAnswer.map((item,i)=>(
           <motion.div key={`${i}`} initial={{x:-20,opacity:0}} animate={{x:0,opacity:1}}
-            className="group flex items-center gap-4 bg-gradient-to-r from-blue-900/40 to-indigo-900/40 border border-blue-500/30 px-5 py-3 rounded-xl shadow-md">
-            <div className="w-8 h-8 bg-blue-500/20 border border-blue-400/50 rounded-lg flex items-center justify-center text-sm font-mono font-bold text-blue-200 shrink-0 shadow-inner">
-              {i}=
+            className="group flex items-center gap-4 bg-amber-50 border border-amber-200 px-5 py-3 rounded-xl shadow-sm">
+            <div className="w-8 h-8 bg-white border border-amber-300 rounded-lg flex items-center justify-center text-sm font-bold text-amber-700 shrink-0 shadow-sm">
+              {i + 1}
             </div>
-            <span className="flex-1 text-sm md:text-base text-blue-50 font-medium">{item}</span>
-            <button onClick={()=>rem(i)} className="opacity-0 group-hover:opacity-100 w-8 h-8 rounded-full hover:bg-rose-500/20 text-rose-300 hover:text-rose-200 transition-all flex items-center justify-center">✕</button>
+            <span className="flex-1 text-sm md:text-base text-stone-800 font-medium">{item}</span>
+            <button onClick={()=>rem(i)} className="opacity-0 group-hover:opacity-100 w-8 h-8 rounded-full hover:bg-rose-100 text-rose-500 hover:text-rose-600 transition-all flex items-center justify-center">✕</button>
           </motion.div>
         ))}
       </div>
       
       <div>
-        <p className="text-xs font-mono text-white/40 uppercase tracking-widest mb-3">» Available Instructions</p>
+        <p className="text-xs font-bold text-stone-400 uppercase tracking-widest mb-3">» Pilihan Instruksi</p>
         <div className="grid gap-2">
           {options.map((opt,i)=>{
             const used=userAnswer.includes(opt);
             return <motion.button key={i} whileHover={!used?{scale:1.01}:{}} onClick={()=>!used&&add(opt)} disabled={used}
               className={`px-4 py-3 rounded-xl text-sm md:text-base font-medium border text-left flex items-center justify-between transition-all ${
                 used
-                  ? 'bg-transparent border-white/5 text-white/20 cursor-not-allowed'
-                  :'bg-white/5 border-white/20 text-white/90 hover:bg-white/10 hover:border-white/40 shadow-sm'
+                  ? 'bg-stone-50 border-stone-200 text-stone-400 cursor-not-allowed'
+                  :'bg-white border-stone-200 text-stone-700 hover:bg-emerald-50 hover:border-emerald-300 shadow-sm'
               }`}>
                 <span>{opt}</span>
-                {!used && <span className="text-white/30 text-xs">CLICK_TO_ADD</span>}
+                {!used && <span className="text-emerald-500/50 text-xs">PILIH</span>}
               </motion.button>
           })}
         </div>
@@ -438,28 +412,28 @@ function Classification({ categories, options, userAnswer, setUserAnswer }) {
     <div className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {categories.map((cat, idx)=>(
-          <div key={cat} className="relative bg-black/40 border border-white/15 rounded-2xl p-4 overflow-hidden shadow-lg min-h-[140px]">
+          <div key={cat} className="relative bg-white border border-stone-200 rounded-2xl p-4 overflow-hidden shadow-sm min-h-[140px]">
             {/* Header Accent */}
-            <div className={`absolute top-0 left-0 w-full h-1 ${idx%2===0 ? 'bg-indigo-500' : 'bg-teal-500'}`} />
+            <div className={`absolute top-0 left-0 w-full h-1.5 ${idx%2===0 ? 'bg-amber-400' : 'bg-emerald-400'}`} />
             
-            <p className="text-xs font-mono font-bold text-white/60 uppercase tracking-widest mb-4 flex items-center gap-2">
-              <span className={`w-2 h-2 rounded-full ${idx%2===0 ? 'bg-indigo-500' : 'bg-teal-500'} animate-pulse`} />
+            <p className="text-xs font-bold text-stone-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+              <span className={`w-2 h-2 rounded-full ${idx%2===0 ? 'bg-amber-400' : 'bg-emerald-400'} animate-pulse`} />
               {cat}
             </p>
             
             <div className="flex flex-wrap gap-2">
               {(userAnswer[cat]||[]).map((item,j)=>(
                 <motion.div initial={{scale:0.8,opacity:0}} animate={{scale:1,opacity:1}} key={j} 
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-white border shadow-sm ${
-                    idx%2===0 ? 'bg-indigo-900/40 border-indigo-400/50' : 'bg-teal-900/40 border-teal-400/50'
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-stone-800 border shadow-sm ${
+                    idx%2===0 ? 'bg-amber-50 border-amber-200' : 'bg-emerald-50 border-emerald-200'
                   }`}>
                   {item}
-                  <button onClick={()=>remove(cat,item)} className="ml-1 w-5 h-5 rounded-full hover:bg-white/20 flex items-center justify-center transition-colors">✕</button>
+                  <button onClick={()=>remove(cat,item)} className="ml-1 w-5 h-5 rounded-full hover:bg-black/5 flex items-center justify-center transition-colors">✕</button>
                 </motion.div>
               ))}
               {!(userAnswer[cat]||[]).length && (
-                <div className="w-full py-4 text-center border border-dashed border-white/10 rounded-xl bg-white/5 text-white/20 font-mono text-xs">
-                  [EMPTY_DIRECTORY]
+                <div className="w-full py-4 text-center border border-dashed border-stone-300 rounded-xl bg-stone-50 text-stone-400 font-medium text-xs">
+                  KOSONG
                 </div>
               )}
             </div>
@@ -468,22 +442,22 @@ function Classification({ categories, options, userAnswer, setUserAnswer }) {
       </div>
       
       {unused.length>0&&(
-        <div className="pt-4 border-t border-white/10">
-          <p className="text-xs font-mono text-white/40 uppercase tracking-widest mb-4">» Unassigned Items</p>
+        <div className="pt-4 border-t border-stone-200">
+          <p className="text-xs font-bold text-stone-400 uppercase tracking-widest mb-4">» Objek Belum Diklasifikasikan</p>
           <div className="space-y-3">
             {unused.map((opt,i)=>(
-              <div key={i} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-colors">
-                <p className="text-sm font-medium text-white/90">"{opt}"</p>
+              <div key={i} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 bg-white border border-stone-200 rounded-xl hover:bg-stone-50 transition-colors shadow-sm">
+                <p className="text-sm font-medium text-stone-800">"{opt}"</p>
                 <div className="flex flex-wrap gap-2 shrink-0">
                   {categories.map((cat, idx)=>(
                     <motion.button key={cat} whileHover={{scale:1.05}} whileTap={{scale:0.95}}
                       onClick={()=>place(cat,opt)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all shadow-sm border ${
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm border ${
                         idx%2===0 
-                          ? 'bg-indigo-600/20 text-indigo-300 border-indigo-500/40 hover:bg-indigo-600/40' 
-                          : 'bg-teal-600/20 text-teal-300 border-teal-500/40 hover:bg-teal-600/40'
+                          ? 'bg-amber-100 text-amber-700 border-amber-300 hover:bg-amber-200' 
+                          : 'bg-emerald-100 text-emerald-700 border-emerald-300 hover:bg-emerald-200'
                       }`}>
-                      ASSIGN ➔ {idx===0 ? 'A' : 'B'}
+                      Pilih ➔ {idx===0 ? 'A' : 'B'}
                     </motion.button>
                   ))}
                 </div>
@@ -492,7 +466,7 @@ function Classification({ categories, options, userAnswer, setUserAnswer }) {
           </div>
         </div>
       )}
-      {unused.length===0&&<p className="text-emerald-400 text-sm font-mono text-center animate-pulse bg-emerald-900/20 py-3 rounded-xl border border-emerald-500/30">✓ SYSTEM_CHECK_PASSED: All objects assigned. Ready for verification.</p>}
+      {unused.length===0&&<p className="text-emerald-700 text-sm font-bold text-center bg-emerald-100 py-3 rounded-xl border border-emerald-300">✓ Semua objek terklasifikasi. Siap diselesaikan.</p>}
     </div>
   );
 }
@@ -504,45 +478,45 @@ function Matching({ leftItems, rightItems, userAnswer, setUserAnswer }) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-2">
-        <p className="text-xs font-mono text-cyan-400/80 uppercase tracking-widest">» Configure Links</p>
-        <span className="text-xs font-mono bg-black/50 px-3 py-1 rounded-full border border-white/10">
-          {Object.keys(userAnswer).length}/{leftItems.length} CONNECTED
+        <p className="text-xs font-bold text-stone-500 uppercase tracking-widest">» Hubungkan Konsep</p>
+        <span className="text-xs font-bold bg-white text-stone-600 px-3 py-1 rounded-full border border-stone-200 shadow-sm">
+          {Object.keys(userAnswer).length}/{leftItems.length} TERHUBUNG
         </span>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-3">
-          <p className="text-[10px] font-black font-mono text-white/40 uppercase mb-2 border-b border-white/10 pb-2">NODE A [SELECT]</p>
+          <p className="text-[10px] font-black font-sans text-stone-400 uppercase mb-2 border-b border-stone-200 pb-2">KOLOM A [PILIH]</p>
           {leftItems.map((item,i)=>{
             const isPaired=userAnswer[item]; const isSel=sel===item;
             return <motion.button key={i} whileHover={{scale:1.02}} onClick={()=>isSel?setSel(null):isPaired?clear(item):setSel(item)}
               className={`w-full p-4 rounded-xl text-sm md:text-base text-left font-medium border transition-all leading-snug shadow-sm relative overflow-hidden ${
                 isSel
-                  ?'bg-amber-500/20 border-amber-400 text-amber-100 shadow-[0_0_15px_rgba(251,191,36,0.3)]'
+                  ?'bg-amber-100 border-amber-300 text-amber-800'
                   :isPaired
-                    ?'bg-emerald-900/40 border-emerald-500/60 text-emerald-100'
-                    :'bg-white/5 border-white/20 text-white/80 hover:bg-white/10'
+                    ?'bg-emerald-50 border-emerald-300 text-emerald-800'
+                    :'bg-white border-stone-200 text-stone-700 hover:bg-stone-50'
               }`}>
-              {isPaired && <div className="text-[10px] font-mono text-emerald-400 mb-1 flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> LINKED</div>}
-              {isSel && <div className="text-[10px] font-mono text-amber-400 mb-1 flex items-center gap-1 animate-pulse"><span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span> AWAITING TARGET</div>}
+              {isPaired && <div className="text-[10px] font-bold text-emerald-600 mb-1 flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> TERHUBUNG</div>}
+              {isSel && <div className="text-[10px] font-bold text-amber-600 mb-1 flex items-center gap-1 animate-pulse"><span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span> PILIH TARGET DI KOLOM B</div>}
               {item}
             </motion.button>;
           })}
         </div>
         
         <div className="space-y-3">
-          <p className="text-[10px] font-black font-mono text-white/40 uppercase mb-2 border-b border-white/10 pb-2">NODE B [TARGET]</p>
+          <p className="text-[10px] font-black font-sans text-stone-400 uppercase mb-2 border-b border-stone-200 pb-2">KOLOM B [TARGET]</p>
           {rightItems.map((item,i)=>{
             const usedBy=Object.entries(userAnswer).find(([_,v])=>v===item)?.[0];
             return <motion.button key={i} whileHover={sel && !usedBy ? {scale:1.02} : {}} onClick={()=>usedBy?clear(usedBy):pick(item)}
               className={`w-full p-4 rounded-xl text-sm md:text-base text-left font-medium border transition-all leading-snug shadow-sm ${
                 usedBy
-                  ?'bg-emerald-900/40 border-emerald-500/60 text-emerald-300'
+                  ?'bg-emerald-50 border-emerald-300 text-emerald-800'
                   :sel
-                    ?'bg-cyan-900/40 border-cyan-400/60 text-white hover:bg-cyan-800/60 hover:shadow-[0_0_15px_rgba(34,211,238,0.3)] cursor-pointer ring-1 ring-cyan-400/50'
-                    :'bg-black/30 border-white/10 text-white/40 cursor-default'
+                    ?'bg-blue-50 border-blue-300 text-blue-800 hover:bg-blue-100 cursor-pointer pointer-events-auto'
+                    :'bg-stone-100 border-stone-200 text-stone-500 cursor-default pointer-events-none'
               }`}>
-              {usedBy && <div className="text-[10px] font-mono text-emerald-400 mb-1 flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> LINKED TO NODE A</div>}
+              {usedBy && <div className="text-[10px] font-bold text-emerald-600 mb-1 flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> TERHUBUNG KE KOLOM A</div>}
               {item}
             </motion.button>;
           })}
@@ -566,16 +540,18 @@ export default function GameLevel() {
   const [loadingQ, setLoadingQ]     = useState(true);
   const [dataReady, setDataReady]   = useState(false);
 
-  // 'INTRO' | 'PRE_GAME_ANIM' | 'GAME' | 'OUTRO' | 'COMPLETE'
+  // 'INTRO' | 'CHAR_SELECT' | 'PRE_GAME_ANIM' | 'GAME' | 'OUTRO' | 'COMPLETE'
   const [phase, setPhase]           = useState('INTRO');
   const [dialogIdx, setDialogIdx]   = useState(0);
+  const [selectedSolver, setSelectedSolver] = useState(null);
 
   const [timeLeft, setTimeLeft]     = useState(300);
   const [lives, setLives]           = useState(3);
   const [submitted, setSubmitted]   = useState(false);
   const [feedback, setFeedback]     = useState(null);
-  const [winData, setWinData]       = useState(null); // { pts, bintang }
+  const [winData, setWinData]       = useState(null);
   const [totalLevels, setTotalLevels] = useState(null);
+  const [hintsUsed, setHintsUsed]   = useState(0);
   const gameOverRef                 = useRef(false);
 
   const [seqAns, setSeqAns]         = useState([]);
@@ -592,6 +568,7 @@ export default function GameLevel() {
     setDataReady(false);
     setPhase('INTRO');
     setDialogIdx(0);
+    setSelectedSolver(null);
     setTimeLeft(300);
     setLives(3);
     setSubmitted(false);
@@ -600,6 +577,7 @@ export default function GameLevel() {
     setSeqAns([]);
     setClassAns({});
     setMatchAns({});
+    setHintsUsed(0);
     setIsNavigating(false);
     gameOverRef.current = false;
     
@@ -644,16 +622,26 @@ export default function GameLevel() {
       });
   }, [lvl, student]);
 
+  // ── Adaptive Mechanics Setup ─────────────────────────────
+  useEffect(() => {
+    if (phase === 'GAME') {
+      if (selectedSolver === 'ARKA') { setTimeLeft(180); setLives(999); }
+      else if (selectedSolver === 'NEXA') { setTimeLeft(240); setLives(1); }
+      else if (selectedSolver === 'DIRA') { setTimeLeft(999); setLives(3); }
+      else { setTimeLeft(300); setLives(3); }
+    }
+  }, [phase, selectedSolver]);
+
   // ── Timer ─────────────────────────────────────────────────
   useEffect(() => {
     if (phase !== 'GAME' || submitted || gameOverRef.current) return;
-    if (lives <= 0 || timeLeft <= 0) {
+    if ((lives <= 0 && selectedSolver !== 'ARKA') || timeLeft <= 0) {
       if (!gameOverRef.current) { gameOverRef.current = true; doSubmit(false); }
       return;
     }
     const id = setTimeout(() => setTimeLeft(t => t - 1), 1000);
     return () => clearTimeout(id);
-  }, [timeLeft, lives, phase, submitted]);
+  }, [timeLeft, lives, phase, submitted, selectedSolver]);
 
   // ── Dialog data ───────────────────────────────────────────
   const introDialogs = storyData?.intro  || [];
@@ -675,18 +663,14 @@ export default function GameLevel() {
     if (def.side === 'right' && !rightKey) rightKey = sk;
   }
   // Ardi always on right if no right speaker found
-  if (!rightKey && phase !== 'GAME') rightKey = 'ARDI';
+  if (!rightKey && phase !== 'GAME') rightKey = 'ZENO';
 
   const handleDialogNext = useCallback(() => {
     if (dialogIdx + 1 < currentDialogs.length) {
       setDialogIdx(i => i + 1);
     } else if (phase === 'INTRO') {
-      // Transition animation before game
-      setPhase('PRE_GAME_ANIM');
-      setTimeout(() => {
-        setPhase('GAME');
-        setDialogIdx(0);
-      }, 1500);
+      setPhase('PRE_GAME_ANIM'); 
+      setTimeout(() => { setPhase('GAME'); setDialogIdx(0); }, 1500);
     } else if (phase === 'OUTRO') {
       // Outro selesai → tampilkan layar Level Complete
       setPhase('COMPLETE');
@@ -717,9 +701,7 @@ export default function GameLevel() {
     if (submitted) return;
     const ok = verifyAnswer(question.type, question.correct_config, ans);
     if (ok) {
-      setFeedback({ type: 'success', text: 'SYSTEM OVERRIDE SUCCESS!', explanation: question.explanation });
-      // Wait for user to click button in feedback overlay, don't auto-dismiss
-      // Set a timeout as fallback to go to complete after 10 seconds
+      setFeedback({ type: 'success', text: 'KERJA BAGUS!', explanation: question.explanation });
       setTimeout(() => { 
         if (feedback?.type === 'success' && !submitted) {
           setFeedback(null); 
@@ -727,11 +709,14 @@ export default function GameLevel() {
         }
       }, 10000);
     } else {
-      const nl = lives - 1;
-      setLives(nl);
-      setFeedback({ type: 'error', text: `ERROR: INCORRECT MATCH. HP REMAINING: ${nl}`, explanation: question.explanation });
+      let nl = lives;
+      if (selectedSolver !== 'ARKA') {
+        nl -= 1;
+        setLives(nl);
+      }
+      setFeedback({ type: 'error', text: `JAWABAN KURANG TEPAT. ${selectedSolver !== 'ARKA' ? `KESEMPATAN: ${nl}` : 'WAKTU TERUS BERJALAN!' }`, explanation: question.explanation });
       setSeqAns([]); setClassAns({}); setMatchAns({});
-      if (nl <= 0) setTimeout(() => { gameOverRef.current=true; setFeedback(null); doSubmit(false); }, 2800);
+      if (nl <= 0 && selectedSolver !== 'ARKA') setTimeout(() => { gameOverRef.current=true; setFeedback(null); doSubmit(false); }, 2800);
       else setTimeout(() => setFeedback(null), 3000);
     }
   };
@@ -739,12 +724,28 @@ export default function GameLevel() {
   const handleLevelComplete = async () => {
     if (submitted) return;
     setSubmitted(true);
-    const r = timeLeft / 300;
+    let baseTime = 300;
+    if (selectedSolver === 'ARKA') baseTime = 180;
+    if (selectedSolver === 'DIRA') baseTime = 999;
+    
+    // Default ratio scoring
+    let r = timeLeft / baseTime;
+    if (selectedSolver === 'DIRA') r = 0.5; // Dira scores standard/middle speed always
+    
     let pts = 0, st = 0;
     if (r > 0.75) { pts = 100; st = 3; } 
-    else if (r > 0.5) { pts = 80; st = 3; } 
-    else if (r > 0.25) { pts = 60; st = 2; } 
+    else if (r > 0.4) { pts = 80; st = 3; } 
+    else if (r > 0.15) { pts = 60; st = 2; } 
     else { pts = 40; st = 1; }
+
+    // ✅ BALANCED Character Impacts - All equal at ~1.3x bonus for fairness
+    if (selectedSolver === 'ARKA') pts = Math.floor(pts * 1.3); // Speed bonus
+    if (selectedSolver === 'NEXA') pts = Math.floor(pts * 1.3); // Precision bonus (same as Arka, different challenge)
+    
+    // Zeno Hint Impacts
+    if (hintsUsed > 0) {
+      pts = Math.max(10, Math.floor(pts - (hintsUsed * 20))); // Reduce score per hint
+    }
     
     let success = false;
     try {
@@ -798,122 +799,350 @@ export default function GameLevel() {
   const mm = Math.floor(timeLeft/60).toString().padStart(2,'0');
   const ss = (timeLeft%60).toString().padStart(2,'0');
 
+  const getBgClass = (l) => {
+    if ([1, 2, 4, 5, 6].includes(l)) return 'bg-hardware';
+    if ([3].includes(l)) return 'bg-core';
+    if ([7, 8].includes(l)) return 'bg-academy';
+    if ([9, 10].includes(l)) return 'bg-network';
+    return 'bg-hardware';
+  };
+  const bgClass = getBgClass(lvl);
+
   // ── Guards ────────────────────────────────────────────────
   if (loading || loadingQ || !dataReady) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center text-white font-mono bg-[#020617]">
-        <div className="w-24 h-24 border-4 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin mb-8" />
-        <h2 className="text-2xl font-black text-cyan-400 tracking-[0.3em]">INITIALIZING SYSTEM</h2>
-        <p className="text-cyan-600/60 mt-2 text-sm">LOADING CHAPTER {lvl} DATA_MODULES</p>
+      <div className={`min-h-screen flex flex-col items-center justify-center text-stone-800 city-bg ${bgClass} font-sans`}>
+        <div className="text-center glass rounded-3xl px-12 py-10 shadow-xl">
+          <div className="w-20 h-20 border-4 border-sky-200 border-t-sky-500 rounded-full animate-spin mb-8 mx-auto shadow-sm" />
+          <h2 className="text-2xl font-black text-stone-800 tracking-tight">MENYIAPKAN MISI</h2>
+          <p className="text-stone-500 mt-2 text-sm font-bold uppercase tracking-widest">MEMUAT BAB {lvl} ...</p>
+        </div>
       </div>
     );
   }
   if (!student) return <Navigate to="/register" replace />;
   if (!question) return (
-    <div className="min-h-screen flex flex-col items-center justify-center text-white bg-[#020617] font-mono">
-      <div className="text-rose-500 text-6xl mb-4">⚠️</div>
-      <p className="mb-8 text-xl text-rose-300">DATA_NOT_FOUND: Level {lvl} module missing.</p>
-      <button onClick={()=>navigate('/dashboard')} className="px-8 py-3 bg-white/5 border border-white/20 hover:bg-white/10 rounded-lg tracking-widest">RETURN_TO_BASE</button>
+    <div className={`min-h-screen flex flex-col items-center justify-center text-stone-800 city-bg ${bgClass} font-sans`}>
+      <div className="text-center glass rounded-3xl p-10 shadow-xl">
+        <div className="text-amber-500 text-6xl mb-4 animate-bounce">🙈</div>
+        <p className="mb-8 text-xl text-stone-600 font-bold">Ups! Modul untuk Bab {lvl} tidak ditemukan.</p>
+        <button onClick={()=>navigate('/dashboard')} className="px-8 py-3 bg-gradient-to-r from-sky-400 to-blue-500 text-white font-bold hover:from-sky-500 hover:to-blue-600 rounded-xl tracking-wide shadow-md transition-all">KEMBALI KE PETA</button>
+      </div>
     </div>
   );
 
   return (
-    <div className="min-h-screen w-full flex flex-col relative overflow-hidden text-white font-sans"
-      style={{ background: scene.bg }}>
+    <div className={`min-h-screen w-full flex flex-col relative overflow-hidden text-stone-800 font-sans city-bg ${bgClass}`}>
 
-      {/* ── ADVANCED CYBERPUNK AMBIENT BACKGROUND ── */}
-      <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
-        {/* Primary glow core - scene-specific color */}
+      {/* ── MODERN KODOMO CITY AMBIENT BACKGROUND OVERLAY ── */}
+      <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden bg-white/5 backdrop-blur-[2px]">
+        {/* Soft lighting */}
         <div
-          className="absolute top-[-25%] left-[-15%] w-[70%] h-[70%] rounded-full blur-[140px] opacity-25"
-          style={{ background: scene.glow }}
-        />
-        <div
-          className="absolute bottom-[-15%] right-[-15%] w-[55%] h-[55%] rounded-full blur-[120px] opacity-12"
-          style={{ background: scene.glow }}
-        />
-        {/* Subtle secondary accent in opposite corner */}
-        <div
-          className="absolute top-[30%] right-[10%] w-[30%] h-[30%] rounded-full blur-[80px] opacity-8"
-          style={{ background: '#38bdf8' }}
-        />
-
-        {/* Scene-colored Grid Pattern */}
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: `linear-gradient(${scene.grid} 1px, transparent 1px), linear-gradient(90deg, ${scene.grid} 1px, transparent 1px)`,
-            backgroundSize: '44px 44px',
-          }}
-        />
-
-        {/* Scanline Effect */}
-        <div
-          className="absolute inset-0 opacity-[0.018]"
-          style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, white 2px, white 4px)' }}
-        />
-
-        {/* Vignette - heavier at edges */}
-        <div
-          className="absolute inset-0"
-          style={{ background: 'radial-gradient(ellipse 80% 80% at 50% 50%, transparent 40%, rgba(0,0,0,0.65) 100%)' }}
+          className="absolute top-0 left-0 w-full h-[30%] bg-gradient-to-b from-white/30 to-transparent"
         />
       </div>
 
-      {/* ════════════════ PRE-GAME TRANSITION ANIMATION ════════════════ */}
+      {/* ════════════════ PRE-GAME TRANSITION ANIMATION - ELEGANT MINIMAL STYLE ════════════════ */}
       <AnimatePresence>
         {phase === 'PRE_GAME_ANIM' && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0, transition: { duration: 0.5 } }}
-            className="absolute inset-0 z-50 flex items-center justify-center overflow-hidden"
-            style={{ background: 'radial-gradient(ellipse at center, #050a1a 0%, #000005 100%)' }}
+            exit={{ opacity: 0, transition: { duration: 1 } }}
+            className="absolute inset-0 z-50 flex items-center justify-center overflow-hidden city-bg bg-white/70 backdrop-blur-md"
           >
-            {/* Scanline overlay */}
-            <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.5) 2px, rgba(255,255,255,0.5) 3px)' }} />
-            {/* Glow pulse */}
-            <motion.div
-              animate={{ scale: [1, 1.3, 1], opacity: [0.1, 0.25, 0.1] }}
-              transition={{ duration: 1.4, repeat: Infinity }}
-              className="absolute w-[600px] h-[600px] rounded-full blur-[120px]"
-              style={{ background: scene.glow }}
+            {/* Background mesh pattern - subtle consistency element */}
+            <div 
+              className="absolute inset-0 pointer-events-none opacity-5"
+              style={{
+                backgroundImage: `linear-gradient(45deg, ${scene.glow} 1px, transparent 1px)`,
+                backgroundSize: '30px 30px'
+              }}
             />
-            <div className="relative z-10 text-center font-mono px-6">
-              {/* Top progress bar */}
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: '100%' }}
-                transition={{ duration: 1.2, ease: 'easeInOut' }}
-                className="h-[2px] mb-8 mx-auto max-w-md shadow-lg"
-                style={{ background: `linear-gradient(90deg, transparent, ${scene.glow}, ${scene.glow}, transparent)`, boxShadow: `0 0 20px ${scene.glow}` }}
-              />
-              <motion.p
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="text-xs tracking-[0.5em] uppercase mb-4 opacity-60"
-                style={{ color: scene.glow }}
-              >
-                ◈ PROBLEM SOLVING PROTOCOL ◈
-              </motion.p>
-              <motion.h1
-                initial={{ opacity: 0, scale: 0.85 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.3, type: 'spring', stiffness: 150 }}
-                className="text-5xl md:text-7xl font-black text-transparent bg-clip-text tracking-[0.15em] drop-shadow-2xl leading-none"
-                style={{ backgroundImage: `linear-gradient(135deg, #e2e8f0, ${scene.glow}, #e2e8f0)` }}
-              >
-                SYSTEM<br/>OVERRIDE
-              </motion.h1>
+            
+            {/* Enhanced dual glow backdrops for better contrast */}
+            <motion.div
+              animate={{ scale: [1, 1.35, 1], opacity: [0.35, 0.55, 0.35] }}
+              transition={{ duration: 6.5, repeat: Infinity, ease: 'easeInOut' }}
+              className="absolute w-[900px] h-[900px] rounded-full blur-3xl pointer-events-none"
+              style={{ background: scene.glow, left: '-300px', top: '-200px' }}
+            />
+            <motion.div
+              animate={{ scale: [1.15, 0.95, 1.15], opacity: [0.28, 0.45, 0.28] }}
+              transition={{ duration: 7.2, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
+              className="absolute w-[700px] h-[700px] rounded-full blur-3xl pointer-events-none"
+              style={{ background: '#fbbf24', right: '-180px', bottom: '-150px' }}
+            />
+            
+            {/* Enhanced secondary accent glow */}
+            <motion.div
+              animate={{ scale: [1.2, 1, 1.2], opacity: [0.15, 0.28, 0.15] }}
+              transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+              className="absolute w-[500px] h-[500px] rounded-full blur-3xl pointer-events-none"
+              style={{ background: '#f97316', left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}
+            />
+            
+            {/* Vibrant floating particles with stronger glow */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden">
+              {[...Array(12)].map((_, i) => {
+                const colors = ['#fbbf24', '#f97316', '#fb7185', '#fca5a5', scene.glow];
+                const color = colors[i % colors.length];
+                return (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: '100vh', x: Math.random() * window.innerWidth }}
+                    animate={{ 
+                      opacity: [0, 0.9, 0.9, 0],
+                      y: '-100vh',
+                      x: Math.random() * window.innerWidth,
+                      rotate: [0, 360]
+                    }}
+                    transition={{
+                      delay: i * 0.2,
+                      duration: 7,
+                      repeat: Infinity,
+                      ease: 'easeInCubic'
+                    }}
+                    className="absolute w-4 h-4 rounded-full"
+                    style={{ 
+                      background: color, 
+                      boxShadow: `0 0 24px ${color}, 0 0 48px ${color}80`
+                    }}
+                  />
+                )
+              })}
+            </div>
+            
+            <div className="relative z-10 text-center px-6 max-w-4xl">
+              {/* Top decorative system - enhanced consistency */}
               <motion.div
                 initial={{ opacity: 0 }}
-                animate={{ opacity: [0, 1, 0] }}
-                transition={{ delay: 0.6, duration: 0.8, repeat: 1 }}
-                className="mt-6 text-sm tracking-[0.35em] uppercase font-bold"
-                style={{ color: scene.glow }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.05, duration: 0.7 }}
+                className="mb-6"
               >
-                INITIALIZING...
+                {/* Geometric accent bar */}
+                <motion.div
+                  animate={{ scaleX: [0, 1, 1] }}
+                  transition={{ delay: 0.08, duration: 0.8 }}
+                  className="h-1 mx-auto mb-5 origin-left rounded-full"
+                  style={{ width: '70px', background: `linear-gradient(90deg, ${scene.glow}, transparent)`, boxShadow: `0 0 16px ${scene.glow}60` }}
+                />
+              </motion.div>
+              
+              {/* Protocol Header - Professional styling */}
+              <motion.div
+                initial={{ opacity: 0, y: -25 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.12, duration: 0.9 }}
+                className="mb-4"
+              >
+                <motion.p
+                  animate={{ opacity: [0.6, 1, 0.6] }}
+                  transition={{ delay: 0.25, duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
+                  className="text-xs font-serif uppercase tracking-[0.6em] font-extrabold"
+                  style={{ 
+                    color: scene.glow,
+                    textShadow: `0 2px 12px rgba(0, 0, 0, 0.4), 0 0 12px ${scene.glow}40`
+                  }}
+                >
+                  Problem Solving Protocol
+                </motion.p>
+              </motion.div>
+              
+              {/* Separator line - visual consistency */}
+              <motion.div
+                animate={{ scaleX: [0, 1] }}
+                transition={{ delay: 0.2, duration: 1 }}
+                className="h-1.5 mx-auto mb-8 origin-center rounded-full"
+                style={{ 
+                  width: '100px',
+                  background: scene.glow, 
+                  boxShadow: `0 0 24px ${scene.glow}, 0 0 12px ${scene.glow}60` 
+                }}
+              />
+              
+              {/* Main title - Balanced sizing */}
+              <motion.h1
+                initial={{ opacity: 0, scale: 0.75, y: 40 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ delay: 0.35, duration: 1.2, ease: 'easeOut' }}
+                className="font-serif font-black text-6xl md:text-7xl leading-tight mb-6"
+                style={{ 
+                  color: scene.glow,
+                  textShadow: `0 6px 16px rgba(0, 0, 0, 0.5), 0 0 20px ${scene.glow}40`,
+                  filter: `drop-shadow(0 0 20px ${scene.glow}30)`
+                }}
+              >
+                Ready<br/>to<br/>Solve
+              </motion.h1>
+              
+              {/* Subtitle - Consistent with theme */}
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5, duration: 0.9 }}
+                className="text-xs md:text-sm font-serif italic font-semibold tracking-wide mb-5"
+                style={{ 
+                  color: '#e8d9cc',
+                  textShadow: `0 2px 6px rgba(0, 0, 0, 0.4)`
+                }}
+              >
+                Master the Challenge
+              </motion.p>
+              
+              {/* Decorative underline */}
+              <motion.div
+                animate={{ scaleX: [0, 1] }}
+                transition={{ delay: 0.6, duration: 1 }}
+                className="h-0.5 mx-auto mb-12 origin-center"
+                style={{ width: '70px', background: `linear-gradient(90deg, transparent, ${scene.glow}, transparent)` }}
+              />
+              
+              {/* Enhanced loading indicator */}
+              <motion.div
+                initial={{ opacity: 0, y: 25 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.65, duration: 0.9 }}
+                className="flex flex-col items-center gap-12"
+              >
+                {/* Premium triple orbiting system */}
+                <div className="relative w-36 h-36 flex items-center justify-center">
+                  {/* Outer decorative ring with gradient */}
+                  <motion.div
+                    animate={{ rotate: -360 }}
+                    transition={{ duration: 6, repeat: Infinity, ease: 'linear' }}
+                    className="absolute w-36 h-36 rounded-full border-2 border-dashed"
+                    style={{ 
+                      borderColor: `${scene.glow}85`,
+                      boxShadow: `inset 0 0 20px ${scene.glow}25, 0 0 16px ${scene.glow}30`
+                    }}
+                  />
+                  
+                  {/* Primary vibrant orbit - thicker and more prominent */}
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
+                    className="absolute w-32 h-32 rounded-full border-4"
+                    style={{ 
+                      borderColor: scene.glow,
+                      opacity: 1,
+                      boxShadow: `0 0 28px ${scene.glow}, 0 0 56px ${scene.glow}60, inset 0 0 12px ${scene.glow}30`
+                    }}
+                  />
+                  
+                  {/* Secondary vibrant orbit - golden accent */}
+                  <motion.div
+                    animate={{ rotate: -360 }}
+                    transition={{ duration: 5.5, repeat: Infinity, ease: 'linear' }}
+                    className="absolute w-24 h-24 rounded-full border-3"
+                    style={{ 
+                      borderColor: '#fbbf24',
+                      opacity: 1,
+                      boxShadow: `0 0 24px #fbbf24, 0 0 48px #fbbf2460, inset 0 0 10px #fbbf2440`
+                    }}
+                  />
+                  
+                  {/* Tertiary orbit for visual richness */}
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 7, repeat: Infinity, ease: 'linear' }}
+                    className="absolute w-14 h-14 rounded-full border-2"
+                    style={{ 
+                      borderColor: `${scene.glow}`,
+                      opacity: 0.75,
+                      boxShadow: `0 0 16px ${scene.glow}60`
+                    }}
+                  />
+                  
+                  {/* Central luminous core with multi-layer glow */}
+                  <motion.div
+                    animate={{ scale: [0.8, 1.5, 0.8] }}
+                    transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+                    className="w-8 h-8 rounded-full"
+                    style={{ 
+                      background: scene.glow,
+                      boxShadow: `0 0 32px ${scene.glow}, 0 0 64px ${scene.glow}70, inset 0 0 12px rgba(255, 255, 255, 0.6)`
+                    }}
+                  />
+                </div>
+                
+                {/* Status text with enhanced styling */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.75, duration: 0.7 }}
+                  className="text-center"
+                >
+                  <motion.div
+                    animate={{ opacity: [0.4, 1, 0.4] }}
+                    transition={{ delay: 0.8, duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
+                    className="text-xs font-serif uppercase tracking-[0.4em] font-bold"
+                    style={{ 
+                      color: scene.glow,
+                      textShadow: `0 2px 10px rgba(0, 0, 0, 0.35), 0 0 8px ${scene.glow}40`
+                    }}
+                  >
+                    Initializing
+                  </motion.div>
+                  
+                  {/* Animated progress dots */}
+                  <div className="flex gap-4 justify-center mt-5">
+                    {[0, 1, 2].map((i) => (
+                      <motion.div
+                        key={i}
+                        animate={{ 
+                          scale: [0.5, 1.4, 0.5], 
+                          opacity: [0.4, 1, 0.4],
+                          y: [0, -8, 0]
+                        }}
+                        transition={{
+                          delay: i * 0.18,
+                          duration: 1.6,
+                          repeat: Infinity,
+                          ease: 'easeInOut'
+                        }}
+                        className="w-3.5 h-3.5 rounded-full"
+                        style={{ 
+                          background: ['#fbbf24', scene.glow, '#f97316'][i],
+                          boxShadow: `0 0 16px ${['#fbbf24', scene.glow, '#f97316'][i]}`
+                        }}
+                      />
+                    ))}
+                  </div>
+                </motion.div>
+              </motion.div>
+              
+              {/* Bottom decorative system - consistent with top */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.85, duration: 0.7 }}
+                className="mt-10 flex flex-col items-center gap-3"
+              >
+                {/* Left accent bar */}
+                <motion.div
+                  animate={{ scaleX: [0, 1, 1] }}
+                  transition={{ delay: 0.9, duration: 0.8 }}
+                  className="h-1 origin-center rounded-full"
+                  style={{ width: '70px', background: `linear-gradient(90deg, transparent, ${scene.glow})`, boxShadow: `0 0 16px ${scene.glow}60` }}
+                />
+                
+                {/* Center accent point */}
+                <motion.div
+                  animate={{ scale: [0.5, 1, 0.5] }}
+                  transition={{ delay: 0.95, duration: 2.8, repeat: Infinity }}
+                  className="w-1.5 h-1.5 rounded-full"
+                  style={{ background: scene.glow, boxShadow: `0 0 12px ${scene.glow}, 0 0 24px ${scene.glow}50` }}
+                />
+                
+                {/* Right accent bar */}
+                <motion.div
+                  animate={{ scaleX: [1, 1, 0] }}
+                  transition={{ delay: 1, duration: 0.8 }}
+                  className="h-1 origin-center rounded-full"
+                  style={{ width: '70px', background: `linear-gradient(90deg, ${scene.glow}, transparent)`, boxShadow: `0 0 16px ${scene.glow}60` }}
+                />
               </motion.div>
             </div>
           </motion.div>
@@ -923,35 +1152,35 @@ export default function GameLevel() {
       {/* ════════════════ VN PHASE (INTRO / OUTRO) ════════════════ */}
       {(phase === 'INTRO' || phase === 'OUTRO') && (
         <>
-          {/* Cyberpunk VN Header */}
+          {/* Kodomo-style VN Header */}
           <div className="relative z-30 px-6 py-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <div className="flex items-center gap-4 bg-black/40 border border-white/10 backdrop-blur-md px-5 py-2 rounded-full shadow-lg">
-              <div className="w-8 h-8 rounded-full flex items-center justify-center text-lg" style={{ background: `linear-gradient(135deg, ${scene.glow}40, transparent)`, border: `1px solid ${scene.glow}` }}>
+            <div className="flex items-center gap-3 glass px-5 py-2.5 rounded-full shadow-md">
+              <div className="w-9 h-9 rounded-full flex items-center justify-center text-lg bg-white/80 shadow-sm border border-white/90" style={{ borderColor: scene.glow }}>
                 {scene.icon}
               </div>
               <div>
-                <p className="text-[10px] font-mono font-bold text-white/50 uppercase tracking-widest">{storyData?.chapter}</p>
-                <p className="text-sm font-bold text-white tracking-wide">{scene.label}</p>
+                <p className="text-[10px] font-bold text-stone-500 uppercase tracking-widest">{storyData?.chapter}</p>
+                <p className="text-sm font-bold text-stone-800 tracking-wide">{scene.label}</p>
               </div>
             </div>
-            
+
             {phase === 'INTRO' && (
               <button onClick={() => { setPhase('PRE_GAME_ANIM'); setTimeout(()=>setPhase('GAME'), 1500); setDialogIdx(0); }}
-                className="group flex items-center gap-2 text-xs font-mono font-bold text-white/40 border border-white/10 bg-black/30 px-4 py-2 rounded-full hover:text-white hover:border-white/30 hover:bg-white/5 transition-all">
-                SKIP_SCENE <span className="group-hover:translate-x-1 transition-transform">▶▶</span>
+                className="group flex items-center gap-2 text-xs font-bold text-sky-600 border border-sky-300 bg-white/80 backdrop-blur-md px-4 py-2 rounded-full hover:bg-sky-50 hover:border-sky-400 transition-all shadow-sm">
+                Lewati Cerita <span className="group-hover:translate-x-1 transition-transform">▶▶</span>
               </button>
             )}
           </div>
 
-          {/* Progress indicator - Tech style */}
-          <div className="relative z-30 px-8 flex gap-1 justify-center max-w-2xl mx-auto">
+          {/* Progress dots - Kodomo style */}
+          <div className="relative z-30 px-8 flex gap-1.5 justify-center max-w-2xl mx-auto">
             {currentDialogs.map((_, i) => (
               <div key={i}
-                className="h-1 rounded-sm transition-all duration-500"
+                className="h-2 rounded-full transition-all duration-500"
                 style={{
-                  width: i === dialogIdx ? '40px' : '12px',
-                  background: i <= dialogIdx ? scene.glow : 'rgba(255,255,255,0.1)',
-                  boxShadow: i === dialogIdx ? `0 0 10px ${scene.glow}` : 'none'
+                  width: i === dialogIdx ? '36px' : '10px',
+                  background: i <= dialogIdx ? scene.glow : 'rgba(0,0,0,0.15)',
+                  boxShadow: i === dialogIdx ? `0 0 8px ${scene.glow}` : 'none'
                 }} />
             ))}
           </div>
@@ -1009,40 +1238,44 @@ export default function GameLevel() {
       {/* ════════════════ GAME PHASE ════════════════ */}
       {phase === 'GAME' && (
         <div className="flex-1 flex flex-col relative z-20 h-screen overflow-hidden">
-          {/* Cyberpunk HUD Header */}
-          <header className="bg-black/80 backdrop-blur-xl border-b border-white/10 px-4 sm:px-8 py-3 flex justify-between items-center z-30 shrink-0">
+          {/* Ghibli HUD Header */}
+          <header className="bg-white/80 backdrop-blur-md border-b border-stone-200 px-4 sm:px-8 py-3 flex justify-between items-center z-30 shrink-0 shadow-sm">
             <div className="flex items-center gap-4 sm:gap-6">
-              <button onClick={() => navigate('/dashboard')} className="group flex items-center justify-center w-10 h-10 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 transition-colors">
-                <span className="text-white/60 group-hover:text-white transition-colors group-hover:-translate-x-0.5 transform block">◁</span>
+              <button onClick={() => navigate('/dashboard')} className="group flex items-center justify-center w-10 h-10 rounded-full border border-stone-200 bg-stone-50 hover:bg-stone-100 transition-colors shadow-sm text-stone-500 hover:text-stone-700">
+                <span className="group-hover:-translate-x-0.5 transform block">◁</span>
               </button>
               
-              <div className="hidden sm:block h-8 w-px bg-white/10" />
+              <div className="hidden sm:block h-8 w-px bg-stone-300" />
               
               <div>
-                <p className="text-[10px] font-mono font-bold text-cyan-500/80 uppercase tracking-widest">{storyData?.chapter || `CHAPTER ${lvl}`}</p>
-                <p className="text-sm font-black text-white flex items-center gap-2">
-                  <span className="opacity-70">{scene.icon}</span>{scene.label}
+                <p className="text-[11px] font-bold text-emerald-600 uppercase tracking-widest">{storyData?.chapter || `CHAPTER ${lvl}`}</p>
+                <p className="text-base font-serif font-black text-stone-800 flex items-center gap-2">
+                  <span className="opacity-90">{scene.icon}</span>{scene.label}
                 </p>
               </div>
             </div>
             
-            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-1.5 bg-black/50 px-4 py-2 rounded-full border border-white/5">
-                {[...Array(3)].map((_,i)=>(
+            <div className="flex items-center gap-4 sm:gap-6">
+
+
+              <div className="flex items-center gap-1.5 bg-stone-100 px-4 py-2 rounded-full border border-stone-200 shadow-inner">
+                {[...Array(selectedSolver === 'ARKA' ? 1 : 3)].map((_,i)=>(
                   <motion.div key={i} 
                     initial={{scale:0.8, opacity:0}} animate={{scale:1, opacity:1}} transition={{delay: i*0.1}}
-                    className={`relative w-4 h-4 rounded-sm rotate-45 border ${
+                    className={`relative w-4 h-4 rounded-full border ${
+                      selectedSolver === 'ARKA' ? 'bg-blue-400 border-blue-300' :
                       i < lives 
-                        ? 'bg-emerald-500 border-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.5)]' 
-                        : 'bg-black border-white/10'
+                        ? 'bg-rose-400 border-rose-300 shadow-[0_2px_4px_rgba(251,113,133,0.3)]' 
+                        : 'bg-stone-300 border-stone-200'
                     }`} 
                   />
                 ))}
+                {selectedSolver === 'ARKA' && <span className="text-blue-500 font-bold ml-1 text-sm">∞</span>}
               </div>
               
-              <div className={`flex flex-col items-end`}>
-                <span className="text-[9px] font-mono text-white/40 uppercase tracking-widest mb-0.5">SYS_TIME</span>
-                <div className={`font-mono text-xl font-black tracking-wider ${timeLeft<60?'text-rose-400 animate-pulse':'text-cyan-300'}`} style={{ textShadow: `0 0 15px ${timeLeft<60?'#f43f5e':'#06b6d4'}80` }}>
+              <div className="flex flex-col items-end">
+                <span className="text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-0.5">Waktu</span>
+                <div className={`font-mono text-xl font-bold tracking-wider ${timeLeft<60?'text-rose-500 animate-pulse':'text-stone-700'}`}>
                   {mm}:{ss}
                 </div>
               </div>
@@ -1053,35 +1286,35 @@ export default function GameLevel() {
             
             {/* Quest Briefing Panel */}
             <motion.div initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.4 }}
-              className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/50 backdrop-blur-md p-6 shadow-2xl">
-              <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-cyan-400 to-blue-600" />
+              className="relative overflow-hidden rounded-2xl border border-stone-200 bg-white/95 backdrop-blur-md p-6 shadow-xl">
+              <div className="absolute top-0 left-0 w-1.5 h-full bg-emerald-400" />
               
               <div className="flex flex-wrap gap-2 mb-4">
-                <span className="bg-cyan-500/10 text-cyan-300 text-[10px] font-mono font-black px-3 py-1 rounded-sm border border-cyan-500/30 uppercase tracking-widest flex items-center gap-1"><span className="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-pulse"/> ACTIVE_DIRECTIVE</span>
-                <span className="text-[10px] font-mono font-bold px-3 py-1 rounded-sm bg-white/5 text-white/50 border border-white/10 uppercase">{question.topic}</span>
-                <span className="text-[10px] font-mono font-bold px-3 py-1 rounded-sm bg-white/5 text-white/50 border border-white/10 uppercase">{question.bloom_level}</span>
+                <span className="bg-emerald-50 text-emerald-600 text-xs font-bold px-3 py-1.5 rounded border border-emerald-200 uppercase tracking-widest flex items-center gap-1.5"><span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"/> TUGAS AKTIF</span>
+                <span className="text-xs font-bold px-3 py-1.5 rounded bg-stone-100 text-stone-500 border border-stone-200 uppercase">{question.topic}</span>
+                <span className="text-xs font-bold px-3 py-1.5 rounded bg-stone-100 text-stone-500 border border-stone-200 uppercase">{question.bloom_level}</span>
               </div>
               
-              <p className="text-lg md:text-xl font-medium text-white/90 leading-relaxed font-sans">{question.question_text}</p>
+              <p className="text-lg md:text-xl font-medium text-stone-800 leading-relaxed font-serif">{question.question_text}</p>
             </motion.div>
 
             {/* Interactive Workspace */}
             <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.4, delay: 0.1 }}
-              className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-black/60 to-black/80 backdrop-blur-xl p-6 shadow-2xl">
+              className="relative overflow-hidden rounded-2xl border border-stone-200 bg-stone-50/95 backdrop-blur-md p-6 shadow-xl">
               
-              {/* Subtle grid pattern in workspace */}
-              <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.2) 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
+              {/* Subtle texture in workspace */}
+              <div className="absolute inset-0 opacity-50 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#d6d3d1 1px, transparent 1px)', backgroundSize: '16px 16px' }} />
               
               <div className="relative z-10 w-full mb-6 flex items-center gap-4">
-                <div className="h-px flex-1 bg-gradient-to-r from-transparent to-white/10" />
-                <p className="text-[10px] font-mono font-black text-white/30 uppercase tracking-widest shrink-0">
-                  {question.type==='MULTIPLE_CHOICE'&&'// MULTIPLE_CHOICE_INPUT'}
-                  {question.type==='TRUE_FALSE'&&'// BOOLEAN_EVALUATION'}
-                  {question.type==='SEQUENCE'&&'// CONSTRUCT_ARRAY_SEQUENCE'}
-                  {question.type==='CLASSIFICATION'&&'// CLASSIFY_OBJECTS'}
-                  {question.type==='MATCHING'&&'// ESTABLISH_NODE_LINKS'}
+                <div className="h-px flex-1 bg-stone-300" />
+                <p className="text-xs font-bold text-stone-400 uppercase tracking-widest shrink-0">
+                  {question.type==='MULTIPLE_CHOICE'&&'PILIHAN GANDA'}
+                  {question.type==='TRUE_FALSE'&&'BENAR ATAU SALAH'}
+                  {question.type==='SEQUENCE'&&'SUSUN URUTAN'}
+                  {question.type==='CLASSIFICATION'&&'KLASIFIKASI OBJEK'}
+                  {question.type==='MATCHING'&&'HUBUNGKAN KONSEP'}
                 </p>
-                <div className="h-px flex-1 bg-gradient-to-l from-transparent to-white/10" />
+                <div className="h-px flex-1 bg-stone-300" />
               </div>
 
               <div className="relative z-10 w-full pb-6">
@@ -1094,18 +1327,18 @@ export default function GameLevel() {
               
               {/* Submit Button (Only for complex mechanics) */}
               {['SEQUENCE','CLASSIFICATION','MATCHING'].includes(question.type) && (
-                <div className="relative z-10 pt-4 border-t border-white/10 mt-2">
-                  <motion.button whileHover={{scale:canVerify()?1.01:1}} whileTap={{scale:canVerify()?0.98:1}}
+                <div className="relative z-10 pt-6 mt-4">
+                  <motion.button whileHover={{scale:canVerify()?1.02:1}} whileTap={{scale:canVerify()?0.98:1}}
                     onClick={()=>processAnswer(getUserAnswer())} disabled={!canVerify()}
-                    className={`w-full py-5 font-black font-mono text-lg rounded-xl border-2 transition-all uppercase tracking-widest flex items-center justify-center gap-3 ${
+                    className={`w-full py-4 font-bold text-lg rounded-xl transition-all tracking-wide flex items-center justify-center gap-3 shadow-md ${
                       canVerify() 
-                        ? 'bg-gradient-to-r from-emerald-600 to-teal-600 border-emerald-400 text-white shadow-[0_0_20px_rgba(16,185,129,0.4)] cursor-pointer' 
-                        : 'bg-black/50 border-white/10 text-white/20 cursor-not-allowed'
+                        ? 'bg-blue-500 hover:bg-blue-600 text-white cursor-pointer shadow-blue-500/30' 
+                        : 'bg-stone-200 text-stone-400 cursor-not-allowed border border-stone-300'
                     }`}>
                     {canVerify() ? (
-                      <><span className="w-2 h-2 rounded-full bg-white animate-pulse" /> EXECUTE_VERIFICATION</>
+                      <><span className="w-2 h-2 rounded-full bg-white animate-pulse" /> SELESAIKAN TUGAS</>
                     ) : (
-                      <><span className="opacity-50">INPUT_REQUIRED</span></>
+                      <><span className="opacity-70">MEMBUTUHKAN INPUT</span></>
                     )}
                   </motion.button>
                 </div>
@@ -1122,31 +1355,21 @@ export default function GameLevel() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] flex items-center justify-center p-4 overflow-auto"
-            style={{ background: 'radial-gradient(ellipse at center, #050f1f 0%, #000005 100%)' }}
+            className="fixed inset-0 z-[200] flex items-center justify-center p-4 overflow-auto city-bg"
           >
-            {/* Scanline */}
-            <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.4) 2px, rgba(255,255,255,0.4) 3px)' }} />
-
-            {/* Glow pulse */}
-            <motion.div
-              animate={{ scale: [1, 1.25, 1], opacity: [0.08, 0.18, 0.08] }}
-              transition={{ duration: 3, repeat: Infinity }}
-              className="absolute w-[700px] h-[700px] rounded-full blur-[160px] pointer-events-none"
-              style={{ background: scene.glow }}
-            />
+            <div className="absolute inset-0 bg-white/50 pointer-events-none" />
 
             <motion.div
               initial={{ scale: 0.85, y: 30, opacity: 0 }}
               animate={{ scale: 1, y: 0, opacity: 1 }}
               transition={{ type: 'spring', stiffness: 180, damping: 20, delay: 0.1 }}
-              className="relative z-10 w-full max-w-lg text-center font-mono"
+              className="relative z-10 w-full max-w-lg text-center font-sans"
             >
               {/* Trophy Icon */}
               <motion.div
                 animate={{ rotate: [-5, 5, -5], y: [0, -8, 0] }}
                 transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-                className="text-7xl md:text-8xl mb-4 select-none"
+                className="text-7xl md:text-8xl mb-4 select-none drop-shadow-xl"
               >
                 🏆
               </motion.div>
@@ -1156,12 +1379,11 @@ export default function GameLevel() {
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.25 }}
-                className="text-4xl md:text-5xl font-black tracking-[0.15em] uppercase mb-1"
-                style={{ color: scene.glow, textShadow: `0 0 40px ${scene.glow}80` }}
+                className="text-4xl md:text-5xl font-serif font-black tracking-wide uppercase mb-1 text-amber-600"
               >
-                LEVEL CLEAR
+                LEVEL SELESAI
               </motion.h1>
-              <p className="text-white/40 text-xs tracking-[0.4em] uppercase mb-8">Chapter {lvl} — Mission Accomplished</p>
+              <p className="text-amber-800 font-bold mb-8">Bab {lvl} — Misi Berhasil</p>
 
               {/* Stars */}
               <div className="flex justify-center gap-3 mb-6">
@@ -1171,7 +1393,7 @@ export default function GameLevel() {
                     initial={{ scale: 0, rotate: -30 }}
                     animate={{ scale: 1, rotate: 0 }}
                     transition={{ delay: 0.35 + i * 0.18, type: 'spring', stiffness: 200 }}
-                    className="text-4xl md:text-5xl"
+                    className="text-4xl md:text-5xl drop-shadow-md"
                   >
                     {i < winData.bintang ? '⭐' : '☆'}
                   </motion.div>
@@ -1183,22 +1405,22 @@ export default function GameLevel() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.7 }}
-                className="rounded-2xl border border-white/10 bg-black/50 backdrop-blur-xl p-6 mb-8 shadow-2xl"
+                className="rounded-2xl border border-stone-200 bg-white p-6 mb-8 shadow-xl"
               >
                 <div className="flex justify-around">
                   <div>
-                    <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1">Poin</p>
-                    <p className="text-3xl font-black" style={{ color: scene.glow }}>{winData.pts}</p>
+                    <p className="text-xs font-bold text-stone-400 uppercase tracking-widest mb-1">Skor</p>
+                    <p className="text-3xl font-black text-amber-500">{winData.pts}</p>
                   </div>
-                  <div className="w-px bg-white/10" />
+                  <div className="w-px bg-stone-200" />
                   <div>
-                    <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1">Bintang</p>
-                    <p className="text-3xl font-black text-amber-400">{winData.bintang} / 3</p>
+                    <p className="text-xs font-bold text-stone-400 uppercase tracking-widest mb-1">Bintang</p>
+                    <p className="text-3xl font-black text-amber-500">{winData.bintang} / 3</p>
                   </div>
-                  <div className="w-px bg-white/10" />
+                  <div className="w-px bg-stone-200" />
                   <div>
-                    <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1">Level</p>
-                    <p className="text-3xl font-black text-white">{lvl}</p>
+                    <p className="text-xs font-bold text-stone-400 uppercase tracking-widest mb-1">Level</p>
+                    <p className="text-3xl font-black text-stone-700">{lvl}</p>
                   </div>
                 </div>
               </motion.div>
@@ -1239,7 +1461,7 @@ export default function GameLevel() {
                           transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
                           className="w-4 h-4 border-2 border-transparent border-r-white border-t-white rounded-full"
                         />
-                        <span>LOADING...</span>
+                        <span>MEMUAT...</span>
                       </>
                     ) : (
                       <>
@@ -1261,7 +1483,7 @@ export default function GameLevel() {
                     }
                   }}
                   disabled={isNavigating}
-                  className="flex-1 py-5 rounded-xl font-black text-lg uppercase tracking-widest border-2 border-white/20 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 py-5 rounded-xl font-black text-lg uppercase tracking-widest border-2 border-stone-300 bg-white hover:bg-stone-50 text-stone-700 hover:text-stone-900 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                 >
                   <span>◁</span>
                   <span>{(lvl >= (totalLevels || 10)) ? 'Selesai 🎉' : 'Dashboard'}</span>
@@ -1276,37 +1498,34 @@ export default function GameLevel() {
       <AnimatePresence>
         {feedback && (
           <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}}
-            className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-lg flex items-center justify-center p-4">
-            
-            {/* Terminal scanline effect */}
-            <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, white 2px, white 4px)' }} />
+            className="fixed inset-0 z-[100] bg-white/60 backdrop-blur-md flex items-center justify-center p-4">
             
             <motion.div initial={{scale:0.9, y: 20}} animate={{scale:1, y: 0}} exit={{scale:0.9, opacity:0}}
-              className={`relative max-w-2xl w-full p-8 md:p-10 rounded-2xl border shadow-2xl overflow-hidden ${
+              className={`relative max-w-2xl w-full p-8 md:p-10 rounded-2xl border shadow-xl overflow-hidden bg-white ${
                 feedback.type==='success'
-                  ? 'bg-emerald-950/40 border-emerald-500/50 shadow-[0_0_50px_rgba(16,185,129,0.15)]'
-                  : 'bg-rose-950/40 border-rose-500/50 shadow-[0_0_50px_rgba(244,63,94,0.15)]'
+                  ? 'border-emerald-300'
+                  : 'border-rose-300'
               }`}>
               
-              <div className={`absolute top-0 left-0 w-full h-1 ${feedback.type==='success'?'bg-emerald-500':'bg-rose-500'}`} />
+              <div className={`absolute top-0 left-0 w-full h-2 ${feedback.type==='success'?'bg-emerald-400':'bg-rose-400'}`} />
               
-              <div className="flex flex-col items-center text-center font-mono">
-                <div className={`w-20 h-20 rounded-full flex items-center justify-center text-4xl mb-6 shadow-xl border ${
-                  feedback.type==='success' ? 'bg-emerald-900/50 border-emerald-400 text-emerald-400 shadow-[0_0_30px_rgba(16,185,129,0.3)]' : 'bg-rose-900/50 border-rose-400 text-rose-400 shadow-[0_0_30px_rgba(244,63,94,0.3)]'
+              <div className="flex flex-col items-center text-center font-sans">
+                <div className={`w-20 h-20 rounded-full flex items-center justify-center text-4xl mb-6 shadow-md border ${
+                  feedback.type==='success' ? 'bg-emerald-50 border-emerald-200 text-emerald-500' : 'bg-rose-50 border-rose-200 text-rose-500'
                 }`}>
                   {feedback.type==='success'?'✓':'✕'}
                 </div>
                 
-                <h3 className={`text-2xl md:text-3xl font-black mb-6 tracking-widest uppercase ${feedback.type==='success'?'text-emerald-400':'text-rose-400'}`}>
+                <h3 className={`text-2xl md:text-3xl font-black mb-6 tracking-wide uppercase ${feedback.type==='success'?'text-emerald-600':'text-rose-600'}`}>
                   {feedback.text}
                 </h3>
                 
                 {feedback.explanation && (
                   <div className={`text-left w-full p-5 rounded-xl border leading-relaxed text-sm md:text-base mb-6 ${
-                    feedback.type==='success'?'bg-emerald-950/50 border-emerald-500/30 text-emerald-100':'bg-rose-950/50 border-rose-500/30 text-rose-100'
+                    feedback.type==='success'?'bg-emerald-50 border-emerald-200 text-emerald-800':'bg-rose-50 border-rose-200 text-rose-800'
                   }`}>
-                    <p className={`font-mono font-bold mb-2 uppercase tracking-widest text-xs flex items-center gap-2 ${feedback.type==='success'?'text-emerald-400':'text-rose-400'}`}>
-                      <span className={`w-1.5 h-1.5 rounded-full ${feedback.type==='success'?'bg-emerald-400':'bg-rose-400'}`} /> SYSTEM_NOTE:
+                    <p className={`font-bold mb-2 uppercase tracking-wide text-xs flex items-center gap-2 ${feedback.type==='success'?'text-emerald-700':'text-rose-700'}`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${feedback.type==='success'?'bg-emerald-500':'bg-rose-500'}`} /> PENJELASAN:
                     </p>
                     {feedback.explanation}
                   </div>
@@ -1333,9 +1552,9 @@ export default function GameLevel() {
                           setFeedback(null);
                           setTimeout(() => navigate(`/game/${lvl + 1}`), 300);
                         }}
-                        className="flex-1 py-3 rounded-lg font-black text-base uppercase tracking-widest border-2 transition-all shadow-lg flex items-center justify-center gap-2 bg-emerald-600/30 border-emerald-400 text-emerald-300 hover:bg-emerald-600/50"
+                        className="flex-1 py-3 rounded-lg font-bold text-base uppercase tracking-wide border transition-all shadow-md flex items-center justify-center gap-2 bg-emerald-50 border-emerald-300 text-emerald-700 hover:bg-emerald-100"
                       >
-                        <span>Next Level</span>
+                        <span>Lanjut ke Berikutnya</span>
                         <span>▶</span>
                       </motion.button>
                     )}
@@ -1351,7 +1570,7 @@ export default function GameLevel() {
                         setFeedback(null);
                         setTimeout(() => navigate('/dashboard'), 300);
                       }}
-                      className="flex-1 py-3 rounded-lg font-black text-base uppercase tracking-widest border-2 border-white/30 bg-white/10 hover:bg-white/20 text-white/70 hover:text-white transition-all flex items-center justify-center gap-2"
+                      className="flex-1 py-3 rounded-lg font-bold text-base uppercase tracking-wide border border-stone-300 bg-white hover:bg-stone-50 text-stone-600 hover:text-stone-800 transition-all flex items-center justify-center gap-2 shadow-sm"
                     >
                       <span>◁</span>
                       <span>{lvl >= (totalLevels || 10) ? 'Selesai' : 'Dashboard'}</span>
@@ -1360,9 +1579,9 @@ export default function GameLevel() {
                 )}
                 
                 {feedback.type==='success' && (
-                  <div className="mt-8 flex items-center gap-3 text-emerald-500/80 text-xs font-bold uppercase tracking-widest">
-                    <span className="w-4 h-4 rounded-full border border-emerald-500/50 border-t-emerald-400 animate-spin" />
-                    LOADING_NEXT_SEQUENCE...
+                  <div className="mt-8 flex items-center gap-3 text-emerald-600 text-xs font-bold uppercase tracking-wide">
+                    <span className="w-4 h-4 rounded-full border border-emerald-200 border-t-emerald-500 animate-spin" />
+                    MEMPROSES...
                   </div>
                 )}
               </div>
