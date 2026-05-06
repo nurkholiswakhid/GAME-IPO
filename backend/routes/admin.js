@@ -93,8 +93,8 @@ router.put('/questions/:id', async (req, res) => {
     });
     res.json({ message: 'Soal berhasil diperbarui', question: updated });
   } catch (error) {
-    console.error('Admin update question error:', error.message || error);
-    res.status(500).json({ error: error.message || 'Server error', detail: error.toString() });
+    console.error('Admin update question error:', error);
+    res.status(500).json({ error: error.message || 'Server error' });
   }
 });
 
@@ -125,8 +125,8 @@ router.post('/questions', async (req, res) => {
     });
     res.json({ message: 'Soal baru berhasil dibuat', question: newQuestion });
   } catch (error) {
-    console.error('Admin create question error:', error.message || error);
-    res.status(500).json({ error: error.message || 'Server error', detail: error.toString() });
+    console.error('Admin create question error:', error);
+    res.status(500).json({ error: error.message || 'Server error' });
   }
 });
 

@@ -1,5 +1,4 @@
-﻿import React, { useState, useEffect, useContext, useRef, useCallback } from 'react';
-import { createPortal } from 'react-dom';
+import React, { useState, useEffect, useContext, useRef, useCallback } from 'react';
 import { useParams, useNavigate, Navigate } from 'react-router-dom';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -813,53 +812,22 @@ export default function GameLevel() {
   if (loading || loadingQ || !dataReady) {
     return (
       <div className={`min-h-screen flex flex-col items-center justify-center text-stone-800 city-bg ${bgClass} font-sans`}>
-        <motion.div
-          initial={{ opacity: 0, scale: 0.92 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-          className="text-center glass rounded-3xl px-10 py-10 shadow-2xl max-w-xs w-full mx-4"
-        >
-          {/* Spinning rings */}
-          <div className="relative w-20 h-20 mx-auto mb-6">
-            <div className="absolute inset-0 rounded-full border-4 border-sky-100 animate-ping opacity-30" />
-            <div className="absolute inset-0 w-20 h-20 rounded-full border-4 border-sky-100 border-t-sky-400 animate-spin" />
-            <div className="absolute inset-2 w-16 h-16 rounded-full border-4 border-amber-100 border-b-amber-400 animate-[spin_1.5s_linear_reverse_infinite]" />
-            <div className="absolute inset-0 flex items-center justify-center text-2xl font-black text-sky-600">{lvl}</div>
-          </div>
-          <h2 className="text-xl font-black text-stone-800 tracking-tight mb-1">MEMUAT BAB {lvl}</h2>
-          <motion.p
-            animate={{ opacity: [0.5, 1, 0.5] }}
-            transition={{ duration: 1.6, repeat: Infinity }}
-            className="text-stone-500 text-xs font-bold uppercase tracking-widest"
-          >
-            Menyiapkan soal...
-          </motion.p>
-          {/* Progress bar */}
-          <div className="mt-5 h-1.5 bg-stone-100 rounded-full overflow-hidden">
-            <motion.div
-              initial={{ width: '0%' }}
-              animate={{ width: '90%' }}
-              transition={{ duration: 2.5, ease: 'easeOut' }}
-              className="h-full rounded-full bg-gradient-to-r from-sky-400 to-blue-500"
-            />
-          </div>
-        </motion.div>
+        <div className="text-center glass rounded-3xl px-12 py-10 shadow-xl">
+          <div className="w-20 h-20 border-4 border-sky-200 border-t-sky-500 rounded-full animate-spin mb-8 mx-auto shadow-sm" />
+          <h2 className="text-2xl font-black text-stone-800 tracking-tight">MENYIAPKAN MISI</h2>
+          <p className="text-stone-500 mt-2 text-sm font-bold uppercase tracking-widest">MEMUAT BAB {lvl} ...</p>
+        </div>
       </div>
     );
   }
   if (!student) return <Navigate to="/register" replace />;
   if (!question) return (
     <div className={`min-h-screen flex flex-col items-center justify-center text-stone-800 city-bg ${bgClass} font-sans`}>
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-        className="text-center glass rounded-3xl p-10 shadow-xl max-w-sm mx-4">
-        <div className="text-6xl mb-4">🙈</div>
-        <p className="mb-2 text-xl text-stone-700 font-black">Modul Tidak Ditemukan</p>
-        <p className="text-stone-400 text-sm mb-8">Bab {lvl} belum tersedia. Hubungi guru.</p>
-        <button onClick={()=>navigate('/dashboard')}
-          className="px-8 py-3 bg-gradient-to-r from-sky-400 to-blue-500 text-white font-bold hover:from-sky-500 hover:to-blue-600 rounded-xl tracking-wide shadow-md transition-all w-full">
-          ← Kembali ke Peta
-        </button>
-      </motion.div>
+      <div className="text-center glass rounded-3xl p-10 shadow-xl">
+        <div className="text-amber-500 text-6xl mb-4 animate-bounce">🙈</div>
+        <p className="mb-8 text-xl text-stone-600 font-bold">Ups! Modul untuk Bab {lvl} tidak ditemukan.</p>
+        <button onClick={()=>navigate('/dashboard')} className="px-8 py-3 bg-gradient-to-r from-sky-400 to-blue-500 text-white font-bold hover:from-sky-500 hover:to-blue-600 rounded-xl tracking-wide shadow-md transition-all">KEMBALI KE PETA</button>
+      </div>
     </div>
   );
 
@@ -874,79 +842,307 @@ export default function GameLevel() {
         />
       </div>
 
-      {/* ════════════════ PRE-GAME TRANSITION ════════════════ */}
+      {/* ════════════════ PRE-GAME TRANSITION ANIMATION - ELEGANT MINIMAL STYLE ════════════════ */}
       <AnimatePresence>
         {phase === 'PRE_GAME_ANIM' && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0, scale: 1.04 }}
-            transition={{ duration: 0.35 }}
-            className="fixed inset-0 z-[200] w-screen h-screen flex items-center justify-center overflow-hidden"
-            style={{ background: 'rgba(255,255,255,0.94)', backdropFilter: 'blur(28px)' }}
+            exit={{ opacity: 0, transition: { duration: 1 } }}
+            className="absolute inset-0 z-50 flex items-center justify-center overflow-hidden city-bg bg-white/70 backdrop-blur-md"
           >
-            {/* Animated color blobs */}
+            {/* Background mesh pattern - subtle consistency element */}
+            <div 
+              className="absolute inset-0 pointer-events-none opacity-5"
+              style={{
+                backgroundImage: `linear-gradient(45deg, ${scene.glow} 1px, transparent 1px)`,
+                backgroundSize: '30px 30px'
+              }}
+            />
+            
+            {/* Enhanced dual glow backdrops for better contrast */}
+            <motion.div
+              animate={{ scale: [1, 1.35, 1], opacity: [0.35, 0.55, 0.35] }}
+              transition={{ duration: 6.5, repeat: Infinity, ease: 'easeInOut' }}
+              className="absolute w-[900px] h-[900px] rounded-full blur-3xl pointer-events-none"
+              style={{ background: scene.glow, left: '-300px', top: '-200px' }}
+            />
+            <motion.div
+              animate={{ scale: [1.15, 0.95, 1.15], opacity: [0.28, 0.45, 0.28] }}
+              transition={{ duration: 7.2, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
+              className="absolute w-[700px] h-[700px] rounded-full blur-3xl pointer-events-none"
+              style={{ background: '#fbbf24', right: '-180px', bottom: '-150px' }}
+            />
+            
+            {/* Enhanced secondary accent glow */}
+            <motion.div
+              animate={{ scale: [1.2, 1, 1.2], opacity: [0.15, 0.28, 0.15] }}
+              transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+              className="absolute w-[500px] h-[500px] rounded-full blur-3xl pointer-events-none"
+              style={{ background: '#f97316', left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}
+            />
+            
+            {/* Vibrant floating particles with stronger glow */}
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
-              <motion.div animate={{ scale: [1, 1.4, 1], opacity: [0.25, 0.45, 0.25] }}
-                transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-                className="absolute w-[500px] h-[500px] rounded-full blur-3xl"
-                style={{ background: scene.glow, top: '-15%', left: '-10%' }} />
-              <motion.div animate={{ scale: [1.2, 0.9, 1.2], opacity: [0.15, 0.3, 0.15] }}
-                transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
-                className="absolute w-[400px] h-[400px] rounded-full blur-3xl"
-                style={{ background: '#fbbf24', bottom: '-15%', right: '-10%' }} />
+              {[...Array(12)].map((_, i) => {
+                const colors = ['#fbbf24', '#f97316', '#fb7185', '#fca5a5', scene.glow];
+                const color = colors[i % colors.length];
+                return (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: '100vh', x: Math.random() * window.innerWidth }}
+                    animate={{ 
+                      opacity: [0, 0.9, 0.9, 0],
+                      y: '-100vh',
+                      x: Math.random() * window.innerWidth,
+                      rotate: [0, 360]
+                    }}
+                    transition={{
+                      delay: i * 0.2,
+                      duration: 7,
+                      repeat: Infinity,
+                      ease: 'easeInCubic'
+                    }}
+                    className="absolute w-4 h-4 rounded-full"
+                    style={{ 
+                      background: color, 
+                      boxShadow: `0 0 24px ${color}, 0 0 48px ${color}80`
+                    }}
+                  />
+                )
+              })}
             </div>
-
-            {/* Center content */}
-            <div className="relative z-10 flex flex-col items-center text-center px-6 max-w-sm w-full">
-
-              {/* Scene icon & label badge */}
-              <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }}
-                className="mb-5">
-                <span className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.35em] px-4 py-1.5 rounded-full border"
-                  style={{ color: scene.glow, borderColor: `${scene.glow}55`, background: `${scene.glow}12` }}>
-                  {scene.icon} {scene.label}
-                </span>
+            
+            <div className="relative z-10 text-center px-6 max-w-4xl">
+              {/* Top decorative system - enhanced consistency */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.05, duration: 0.7 }}
+                className="mb-6"
+              >
+                {/* Geometric accent bar */}
+                <motion.div
+                  animate={{ scaleX: [0, 1, 1] }}
+                  transition={{ delay: 0.08, duration: 0.8 }}
+                  className="h-1 mx-auto mb-5 origin-left rounded-full"
+                  style={{ width: '70px', background: `linear-gradient(90deg, ${scene.glow}, transparent)`, boxShadow: `0 0 16px ${scene.glow}60` }}
+                />
               </motion.div>
-
-              {/* Big BAB number */}
-              <motion.div initial={{ opacity: 0, scale: 0.6 }} animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.15, type: 'spring', stiffness: 220, damping: 16 }}
-                className="mb-2">
-                <p className="text-[11px] font-black uppercase tracking-[0.5em] mb-1"
-                  style={{ color: `${scene.glow}99` }}>BAB</p>
-                <p className="font-black leading-none"
-                  style={{ fontSize: 'clamp(6rem, 18vw, 9rem)', color: scene.glow,
-                    textShadow: `0 0 60px ${scene.glow}50, 0 4px 24px rgba(0,0,0,0.08)`,
-                    WebkitTextStroke: `2px ${scene.glow}30` }}>
-                  {lvl}
-                </p>
-              </motion.div>
-
-              {/* Chapter title */}
-              {storyData?.chapter && (
-                <motion.p initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                  className="text-stone-600 font-bold text-sm md:text-base mb-8 px-4 leading-snug">
-                  {storyData.chapter}
+              
+              {/* Protocol Header - Professional styling */}
+              <motion.div
+                initial={{ opacity: 0, y: -25 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.12, duration: 0.9 }}
+                className="mb-4"
+              >
+                <motion.p
+                  animate={{ opacity: [0.6, 1, 0.6] }}
+                  transition={{ delay: 0.25, duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
+                  className="text-xs font-serif uppercase tracking-[0.6em] font-extrabold"
+                  style={{ 
+                    color: scene.glow,
+                    textShadow: `0 2px 12px rgba(0, 0, 0, 0.4), 0 0 12px ${scene.glow}40`
+                  }}
+                >
+                  Problem Solving Protocol
                 </motion.p>
-              )}
-
-              {/* Progress bar + label */}
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.38 }}
-                className="w-full px-2">
-                <div className="h-1 bg-stone-200/70 rounded-full overflow-hidden mb-2.5">
-                  <motion.div initial={{ width: '0%' }} animate={{ width: '100%' }}
-                    transition={{ duration: 1.3, ease: 'easeInOut', delay: 0.38 }}
-                    className="h-full rounded-full"
-                    style={{ background: `linear-gradient(90deg, ${scene.glow}, #fbbf24)`,
-                      boxShadow: `0 0 8px ${scene.glow}60` }} />
+              </motion.div>
+              
+              {/* Separator line - visual consistency */}
+              <motion.div
+                animate={{ scaleX: [0, 1] }}
+                transition={{ delay: 0.2, duration: 1 }}
+                className="h-1.5 mx-auto mb-8 origin-center rounded-full"
+                style={{ 
+                  width: '100px',
+                  background: scene.glow, 
+                  boxShadow: `0 0 24px ${scene.glow}, 0 0 12px ${scene.glow}60` 
+                }}
+              />
+              
+              {/* Main title - Balanced sizing */}
+              <motion.h1
+                initial={{ opacity: 0, scale: 0.75, y: 40 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ delay: 0.35, duration: 1.2, ease: 'easeOut' }}
+                className="font-serif font-black text-6xl md:text-7xl leading-tight mb-6"
+                style={{ 
+                  color: scene.glow,
+                  textShadow: `0 6px 16px rgba(0, 0, 0, 0.5), 0 0 20px ${scene.glow}40`,
+                  filter: `drop-shadow(0 0 20px ${scene.glow}30)`
+                }}
+              >
+                Ready<br/>to<br/>Solve
+              </motion.h1>
+              
+              {/* Subtitle - Consistent with theme */}
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5, duration: 0.9 }}
+                className="text-xs md:text-sm font-serif italic font-semibold tracking-wide mb-5"
+                style={{ 
+                  color: '#e8d9cc',
+                  textShadow: `0 2px 6px rgba(0, 0, 0, 0.4)`
+                }}
+              >
+                Master the Challenge
+              </motion.p>
+              
+              {/* Decorative underline */}
+              <motion.div
+                animate={{ scaleX: [0, 1] }}
+                transition={{ delay: 0.6, duration: 1 }}
+                className="h-0.5 mx-auto mb-12 origin-center"
+                style={{ width: '70px', background: `linear-gradient(90deg, transparent, ${scene.glow}, transparent)` }}
+              />
+              
+              {/* Enhanced loading indicator */}
+              <motion.div
+                initial={{ opacity: 0, y: 25 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.65, duration: 0.9 }}
+                className="flex flex-col items-center gap-12"
+              >
+                {/* Premium triple orbiting system */}
+                <div className="relative w-36 h-36 flex items-center justify-center">
+                  {/* Outer decorative ring with gradient */}
+                  <motion.div
+                    animate={{ rotate: -360 }}
+                    transition={{ duration: 6, repeat: Infinity, ease: 'linear' }}
+                    className="absolute w-36 h-36 rounded-full border-2 border-dashed"
+                    style={{ 
+                      borderColor: `${scene.glow}85`,
+                      boxShadow: `inset 0 0 20px ${scene.glow}25, 0 0 16px ${scene.glow}30`
+                    }}
+                  />
+                  
+                  {/* Primary vibrant orbit - thicker and more prominent */}
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
+                    className="absolute w-32 h-32 rounded-full border-4"
+                    style={{ 
+                      borderColor: scene.glow,
+                      opacity: 1,
+                      boxShadow: `0 0 28px ${scene.glow}, 0 0 56px ${scene.glow}60, inset 0 0 12px ${scene.glow}30`
+                    }}
+                  />
+                  
+                  {/* Secondary vibrant orbit - golden accent */}
+                  <motion.div
+                    animate={{ rotate: -360 }}
+                    transition={{ duration: 5.5, repeat: Infinity, ease: 'linear' }}
+                    className="absolute w-24 h-24 rounded-full border-3"
+                    style={{ 
+                      borderColor: '#fbbf24',
+                      opacity: 1,
+                      boxShadow: `0 0 24px #fbbf24, 0 0 48px #fbbf2460, inset 0 0 10px #fbbf2440`
+                    }}
+                  />
+                  
+                  {/* Tertiary orbit for visual richness */}
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 7, repeat: Infinity, ease: 'linear' }}
+                    className="absolute w-14 h-14 rounded-full border-2"
+                    style={{ 
+                      borderColor: `${scene.glow}`,
+                      opacity: 0.75,
+                      boxShadow: `0 0 16px ${scene.glow}60`
+                    }}
+                  />
+                  
+                  {/* Central luminous core with multi-layer glow */}
+                  <motion.div
+                    animate={{ scale: [0.8, 1.5, 0.8] }}
+                    transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+                    className="w-8 h-8 rounded-full"
+                    style={{ 
+                      background: scene.glow,
+                      boxShadow: `0 0 32px ${scene.glow}, 0 0 64px ${scene.glow}70, inset 0 0 12px rgba(255, 255, 255, 0.6)`
+                    }}
+                  />
                 </div>
-                <motion.p animate={{ opacity: [0.4, 1, 0.4] }} transition={{ duration: 1, repeat: Infinity }}
-                  className="text-[10px] font-black uppercase tracking-[0.35em]"
-                  style={{ color: `${scene.glow}aa` }}>
-                  Bersiap masuk ke misi...
-                </motion.p>
+                
+                {/* Status text with enhanced styling */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.75, duration: 0.7 }}
+                  className="text-center"
+                >
+                  <motion.div
+                    animate={{ opacity: [0.4, 1, 0.4] }}
+                    transition={{ delay: 0.8, duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
+                    className="text-xs font-serif uppercase tracking-[0.4em] font-bold"
+                    style={{ 
+                      color: scene.glow,
+                      textShadow: `0 2px 10px rgba(0, 0, 0, 0.35), 0 0 8px ${scene.glow}40`
+                    }}
+                  >
+                    Initializing
+                  </motion.div>
+                  
+                  {/* Animated progress dots */}
+                  <div className="flex gap-4 justify-center mt-5">
+                    {[0, 1, 2].map((i) => (
+                      <motion.div
+                        key={i}
+                        animate={{ 
+                          scale: [0.5, 1.4, 0.5], 
+                          opacity: [0.4, 1, 0.4],
+                          y: [0, -8, 0]
+                        }}
+                        transition={{
+                          delay: i * 0.18,
+                          duration: 1.6,
+                          repeat: Infinity,
+                          ease: 'easeInOut'
+                        }}
+                        className="w-3.5 h-3.5 rounded-full"
+                        style={{ 
+                          background: ['#fbbf24', scene.glow, '#f97316'][i],
+                          boxShadow: `0 0 16px ${['#fbbf24', scene.glow, '#f97316'][i]}`
+                        }}
+                      />
+                    ))}
+                  </div>
+                </motion.div>
+              </motion.div>
+              
+              {/* Bottom decorative system - consistent with top */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.85, duration: 0.7 }}
+                className="mt-10 flex flex-col items-center gap-3"
+              >
+                {/* Left accent bar */}
+                <motion.div
+                  animate={{ scaleX: [0, 1, 1] }}
+                  transition={{ delay: 0.9, duration: 0.8 }}
+                  className="h-1 origin-center rounded-full"
+                  style={{ width: '70px', background: `linear-gradient(90deg, transparent, ${scene.glow})`, boxShadow: `0 0 16px ${scene.glow}60` }}
+                />
+                
+                {/* Center accent point */}
+                <motion.div
+                  animate={{ scale: [0.5, 1, 0.5] }}
+                  transition={{ delay: 0.95, duration: 2.8, repeat: Infinity }}
+                  className="w-1.5 h-1.5 rounded-full"
+                  style={{ background: scene.glow, boxShadow: `0 0 12px ${scene.glow}, 0 0 24px ${scene.glow}50` }}
+                />
+                
+                {/* Right accent bar */}
+                <motion.div
+                  animate={{ scaleX: [1, 1, 0] }}
+                  transition={{ delay: 1, duration: 0.8 }}
+                  className="h-1 origin-center rounded-full"
+                  style={{ width: '70px', background: `linear-gradient(90deg, ${scene.glow}, transparent)`, boxShadow: `0 0 16px ${scene.glow}60` }}
+                />
               </motion.div>
             </div>
           </motion.div>
@@ -1298,30 +1494,101 @@ export default function GameLevel() {
         )}
       </AnimatePresence>
 
-      {/* ════════════════ FEEDBACK POPUP (BERHASIL / GAGAL) ════════════════ */}
-      {feedback && createPortal(
-        <AnimatePresence mode="wait">
-          {feedback && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="fixed inset-0 z-[9999] flex items-center justify-center p-4 pointer-events-auto" style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }} onClick={(e) => { if (e.target === e.currentTarget && feedback.type === 'error') setFeedback(null); }} onKeyDown={(e) => { if (e.key === 'Escape' && feedback.type === 'error') setFeedback(null); }}>
-            <motion.div initial={{ scale: 0.75, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.85, opacity: 0, y: -10 }} transition={{ type: 'spring', stiffness: 320, damping: 26 }} className="relative w-full max-w-md max-h-[90vh] overflow-auto custom-scrollbar pointer-events-auto" style={{ background: 'rgba(255,255,255,0.98)', borderRadius: '1.75rem', boxShadow: feedback.type === 'success' ? '0 40px 100px rgba(16,185,129,0.3), 0 0 60px rgba(16,185,129,0.15)' : '0 40px 100px rgba(244,63,94,0.3), 0 0 60px rgba(244,63,94,0.15)' }}>
-              <div className="h-1.5 w-full" style={{ background: feedback.type === 'success' ? 'linear-gradient(90deg, #10b981, #34d399, #6ee7b7)' : 'linear-gradient(90deg, #f43f5e, #fb7185, #fda4af)' }} />
-              <div className="px-7 py-7 flex flex-col items-center text-center font-sans">
-                <motion.div initial={{ scale: 0, rotate: -30 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: 'spring', stiffness: 280, damping: 18, delay: 0.08 }} className="relative mb-5">
-                  <div className="w-24 h-24 rounded-full flex items-center justify-center text-5xl font-black shadow-xl border-4" style={feedback.type === 'success' ? { background: 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)', borderColor: '#6ee7b7', color: '#059669' } : { background: 'linear-gradient(135deg, #ffe4e6 0%, #fecdd3 100%)', borderColor: '#fda4af', color: '#e11d48' }}>
-                    {feedback.type === 'success' ? '✓' : '✕'}
+      {/* ════════════════ TERMINAL FEEDBACK OVERLAY ════════════════ */}
+      <AnimatePresence>
+        {feedback && (
+          <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}}
+            className="fixed inset-0 z-[100] bg-white/60 backdrop-blur-md flex items-center justify-center p-4">
+            
+            <motion.div initial={{scale:0.9, y: 20}} animate={{scale:1, y: 0}} exit={{scale:0.9, opacity:0}}
+              className={`relative max-w-2xl w-full p-8 md:p-10 rounded-2xl border shadow-xl overflow-hidden bg-white ${
+                feedback.type==='success'
+                  ? 'border-emerald-300'
+                  : 'border-rose-300'
+              }`}>
+              
+              <div className={`absolute top-0 left-0 w-full h-2 ${feedback.type==='success'?'bg-emerald-400':'bg-rose-400'}`} />
+              
+              <div className="flex flex-col items-center text-center font-sans">
+                <div className={`w-20 h-20 rounded-full flex items-center justify-center text-4xl mb-6 shadow-md border ${
+                  feedback.type==='success' ? 'bg-emerald-50 border-emerald-200 text-emerald-500' : 'bg-rose-50 border-rose-200 text-rose-500'
+                }`}>
+                  {feedback.type==='success'?'✓':'✕'}
+                </div>
+                
+                <h3 className={`text-2xl md:text-3xl font-black mb-6 tracking-wide uppercase ${feedback.type==='success'?'text-emerald-600':'text-rose-600'}`}>
+                  {feedback.text}
+                </h3>
+                
+                {feedback.explanation && (
+                  <div className={`text-left w-full p-5 rounded-xl border leading-relaxed text-sm md:text-base mb-6 ${
+                    feedback.type==='success'?'bg-emerald-50 border-emerald-200 text-emerald-800':'bg-rose-50 border-rose-200 text-rose-800'
+                  }`}>
+                    <p className={`font-bold mb-2 uppercase tracking-wide text-xs flex items-center gap-2 ${feedback.type==='success'?'text-emerald-700':'text-rose-700'}`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${feedback.type==='success'?'bg-emerald-500':'bg-rose-500'}`} /> PENJELASAN:
+                    </p>
+                    {feedback.explanation}
                   </div>
-                  <div className="absolute inset-0 rounded-full animate-ping opacity-20 pointer-events-none" style={{ background: feedback.type === 'success' ? '#10b981' : '#f43f5e', animationDuration: '1.8s' }} />
-                </motion.div>
-                <motion.h3 initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="text-2xl md:text-3xl font-black mb-1 tracking-wide uppercase" style={{ color: feedback.type === 'success' ? '#059669' : '#e11d48' }}>{feedback.text}</motion.h3>
-                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="text-xs font-bold uppercase tracking-widest mb-5" style={{ color: feedback.type === 'success' ? '#6ee7b7' : '#fda4af' }}>{feedback.type === 'success' ? '— Jawaban Tepat —' : '— Jawaban Salah —'}</motion.p>
-                {feedback.explanation && <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className="w-full rounded-2xl p-4 mb-6 text-left border" style={feedback.type === 'success' ? { background: '#f0fdf4', borderColor: '#bbf7d0', color: '#166534' } : { background: '#fff1f2', borderColor: '#fecdd3', color: '#9f1239' }}><p className="text-[10px] font-black uppercase tracking-widest mb-1.5 flex items-center gap-1.5" style={{ color: feedback.type === 'success' ? '#15803d' : '#be123c' }}><span className="w-1.5 h-1.5 rounded-full inline-block shrink-0" style={{ background: feedback.type === 'success' ? '#16a34a' : '#e11d48' }} />Penjelasan</p><p className="text-sm leading-relaxed">{feedback.explanation}</p></motion.div>}
-                {feedback.type === 'success' && <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.32 }} className="w-full flex flex-col sm:flex-row gap-3">{lvl < (totalLevels || 10) && <motion.button whileHover={{ scale: 1.04, y: -1 }} whileTap={{ scale: 0.97 }} onClick={async () => { setIsNavigating(true); if (!submitted) await handleLevelComplete(); setFeedback(null); setTimeout(() => navigate(`/game/${lvl + 1}`), 300); }} className="flex-1 py-3.5 rounded-2xl font-black text-sm uppercase tracking-widest text-white flex items-center justify-center gap-2" style={{ background: 'linear-gradient(135deg, #10b981, #059669)', boxShadow: '0 6px 24px rgba(16,185,129,0.4)' }}>Lanjut Level ▶</motion.button>}<motion.button whileHover={{ scale: 1.03, y: -1 }} whileTap={{ scale: 0.97 }} onClick={async () => { setIsNavigating(true); if (!submitted) await handleLevelComplete(); setFeedback(null); setTimeout(() => navigate('/dashboard'), 300); }} className="flex-1 py-3.5 rounded-2xl font-bold text-sm uppercase tracking-widest border-2 border-stone-200 bg-stone-50 text-stone-600 hover:bg-stone-100 flex items-center justify-center gap-2 transition-colors">◁ {lvl >= (totalLevels || 10) ? 'Selesai 🎉' : 'Dashboard'}</motion.button></motion.div>}
-                {feedback.type === 'error' && <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.32 }} className="w-full flex flex-col sm:flex-row gap-3"><motion.button whileHover={{ scale: 1.04, y: -1 }} whileTap={{ scale: 0.97 }} onClick={() => setFeedback(null)} className="flex-1 py-3.5 rounded-2xl font-black text-sm uppercase tracking-widest text-white flex items-center justify-center gap-2" style={{ background: 'linear-gradient(135deg, #f43f5e, #e11d48)', boxShadow: '0 6px 24px rgba(244,63,94,0.4)' }}>🔄 Coba Lagi</motion.button><motion.button whileHover={{ scale: 1.03, y: -1 }} whileTap={{ scale: 0.97 }} onClick={() => navigate('/dashboard')} className="flex-1 py-3.5 rounded-2xl font-bold text-sm uppercase tracking-widest border-2 border-stone-200 bg-stone-50 text-stone-600 hover:bg-stone-100 flex items-center justify-center gap-2 transition-colors">◁ Dashboard</motion.button></motion.div>}
+                )}
+
+                {/* Success Action Buttons */}
+                {feedback.type === 'success' && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 1.2 }}
+                    className="w-full flex flex-col sm:flex-row gap-3 mt-4"
+                  >
+                    {lvl < (totalLevels || 10) && (
+                      <motion.button
+                        whileHover={{ scale: 1.04 }}
+                        whileTap={{ scale: 0.96 }}
+                        onClick={async () => {
+                          setIsNavigating(true);
+                          // Ensure level completion is submitted before navigating
+                          if (!submitted) {
+                            await handleLevelComplete();
+                          }
+                          setFeedback(null);
+                          setTimeout(() => navigate(`/game/${lvl + 1}`), 300);
+                        }}
+                        className="flex-1 py-3 rounded-lg font-bold text-base uppercase tracking-wide border transition-all shadow-md flex items-center justify-center gap-2 bg-emerald-50 border-emerald-300 text-emerald-700 hover:bg-emerald-100"
+                      >
+                        <span>Lanjut ke Berikutnya</span>
+                        <span>▶</span>
+                      </motion.button>
+                    )}
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.97 }}
+                      onClick={async () => {
+                        setIsNavigating(true);
+                        // Ensure level completion is submitted before navigating
+                        if (!submitted) {
+                          await handleLevelComplete();
+                        }
+                        setFeedback(null);
+                        setTimeout(() => navigate('/dashboard'), 300);
+                      }}
+                      className="flex-1 py-3 rounded-lg font-bold text-base uppercase tracking-wide border border-stone-300 bg-white hover:bg-stone-50 text-stone-600 hover:text-stone-800 transition-all flex items-center justify-center gap-2 shadow-sm"
+                    >
+                      <span>◁</span>
+                      <span>{lvl >= (totalLevels || 10) ? 'Selesai' : 'Dashboard'}</span>
+                    </motion.button>
+                  </motion.div>
+                )}
+                
+                {feedback.type==='success' && (
+                  <div className="mt-8 flex items-center gap-3 text-emerald-600 text-xs font-bold uppercase tracking-wide">
+                    <span className="w-4 h-4 rounded-full border border-emerald-200 border-t-emerald-500 animate-spin" />
+                    MEMPROSES...
+                  </div>
+                )}
               </div>
             </motion.div>
-          </motion.div>}
-        </AnimatePresence>,
-        document.body
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

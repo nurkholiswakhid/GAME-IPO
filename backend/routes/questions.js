@@ -26,40 +26,6 @@ router.get('/count', (req, res) => {
   }
 });
 
-// Ringkasan semua level yang punya soal (untuk dashboard siswa)
-router.get('/levels-summary', (req, res) => {
-  try {
-    const db = new sqlite3.Database(dbPath, sqlite3.OPEN_READONLY);
-    // Ambil setiap level: jumlah soal dan tipe soal pertama (representatif)
-    db.all(
-      `SELECT
-         level_number,
-         COUNT(*) AS question_count,
-         (SELECT type FROM questions q2
-          WHERE q2.level_number = q.level_number
-          ORDER BY q2.id ASC LIMIT 1) AS type,
-         (SELECT topic FROM questions q3
-          WHERE q3.level_number = q.level_number
-          ORDER BY q3.id ASC LIMIT 1) AS topic
-       FROM questions q
-       GROUP BY level_number
-       ORDER BY level_number ASC`,
-      [],
-      (err, rows) => {
-        db.close();
-        if (err) {
-          console.error('levels-summary error:', err);
-          return res.status(500).json({ error: 'Database read error' });
-        }
-        res.json(rows || []);
-      }
-    );
-  } catch (error) {
-    console.error('levels-summary endpoint error:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
 // Mengambil bank soal untuk level tertentu
 router.get('/:level', async (req, res) => {
   try {
