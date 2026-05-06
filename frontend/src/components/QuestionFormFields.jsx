@@ -7,7 +7,11 @@ export function buildOptionsJSON(type, optState) {
     if (type === 'MATCHING') {
       return JSON.stringify({ left: optState.left.filter(Boolean), right: optState.right.filter(Boolean) });
     }
-    // CLASSIFICATION, SEQUENCE, MULTIPLE_CHOICE, TRUE_FALSE
+    // TRUE_FALSE always has exactly 2 fixed options
+    if (type === 'TRUE_FALSE') {
+      return JSON.stringify(['BENAR', 'SALAH']);
+    }
+    // CLASSIFICATION, SEQUENCE, MULTIPLE_CHOICE
     return JSON.stringify(optState.items.filter(Boolean));
   } catch { return ''; }
 }
@@ -33,7 +37,12 @@ export function buildCorrectJSON(type, corState) {
     if (type === 'SEQUENCE' || type === 'SEQUENCING') {
       return JSON.stringify(corState.order.filter(Boolean));
     }
-    if (type === 'MULTIPLE_CHOICE' || type === 'TRUE_FALSE') {
+    if (type === 'MULTIPLE_CHOICE') {
+      return JSON.stringify(corState.selected);
+    }
+    if (type === 'TRUE_FALSE') {
+      // selected must be exactly 'BENAR' or 'SALAH'
+      if (corState.selected !== 'BENAR' && corState.selected !== 'SALAH') return '';
       return JSON.stringify(corState.selected);
     }
   } catch { return ''; }
@@ -104,6 +113,7 @@ export function parseCorrectState(type, correctJson) {
 
 export function emptyOptState(type) {
   if (type === 'MATCHING') return { left: [''], right: [''], items: [] };
+  if (type === 'TRUE_FALSE') return { items: ['BENAR', 'SALAH'], left: [], right: [] };
   return { items: [''], left: [], right: [] };
 }
 export function emptyCorState() {
@@ -168,13 +178,16 @@ const smBtn = (color='stone') => `px-3 py-1 text-xs font-bold rounded-lg bg-${co
 // ════════════════════════════════════════════════════════════════════════════
 function ClassificationFields({ optState, setOptState, corState, setCorState }) {
   const items = optState.items;
+  // categories derived from corState: array of unique category strings
+  const categories = [...new Set(Object.values(corState.mapping).filter(Boolean))];
+  const [newCat, setNewCat] = React.useState('');
 
+  // ── Item helpers ──────────────────────────────────────────────────────────
   const updateItem = (idx, val) => {
     const oldVal = items[idx];
     const next = [...items];
     next[idx] = val;
     setOptState({ ...optState, items: next });
-    
     if (oldVal !== val) {
       const map = { ...corState.mapping };
       if (oldVal && map[oldVal] !== undefined) {
@@ -188,56 +201,186 @@ function ClassificationFields({ optState, setOptState, corState, setCorState }) 
   const addItem = () => setOptState({ ...optState, items: [...items, ''] });
   const removeItem = (idx) => {
     const removed = items[idx];
-    const next = items.filter((_, i) => i !== idx);
     const map = { ...corState.mapping };
     delete map[removed];
-    setOptState({ ...optState, items: next });
+    setOptState({ ...optState, items: items.filter((_, i) => i !== idx) });
     setCorState({ ...corState, mapping: map });
   };
 
+  // ── Category helpers ──────────────────────────────────────────────────────
+  const addCategory = () => {
+    const trimmed = newCat.trim();
+    if (!trimmed || categories.includes(trimmed)) { setNewCat(''); return; }
+    // Add a placeholder mapping so the category appears immediately
+    setNewCat('');
+  };
+
+  const removeCategory = (cat) => {
+    const map = { ...corState.mapping };
+    Object.keys(map).forEach(k => { if (map[k] === cat) delete map[k]; });
+    setCorState({ ...corState, mapping: map });
+  };
+
+  const assignItem = (item, cat) => {
+    const map = { ...corState.mapping };
+    if (cat === '') { delete map[item]; }
+    else { map[item] = cat; }
+    setCorState({ ...corState, mapping: map });
+  };
+
+  // Unique categories currently used in mapping + manually added
+  const allCats = [...new Set([
+    ...Object.values(corState.mapping).filter(Boolean),
+  ])];
+
+  // Group items by category for preview
+  const grouped = {};
+  allCats.forEach(c => { grouped[c] = []; });
+  Object.entries(corState.mapping).forEach(([item, cat]) => {
+    if (cat) { if (!grouped[cat]) grouped[cat] = []; grouped[cat].push(item); }
+  });
+  const unassigned = items.filter(it => it && !corState.mapping[it]);
+
+  const catColors = [
+    'bg-violet-100 border-violet-300 text-violet-800',
+    'bg-blue-100 border-blue-300 text-blue-800',
+    'bg-amber-100 border-amber-300 text-amber-800',
+    'bg-emerald-100 border-emerald-300 text-emerald-800',
+    'bg-pink-100 border-pink-300 text-pink-800',
+    'bg-orange-100 border-orange-300 text-orange-800',
+  ];
+
   return (
     <div className="space-y-4">
+      {/* ── Step 1: Daftar Item ── */}
       <div className="bg-white border border-stone-200 rounded-xl overflow-hidden">
         <div className="px-4 py-3 bg-violet-50 border-b border-violet-100 flex justify-between items-center">
-          <span className="text-xs font-black text-violet-700 uppercase tracking-widest">Item yang Dikelompokkan</span>
+          <div>
+            <span className="text-xs font-black text-violet-700 uppercase tracking-widest">① Daftar Item</span>
+            <p className="text-xs text-violet-500 mt-0.5">Item-item yang akan diacak dan dikelompokkan siswa</p>
+          </div>
           <button type="button" onClick={addItem} className={smBtn('violet')}>+ Tambah Item</button>
         </div>
         <div className="divide-y divide-stone-100">
           {items.map((it, idx) => (
-            <div key={idx} className="flex gap-2 items-center px-4 py-3">
+            <div key={idx} className="flex gap-2 items-center px-4 py-2">
+              <span className="text-xs text-stone-400 w-5 text-right flex-shrink-0">{idx + 1}</span>
               <input value={it} onChange={e => updateItem(idx, e.target.value)}
                 className={inp + ' flex-1'} placeholder="Teks item (contoh: Keyboard)" />
               <button type="button" onClick={() => removeItem(idx)}
-                className="px-2 py-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-500 text-xs font-bold border border-red-100">✕</button>
+                className="px-2 py-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-500 text-xs font-bold border border-red-100">✕</button>
             </div>
           ))}
+          {items.length === 0 && <p className="text-xs text-stone-400 text-center py-4 italic">Belum ada item.</p>}
         </div>
       </div>
 
+      {/* ── Step 2: Assign Kategori ── */}
       {items.filter(Boolean).length > 0 && (
         <div className="bg-white border border-violet-200 rounded-xl overflow-hidden">
           <div className="px-4 py-3 bg-violet-50 border-b border-violet-100">
-            <span className="text-xs font-black text-violet-700 uppercase tracking-widest">Kategori Benar Tiap Item</span>
-            <p className="text-xs text-violet-500 mt-1">Tulis nama kategori (misal: INPUT, OUTPUT)</p>
+            <span className="text-xs font-black text-violet-700 uppercase tracking-widest">② Assign Kategori Tiap Item</span>
+            <p className="text-xs text-violet-500 mt-1">Pilih atau ketik nama kategori untuk setiap item</p>
           </div>
+
+          {/* Add new category shortcut */}
+          <div className="px-4 py-3 bg-violet-50/50 border-b border-violet-100 flex gap-2">
+            <input
+              value={newCat}
+              onChange={e => setNewCat(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addCategory())}
+              className="flex-1 px-3 py-1.5 rounded-lg border border-violet-200 text-xs outline-none focus:border-violet-400 bg-white"
+              placeholder="Tulis nama kategori baru (Enter untuk tambah)..." />
+            <button type="button" onClick={addCategory} className={smBtn('violet')}>+ Kategori</button>
+          </div>
+
+          {/* Existing categories as quick-assign buttons */}
+          {allCats.length > 0 && (
+            <div className="px-4 py-2 flex flex-wrap gap-2 border-b border-violet-100">
+              <span className="text-xs text-stone-400 self-center">Kategori:</span>
+              {allCats.map((cat, i) => (
+                <span key={cat} className={`inline-flex items-center gap-1 px-2 py-1 rounded-full border text-xs font-bold ${catColors[i % catColors.length]}`}>
+                  {cat}
+                  <button type="button" onClick={() => removeCategory(cat)} className="hover:opacity-70 ml-0.5">✕</button>
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* Per-item assignment */}
           <div className="divide-y divide-stone-100">
-            {items.filter(Boolean).map((it, idx) => (
-              <div key={idx} className="flex gap-3 items-center px-4 py-3">
-                <span className="w-1/2 text-sm font-bold text-stone-600 truncate">{it}</span>
-                <span className="text-stone-300">→</span>
-                <input
-                  value={corState.mapping[it] || ''}
-                  onChange={e => setCorState({ ...corState, mapping: { ...corState.mapping, [it]: e.target.value } })}
-                  className={inp + ' flex-1'}
-                  placeholder="Nama Kategori..." />
+            {items.filter(Boolean).map((it, idx) => {
+              const assignedCat = corState.mapping[it] || '';
+              const catIdx = allCats.indexOf(assignedCat);
+              return (
+                <div key={idx} className={`flex gap-3 items-center px-4 py-2.5 ${assignedCat ? catColors[allCats.indexOf(assignedCat) % catColors.length].split(' ')[0] + '/30' : ''}`}>
+                  <span className="flex-1 text-sm font-bold text-stone-700 truncate">{it}</span>
+                  <span className="text-stone-300">→</span>
+                  <select
+                    value={assignedCat}
+                    onChange={e => {
+                      const val = e.target.value;
+                      // If new category typed inline, add it
+                      assignItem(it, val);
+                    }}
+                    className="w-48 px-2 py-1.5 rounded-lg border border-stone-200 text-xs outline-none focus:border-violet-400 bg-white"
+                  >
+                    <option value="">— belum dikategori —</option>
+                    {allCats.map(cat => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                  </select>
+                  {/* quick-type if category not in list yet */}
+                  <input
+                    value={assignedCat}
+                    onChange={e => assignItem(it, e.target.value)}
+                    className="w-36 px-2 py-1.5 rounded-lg border border-stone-200 text-xs outline-none focus:border-violet-400 bg-white"
+                    placeholder="atau ketik manual..."
+                  />
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ── Preview Pengelompokan ── */}
+      {allCats.length > 0 && (
+        <div className="bg-white border border-violet-100 rounded-xl overflow-hidden">
+          <div className="px-4 py-3 bg-violet-50 border-b border-violet-100">
+            <span className="text-xs font-black text-violet-700 uppercase tracking-widest">③ Preview Pengelompokan</span>
+          </div>
+          <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+            {allCats.map((cat, i) => (
+              <div key={cat} className={`rounded-xl border-2 p-3 ${catColors[i % catColors.length]}`}>
+                <p className="text-xs font-black uppercase tracking-wide mb-2">{cat}</p>
+                <div className="flex flex-wrap gap-1">
+                  {(grouped[cat] || []).map(item => (
+                    <span key={item} className="px-2 py-1 bg-white/70 rounded-lg text-xs font-medium">{item}</span>
+                  ))}
+                  {(!grouped[cat] || grouped[cat].length === 0) && (
+                    <span className="text-xs opacity-50 italic">Belum ada item</span>
+                  )}
+                </div>
               </div>
             ))}
+            {unassigned.length > 0 && (
+              <div className="rounded-xl border-2 border-dashed border-stone-300 p-3">
+                <p className="text-xs font-black uppercase tracking-wide mb-2 text-stone-400">Belum Dikategori</p>
+                <div className="flex flex-wrap gap-1">
+                  {unassigned.map(item => (
+                    <span key={item} className="px-2 py-1 bg-stone-100 rounded-lg text-xs font-medium text-stone-600">{item}</span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
     </div>
   );
 }
+
 
 // ════════════════════════════════════════════════════════════════════════════
 // MATCHING FIELDS
@@ -252,10 +395,12 @@ function MatchingFields({ optState, setOptState, corState, setCorState }) {
     setOptState({ ...optState, [side]: arr });
     if (side === 'left' && oldVal !== val) {
       const map = { ...corState.mapping };
-      if (oldVal && map[oldVal] !== undefined) {
-        map[val] = map[oldVal];
-        delete map[oldVal];
-      }
+      if (oldVal && map[oldVal] !== undefined) { map[val] = map[oldVal]; delete map[oldVal]; }
+      setCorState({ ...corState, mapping: map });
+    }
+    if (side === 'right' && oldVal !== val) {
+      const map = { ...corState.mapping };
+      Object.keys(map).forEach(l => { if (map[l] === oldVal) map[l] = val; });
       setCorState({ ...corState, mapping: map });
     }
   };
@@ -272,70 +417,290 @@ function MatchingFields({ optState, setOptState, corState, setCorState }) {
       setOptState({ ...optState, left: left.filter((_, i) => i !== idx) });
       setCorState({ ...corState, mapping: map });
     } else {
+      const removed = right[idx];
+      const map = { ...corState.mapping };
+      Object.keys(map).forEach(l => { if (map[l] === removed) delete map[l]; });
       setOptState({ ...optState, right: right.filter((_, i) => i !== idx) });
+      setCorState({ ...corState, mapping: map });
     }
   };
 
-  return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
-        <div className="bg-white border border-blue-200 rounded-xl overflow-hidden">
-          <div className="px-4 py-3 bg-blue-50 border-b border-blue-100 flex justify-between items-center">
-            <span className="text-xs font-black text-blue-700 uppercase">Kolom Kiri</span>
-            <button type="button" onClick={() => addSide('left')} className={smBtn('blue')}>+</button>
-          </div>
-          {left.map((it, idx) => (
-            <div key={idx} className="flex gap-1 items-center px-3 py-2 border-b border-stone-50">
-              <input value={it} onChange={e => updateSide('left', idx, e.target.value)}
-                className="flex-1 px-2 py-2 rounded border border-stone-200 text-xs outline-none focus:border-blue-400"
-                placeholder="Item kiri..." />
-              <button type="button" onClick={() => removeSide('left', idx)}
-                className="text-red-400 hover:text-red-600 font-bold text-xs px-1">✕</button>
-            </div>
-          ))}
-        </div>
+  const setPair = (lt, rt) => {
+    setCorState({ ...corState, mapping: { ...corState.mapping, [lt]: rt } });
+  };
+  const clearPair = (lt) => {
+    const map = { ...corState.mapping }; delete map[lt];
+    setCorState({ ...corState, mapping: map });
+  };
 
-        <div className="bg-white border border-sky-200 rounded-xl overflow-hidden">
-          <div className="px-4 py-3 bg-sky-50 border-b border-sky-100 flex justify-between items-center">
-            <span className="text-xs font-black text-sky-700 uppercase">Kolom Kanan</span>
-            <button type="button" onClick={() => addSide('right')} className={smBtn('sky')}>+</button>
-          </div>
-          {right.map((it, idx) => (
-            <div key={idx} className="flex gap-1 items-center px-3 py-2 border-b border-stone-50">
-              <input value={it} onChange={e => updateSide('right', idx, e.target.value)}
-                className="flex-1 px-2 py-2 rounded border border-stone-200 text-xs outline-none focus:border-sky-400"
-                placeholder="Item kanan..." />
-              <button type="button" onClick={() => removeSide('right', idx)}
-                className="text-red-400 hover:text-red-600 font-bold text-xs px-1">✕</button>
+  const usedRight   = new Set(Object.values(corState.mapping).filter(Boolean));
+  const leftFilled  = left.filter(Boolean);
+  const rightFilled = right.filter(Boolean);
+  const pairedCount = leftFilled.filter(l => corState.mapping[l]).length;
+  const allPaired   = leftFilled.length > 0 && pairedCount === leftFilled.length;
+
+  return (
+    <div className="space-y-5">
+
+      {/* ─── STEP INDICATOR ─── */}
+      <div className="flex items-center gap-3 px-1">
+        {['Isi Item Kiri', 'Isi Item Kanan', 'Pasangkan'].map((s, i) => (
+          <React.Fragment key={i}>
+            <div className="flex items-center gap-1.5">
+              <span className="w-5 h-5 rounded-full bg-blue-500 text-white text-[10px] font-black flex items-center justify-center flex-shrink-0">{i+1}</span>
+              <span className="text-xs font-bold text-stone-500 hidden sm:block">{s}</span>
             </div>
-          ))}
+            {i < 2 && <div className="flex-1 h-px bg-stone-200 max-w-[40px]" />}
+          </React.Fragment>
+        ))}
+        <div className="ml-auto">
+          {leftFilled.length > 0 && rightFilled.length > 0 && (
+            <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full border ${
+              allPaired
+                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                : 'bg-amber-50 text-amber-700 border-amber-200'
+            }`}>
+              {allPaired ? '✓ Semua terpasang' : `${pairedCount}/${leftFilled.length} terpasang`}
+            </span>
+          )}
         </div>
       </div>
 
-      {left.filter(Boolean).length > 0 && right.filter(Boolean).length > 0 && (
-        <div className="bg-white border border-blue-200 rounded-xl overflow-hidden">
-          <div className="px-4 py-3 bg-blue-50 border-b border-blue-100">
-            <span className="text-xs font-black text-blue-700 uppercase tracking-widest">Pasangan Benar</span>
+      {/* ─── STEP 1 & 2: INPUT ITEM ─── */}
+      <div className="grid grid-cols-2 gap-3">
+
+        {/* Kolom Kiri */}
+        <div className="rounded-2xl border-2 border-blue-200 bg-gradient-to-b from-blue-50 to-white overflow-hidden shadow-sm">
+          <div className="px-4 py-2.5 border-b border-blue-100 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-lg bg-blue-500 text-white text-[10px] font-black flex items-center justify-center shadow-sm">1</div>
+              <div>
+                <p className="text-xs font-black text-blue-700 uppercase tracking-wide leading-none">Kolom Kiri</p>
+                <p className="text-[10px] text-blue-400 mt-0.5">Item pertanyaan</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => addSide('left')}
+              className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-500 hover:bg-blue-600 text-white text-[11px] font-bold transition-all shadow-sm"
+            >
+              + Tambah
+            </button>
           </div>
-          <div className="divide-y divide-stone-100">
-            {left.filter(Boolean).map((lt, idx) => (
-              <div key={idx} className="flex gap-3 items-center px-4 py-3">
-                <span className="w-1/2 text-sm font-bold text-stone-600 truncate">{lt}</span>
-                <span className="text-stone-300 font-bold">↔</span>
-                <select
-                  value={corState.mapping[lt] || ''}
-                  onChange={e => setCorState({ ...corState, mapping: { ...corState.mapping, [lt]: e.target.value } })}
-                  className="flex-1 px-3 py-2 rounded-lg border border-stone-200 bg-white text-sm focus:border-blue-400 outline-none">
-                  <option value="">-- pilih pasangan --</option>
-                  {right.filter(Boolean).map((rt, ridx) => (
-                    <option key={ridx} value={rt}>{rt}</option>
-                  ))}
-                </select>
+          <div className="p-2 space-y-1.5">
+            {left.length === 0 && (
+              <div className="flex flex-col items-center justify-center py-6 gap-2 opacity-50">
+                <span className="text-2xl">📝</span>
+                <p className="text-xs text-stone-400 italic text-center">Belum ada item.<br/>Klik + Tambah</p>
+              </div>
+            )}
+            {left.map((it, idx) => {
+              const isPaired = !!it && !!corState.mapping[it];
+              return (
+                <div key={idx} className={`group flex items-center gap-1.5 rounded-xl px-2.5 py-2 border-2 transition-all ${
+                  isPaired
+                    ? 'border-blue-300 bg-blue-50 shadow-sm'
+                    : 'border-stone-200 bg-white hover:border-blue-200'
+                }`}>
+                  <span className={`w-5 h-5 flex-shrink-0 rounded-lg text-[10px] font-black flex items-center justify-center ${
+                    isPaired ? 'bg-blue-500 text-white' : 'bg-stone-100 text-stone-400'
+                  }`}>
+                    {isPaired ? '✓' : idx + 1}
+                  </span>
+                  <textarea
+                    value={it}
+                    onChange={e => updateSide('left', idx, e.target.value)}
+                    rows={it.length > 40 ? 2 : 1}
+                    className="flex-1 bg-transparent outline-none text-sm font-medium text-stone-700 placeholder-stone-300 min-w-0 resize-none leading-snug"
+                    placeholder={`Item ${idx + 1}...`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeSide('left', idx)}
+                    className="opacity-0 group-hover:opacity-100 w-5 h-5 rounded-md bg-red-100 hover:bg-red-200 text-red-500 text-[10px] font-bold flex items-center justify-center flex-shrink-0 transition-all"
+                  >✕</button>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Kolom Kanan */}
+        <div className="rounded-2xl border-2 border-violet-200 bg-gradient-to-b from-violet-50 to-white overflow-hidden shadow-sm">
+          <div className="px-4 py-2.5 border-b border-violet-100 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-lg bg-violet-500 text-white text-[10px] font-black flex items-center justify-center shadow-sm">2</div>
+              <div>
+                <p className="text-xs font-black text-violet-700 uppercase tracking-wide leading-none">Kolom Kanan</p>
+                <p className="text-[10px] text-violet-400 mt-0.5">Pasangan / jawaban</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => addSide('right')}
+              className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-violet-500 hover:bg-violet-600 text-white text-[11px] font-bold transition-all shadow-sm"
+            >
+              + Tambah
+            </button>
+          </div>
+          <div className="p-2 space-y-1.5">
+            {right.length === 0 && (
+              <div className="flex flex-col items-center justify-center py-6 gap-2 opacity-50">
+                <span className="text-2xl">🔗</span>
+                <p className="text-xs text-stone-400 italic text-center">Belum ada item.<br/>Klik + Tambah</p>
+              </div>
+            )}
+            {right.map((it, idx) => {
+              const isUsed = !!it && usedRight.has(it);
+              return (
+                <div key={idx} className={`group flex items-center gap-1.5 rounded-xl px-2.5 py-2 border-2 transition-all ${
+                  isUsed
+                    ? 'border-violet-300 bg-violet-50 shadow-sm'
+                    : 'border-stone-200 bg-white hover:border-violet-200'
+                }`}>
+                  <span className={`w-5 h-5 flex-shrink-0 rounded-lg text-[10px] font-black flex items-center justify-center ${
+                    isUsed ? 'bg-violet-500 text-white' : 'bg-stone-100 text-stone-400'
+                  }`}>
+                    {isUsed ? '✓' : idx + 1}
+                  </span>
+                  <textarea
+                    value={it}
+                    onChange={e => updateSide('right', idx, e.target.value)}
+                    rows={it.length > 40 ? 2 : 1}
+                    className="flex-1 bg-transparent outline-none text-sm font-medium text-stone-700 placeholder-stone-300 min-w-0 resize-none leading-snug"
+                    placeholder={`Item ${idx + 1}...`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeSide('right', idx)}
+                    className="opacity-0 group-hover:opacity-100 w-5 h-5 rounded-md bg-red-100 hover:bg-red-200 text-red-500 text-[10px] font-bold flex items-center justify-center flex-shrink-0 transition-all"
+                  >✕</button>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* ─── STEP 3: PASANGKAN ─── */}
+      {leftFilled.length > 0 && rightFilled.length > 0 && (
+        <div className="rounded-2xl border-2 border-indigo-200 overflow-hidden shadow-sm">
+          <div className="px-4 py-3 bg-gradient-to-r from-blue-500 to-violet-500 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-lg bg-white/20 text-white text-[10px] font-black flex items-center justify-center">3</div>
+              <div>
+                <p className="text-xs font-black text-white uppercase tracking-wide leading-none">Tentukan Pasangan Benar</p>
+                <p className="text-[10px] text-blue-100 mt-0.5">Pilih item kanan yang cocok untuk setiap item kiri</p>
+              </div>
+            </div>
+            {allPaired && (
+              <span className="text-[11px] font-bold bg-white/20 text-white px-2.5 py-1 rounded-full border border-white/30">
+                ✓ Lengkap!
+              </span>
+            )}
+          </div>
+
+          {/* Pairing rows */}
+          <div className="divide-y divide-stone-100 bg-white">
+            {leftFilled.map((lt, idx) => {
+              const paired = corState.mapping[lt] || '';
+              return (
+                <div key={idx} className={`px-4 py-3 transition-colors ${paired ? 'bg-indigo-50/40' : ''}`}>
+                  {/* Left item label */}
+                  <div className="flex items-start gap-2 mb-2">
+                    <span className={`w-5 h-5 flex-shrink-0 rounded-lg text-[10px] font-black flex items-center justify-center mt-0.5 ${
+                      paired ? 'bg-blue-500 text-white' : 'bg-amber-400 text-white'
+                    }`}>{idx + 1}</span>
+                    <span className="text-sm font-semibold text-stone-800 leading-snug break-words min-w-0 flex-1">{lt}</span>
+                  </div>
+
+                  {/* Arrow + Right picker */}
+                  <div className="pl-7">
+                    {!paired ? (
+                      <div className="flex flex-wrap gap-1.5">
+                        {rightFilled.map((rt, ridx) => {
+                          const taken = usedRight.has(rt) && corState.mapping[lt] !== rt;
+                          return (
+                            <button
+                              key={ridx}
+                              type="button"
+                              disabled={taken}
+                              onClick={() => !taken && setPair(lt, rt)}
+                              className={`px-2.5 py-1.5 rounded-lg text-xs font-bold border-2 transition-all text-left break-words ${
+                                taken
+                                  ? 'border-stone-200 bg-stone-50 text-stone-300 cursor-not-allowed line-through'
+                                  : 'border-violet-200 bg-violet-50 text-violet-700 hover:bg-violet-500 hover:text-white hover:border-violet-500 active:scale-95'
+                              }`}
+                            >
+                              {rt}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <div className="flex items-start gap-2">
+                        <div className="flex items-center gap-1.5 flex-shrink-0 text-indigo-300 mt-1">
+                          <div className="h-px w-3 bg-indigo-300" />
+                          <span className="text-xs font-black">↔</span>
+                        </div>
+                        <span className="flex-1 px-3 py-1.5 rounded-xl bg-indigo-100 border-2 border-indigo-200 text-sm font-semibold text-indigo-800 break-words leading-snug min-w-0">
+                          {paired}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => clearPair(lt)}
+                          className="w-7 h-7 rounded-lg bg-red-50 hover:bg-red-100 border border-red-200 text-red-500 text-xs font-bold flex items-center justify-center flex-shrink-0 transition-all mt-0.5"
+                          title="Ganti pasangan"
+                        >✕</button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Warning: unpaired */}
+          {!allPaired && leftFilled.some(l => !corState.mapping[l]) && (
+            <div className="px-4 py-2.5 bg-amber-50 border-t border-amber-200 flex items-center gap-2">
+              <span className="text-sm">⚠️</span>
+              <p className="text-xs text-amber-700 font-medium">
+                Belum dipasangkan: <span className="font-bold">{leftFilled.filter(l => !corState.mapping[l]).join(', ')}</span>
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ─── PREVIEW RINGKASAN ─── */}
+      {Object.entries(corState.mapping).some(([l, r]) => l && r) && (
+        <div className="rounded-2xl border border-stone-200 overflow-hidden bg-gradient-to-br from-slate-50 to-blue-50">
+          <div className="px-4 py-2.5 border-b border-stone-200 flex items-center gap-2">
+            <span className="text-base">🗂️</span>
+            <span className="text-xs font-black text-stone-600 uppercase tracking-widest">Ringkasan Pasangan</span>
+            <span className="ml-auto text-[11px] font-bold text-stone-400">
+              {Object.entries(corState.mapping).filter(([l,r]) => l && r).length} pasang
+            </span>
+          </div>
+          <div className="p-3 space-y-1.5">
+            {Object.entries(corState.mapping).filter(([l, r]) => l && r).map(([l, r], i) => (
+              <div key={i} className="flex items-start gap-2">
+                <span className="w-5 h-5 flex-shrink-0 rounded-lg bg-blue-500 text-white text-[10px] font-black flex items-center justify-center mt-1">{i+1}</span>
+                <div className="flex-1 min-w-0 flex flex-col gap-1 bg-white rounded-xl border border-stone-200 px-3 py-2 shadow-sm">
+                  <span className="text-xs font-bold text-blue-700 break-words leading-snug">{l}</span>
+                  <div className="flex items-center gap-1">
+                    <div className="h-px flex-1 bg-stone-200" />
+                    <span className="text-stone-400 font-black text-[10px] flex-shrink-0">↔</span>
+                    <div className="h-px flex-1 bg-stone-200" />
+                  </div>
+                  <span className="text-xs font-bold text-violet-700 break-words leading-snug">{r}</span>
+                </div>
               </div>
             ))}
           </div>
         </div>
       )}
+
     </div>
   );
 }
@@ -506,6 +871,71 @@ function MultipleChoiceFields({ optState, setOptState, corState, setCorState }) 
 }
 
 // ════════════════════════════════════════════════════════════════════════════
+// TRUE_FALSE FIELDS (Guru role)
+// ════════════════════════════════════════════════════════════════════════════
+function TrueFalseFields({ corState, setCorState }) {
+  const selected = corState.selected; // 'BENAR' | 'SALAH' | ''
+
+  return (
+    <div className="space-y-4">
+      {/* Info box */}
+      <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-teal-50 border border-teal-200">
+        <span className="text-lg mt-0.5">💡</span>
+        <div>
+          <p className="text-xs font-black text-teal-700 uppercase tracking-widest mb-0.5">Format Soal Benar / Salah</p>
+          <p className="text-xs text-teal-600 leading-relaxed">
+            Opsi jawaban sudah tetap: <strong>BENAR</strong> dan <strong>SALAH</strong>. Pilih satu yang menjadi <strong>kunci jawaban</strong> untuk soal ini.
+          </p>
+        </div>
+      </div>
+
+      {/* Fixed option buttons */}
+      <div className="grid grid-cols-2 gap-4">
+        {['BENAR', 'SALAH'].map((opt) => {
+          const isSelected = selected === opt;
+          return (
+            <button
+              key={opt}
+              type="button"
+              onClick={() => setCorState({ ...corState, selected: opt })}
+              className={`relative overflow-hidden flex flex-col items-center justify-center gap-3 py-8 rounded-2xl border-2 font-black text-xl transition-all shadow-md ${
+                opt === 'BENAR'
+                  ? isSelected
+                    ? 'bg-emerald-500 border-emerald-600 text-white shadow-emerald-300'
+                    : 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:border-emerald-400 hover:bg-emerald-100'
+                  : isSelected
+                    ? 'bg-rose-500 border-rose-600 text-white shadow-rose-300'
+                    : 'bg-rose-50 border-rose-200 text-rose-700 hover:border-rose-400 hover:bg-rose-100'
+              }`}
+            >
+              <span className="text-4xl">{opt === 'BENAR' ? '✓' : '✕'}</span>
+              <span>{opt}</span>
+              {isSelected && (
+                <span className="absolute top-3 right-3 text-[10px] font-black uppercase tracking-widest bg-white/30 px-2 py-0.5 rounded-full">
+                  ✓ Kunci
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Validation hint */}
+      {!selected && (
+        <p className="text-xs text-amber-600 font-bold flex items-center gap-2 px-3 py-2 bg-amber-50 border border-amber-200 rounded-lg">
+          <span>⚠️</span> Pilih salah satu sebagai kunci jawaban!
+        </p>
+      )}
+      {selected && (
+        <p className="text-xs text-emerald-700 font-bold flex items-center gap-2 px-3 py-2 bg-emerald-50 border border-emerald-200 rounded-lg">
+          <span>✅</span> Kunci jawaban: <strong>{selected}</strong>
+        </p>
+      )}
+    </div>
+  );
+}
+
+// ════════════════════════════════════════════════════════════════════════════
 // MAIN EXPORT: QuestionFormFields
 // ════════════════════════════════════════════════════════════════════════════
 export default function QuestionFormFields({ type, optState, setOptState, corState, setCorState }) {
@@ -520,7 +950,8 @@ export default function QuestionFormFields({ type, optState, setOptState, corSta
       {type === 'CLASSIFICATION'  && <ClassificationFields  optState={optState} setOptState={setOptState} corState={corState} setCorState={setCorState} />}
       {type === 'MATCHING'        && <MatchingFields        optState={optState} setOptState={setOptState} corState={corState} setCorState={setCorState} />}
       {(type === 'SEQUENCE' || type === 'SEQUENCING') && <SequenceFields      optState={optState} setOptState={setOptState} corState={corState} setCorState={setCorState} />}
-      {(type === 'MULTIPLE_CHOICE' || type === 'TRUE_FALSE') && <MultipleChoiceFields  optState={optState} setOptState={setOptState} corState={corState} setCorState={setCorState} />}
+      {type === 'MULTIPLE_CHOICE' && <MultipleChoiceFields  optState={optState} setOptState={setOptState} corState={corState} setCorState={setCorState} />}
+      {type === 'TRUE_FALSE'      && <TrueFalseFields       corState={corState} setCorState={setCorState} />}
     </div>
   );
 }

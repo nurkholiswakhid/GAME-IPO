@@ -585,9 +585,9 @@ export default function DashboardGuru() {
                   <QuestionFormFields
                     type={editingQuestion?.type || 'CLASSIFICATION'}
                     optState={editForm.optState}
-                    setOptState={(s) => setEditForm({ ...editForm, optState: s })}
+                    setOptState={(s) => setEditForm(prev => ({ ...prev, optState: s }))}
                     corState={editForm.corState}
-                    setCorState={(s) => setEditForm({ ...editForm, corState: s })}
+                    setCorState={(s) => setEditForm(prev => ({ ...prev, corState: s }))}
                   />
                 </div>
               </form>
@@ -721,9 +721,9 @@ export default function DashboardGuru() {
                   <QuestionFormFields
                     type={createForm.type}
                     optState={createForm.optState}
-                    setOptState={(s) => setCreateForm({ ...createForm, optState: s })}
+                    setOptState={(s) => setCreateForm(prev => ({ ...prev, optState: s }))}
                     corState={createForm.corState}
-                    setCorState={(s) => setCreateForm({ ...createForm, corState: s })}
+                    setCorState={(s) => setCreateForm(prev => ({ ...prev, corState: s }))}
                   />
                 </div>
 
