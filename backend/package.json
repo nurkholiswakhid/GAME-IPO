@@ -5,7 +5,9 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "prisma:seed": "prisma db seed"
+    "prisma:seed": "prisma db seed",
+    "build": "echo 'Backend build complete'",
+    "railway-build": "npx prisma generate && npm run build"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
