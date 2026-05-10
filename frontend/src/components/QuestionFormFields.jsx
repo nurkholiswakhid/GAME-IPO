@@ -47,9 +47,22 @@ export function buildCorrectJSON(type, corState, optState = null) {
       return JSON.stringify(res);
     }
     if (type === 'MATCHING') {
+      // Convert indices to text for storage
       const cleanMapping = {};
-      Object.entries(corState.mapping).forEach(([l, r]) => {
-        if (l && r) cleanMapping[l] = r;
+      Object.entries(corState.mapping).forEach(([leftIdxStr, rightIdxStr]) => {
+        if (leftIdxStr === '' || rightIdxStr === '') return;
+        if (optState && optState.left && optState.right) {
+          const leftIdx = parseInt(leftIdxStr, 10);
+          const rightIdx = parseInt(rightIdxStr, 10);
+          const leftText = optState.left[leftIdx];
+          const rightText = optState.right[rightIdx];
+          if (leftText && rightText) {
+            cleanMapping[leftText] = rightText;
+          }
+        } else {
+          // Fallback: already text
+          if (leftIdxStr && rightIdxStr) cleanMapping[leftIdxStr] = rightIdxStr;
+        }
       });
       if (Object.keys(cleanMapping).length === 0) return ''; // validasi: harus ada pasangan
       return JSON.stringify(cleanMapping);
@@ -144,7 +157,24 @@ export function parseCorrectState(type, correctJson, optState = null) {
       return { mapping, order: [], selected: '' };
     }
     if (type === 'MATCHING') {
-      return { mapping: parsed || {}, order: [], selected: '' };
+      // Convert stored text mapping back to indices
+      const mapping = {};
+      const parsedMapping = parsed || {};
+      if (optState && optState.left && optState.right) {
+        Object.entries(parsedMapping).forEach(([leftText, rightText]) => {
+          const leftIdx = optState.left.indexOf(leftText);
+          const rightIdx = optState.right.indexOf(rightText);
+          if (leftIdx >= 0 && rightIdx >= 0) {
+            mapping[leftIdx] = rightIdx;
+          }
+        });
+      } else {
+        // No optState, use text as key (backward compatibility)
+        Object.entries(parsedMapping).forEach(([k, v]) => {
+          if (k && v) mapping[k] = v;
+        });
+      }
+      return { mapping, order: [], selected: '' };
     }
     if (type === 'SEQUENCE' || type === 'SEQUENCING') {
       // Convert stored item text back to indices for editing
@@ -655,20 +685,20 @@ function ClassificationFields({ optState, setOptState, corState, setCorState }) 
 // ════════════════════════════════════════════════════════════════════════════
 function MatchingFields({ optState, setOptState, corState, setCorState }) {
   const { left, right } = optState;
+  const leftItems = left.filter(Boolean);
+  const rightItems = right.filter(Boolean);
+  const mapping = corState.mapping;
+
+  // Step calculations
+  const hasItems = leftItems.length > 0 && rightItems.length > 0;
+  const filledPairs = Object.entries(mapping).filter(([l, r]) => l !== '' && r !== '').length;
+  const progress = hasItems ? Math.round((filledPairs / leftItems.length) * 100) : 0;
+  const allPaired = filledPairs === leftItems.length;
 
   const updateSide = (side, idx, val) => {
     const arr = side === 'left' ? [...left] : [...right];
-    const oldVal = arr[idx];
     arr[idx] = val;
     setOptState({ ...optState, [side]: arr });
-    if (side === 'left' && oldVal !== val) {
-      const map = { ...corState.mapping };
-      if (oldVal && map[oldVal] !== undefined) {
-        map[val] = map[oldVal];
-        delete map[oldVal];
-      }
-      setCorState({ ...corState, mapping: map });
-    }
   };
 
   const addSide = (side) => {
@@ -678,72 +708,357 @@ function MatchingFields({ optState, setOptState, corState, setCorState }) {
 
   const removeSide = (side, idx) => {
     if (side === 'left') {
-      const removed = left[idx];
-      const map = { ...corState.mapping }; delete map[removed];
-      setOptState({ ...optState, left: left.filter((_, i) => i !== idx) });
-      setCorState({ ...corState, mapping: map });
+      const newLeft = left.filter((_, i) => i !== idx);
+      // Remove mappings and shift indices > idx down by 1
+      const newMapping = {};
+      Object.entries(mapping).forEach(([lIdx, rIdx]) => {
+        const lIdxNum = parseInt(lIdx, 10);
+        if (lIdxNum !== idx) {
+          const newLIdx = lIdxNum > idx ? lIdxNum - 1 : lIdxNum;
+          newMapping[newLIdx] = rIdx;
+        }
+      });
+      setOptState({ ...optState, left: newLeft });
+      setCorState({ ...corState, mapping: newMapping });
     } else {
-      setOptState({ ...optState, right: right.filter((_, i) => i !== idx) });
+      const newRight = right.filter((_, i) => i !== idx);
+      // Remove mappings pointing to this right item
+      const newMapping = {};
+      Object.entries(mapping).forEach(([lIdx, rIdx]) => {
+        const rIdxNum = parseInt(rIdx, 10);
+        if (rIdxNum !== idx) {
+          const newRIdx = rIdxNum > idx ? rIdxNum - 1 : rIdxNum;
+          newMapping[lIdx] = newRIdx;
+        }
+      });
+      setOptState({ ...optState, right: newRight });
+      setCorState({ ...corState, mapping: newMapping });
     }
   };
 
-  return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
-        <div className="bg-white border border-blue-200 rounded-xl overflow-hidden">
-          <div className="px-4 py-3 bg-blue-50 border-b border-blue-100 flex justify-between items-center">
-            <span className="text-xs font-black text-blue-700 uppercase">Kolom Kiri</span>
-            <button type="button" onClick={() => addSide('left')} className={smBtn('blue')}>+</button>
-          </div>
-          {left.map((it, idx) => (
-            <div key={idx} className="flex gap-1 items-center px-3 py-2 border-b border-stone-50">
-              <input value={it} onChange={e => updateSide('left', idx, e.target.value)}
-                className="flex-1 px-2 py-2 rounded border border-stone-200 text-xs outline-none focus:border-blue-400"
-                placeholder="Item kiri..." />
-              <button type="button" onClick={() => removeSide('left', idx)}
-                className="text-red-400 hover:text-red-600 font-bold text-xs px-1">✕</button>
-            </div>
-          ))}
-        </div>
+  const setMapping = (leftIdx, rightIdx) => {
+    const newMapping = { ...mapping };
+    if (rightIdx === '') {
+      delete newMapping[leftIdx];
+    } else {
+      newMapping[leftIdx] = rightIdx;
+    }
+    setCorState({ ...corState, mapping: newMapping });
+  };
 
-        <div className="bg-white border border-sky-200 rounded-xl overflow-hidden">
-          <div className="px-4 py-3 bg-sky-50 border-b border-sky-100 flex justify-between items-center">
-            <span className="text-xs font-black text-sky-700 uppercase">Kolom Kanan</span>
-            <button type="button" onClick={() => addSide('right')} className={smBtn('sky')}>+</button>
-          </div>
-          {right.map((it, idx) => (
-            <div key={idx} className="flex gap-1 items-center px-3 py-2 border-b border-stone-50">
-              <input value={it} onChange={e => updateSide('right', idx, e.target.value)}
-                className="flex-1 px-2 py-2 rounded border border-stone-200 text-xs outline-none focus:border-sky-400"
-                placeholder="Item kanan..." />
-              <button type="button" onClick={() => removeSide('right', idx)}
-                className="text-red-400 hover:text-red-600 font-bold text-xs px-1">✕</button>
+  const getUnpairedRight = (leftIdx) => {
+    const pairedRightIndices = Object.values(mapping)
+      .filter(rIdx => rIdx !== '' && rIdx !== null && rIdx !== undefined)
+      .map(rIdx => parseInt(rIdx, 10));
+    return rightItems.map((_, idx) => idx).filter(idx => !pairedRightIndices.includes(idx) || mapping[leftIdx] === idx);
+  };
+
+  return (
+    <div className="space-y-5">
+      {/* PROGRESS BAR */}
+      <div className="bg-gradient-to-r from-rose-50 via-pink-50 to-rose-50 border-2 border-rose-200 rounded-2xl p-5 shadow-md hover:shadow-lg transition-all duration-300">
+        <div className="flex justify-between items-center mb-4">
+          <div className="flex items-center gap-3">
+            <span className="text-3xl">📊</span>
+            <div>
+              <p className="text-sm font-black text-rose-800 uppercase tracking-wider leading-tight">Progres Pasangan</p>
+              <p className="text-xs text-rose-600 font-medium mt-0.5">{filledPairs} dari {leftItems.length} pasangan</p>
             </div>
-          ))}
+          </div>
+          <div className="flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-rose-100 to-pink-100 border-2 border-rose-300 shadow-md">
+            <span className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-pink-600">{progress}%</span>
+          </div>
+        </div>
+        <div className="w-full bg-rose-100 rounded-full h-5 border-2 border-rose-300 overflow-hidden shadow-inner">
+          <div 
+            className="bg-gradient-to-r from-rose-500 via-pink-500 to-rose-500 h-full rounded-full transition-all duration-700 shadow-md"
+            style={{ width: `${progress}%` }}
+          />
         </div>
       </div>
 
-      {left.filter(Boolean).length > 0 && right.filter(Boolean).length > 0 && (
-        <div className="bg-white border border-blue-200 rounded-xl overflow-hidden">
-          <div className="px-4 py-3 bg-blue-50 border-b border-blue-100">
-            <span className="text-xs font-black text-blue-700 uppercase tracking-widest">Pasangan Benar</span>
+      {/* STEP 1️⃣ & 2️⃣ TWO COLUMNS - RESPONSIVE */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-5">
+        {/* LEFT COLUMN */}
+        <div className="bg-white border-2 border-blue-300 rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300">
+          <div className="px-4 py-4 bg-gradient-to-br from-blue-150 via-blue-50 to-white border-b-2 border-blue-200">
+            <div className="flex items-center gap-2.5 mb-2">
+              <span className="text-3xl">❓</span>
+              <div>
+                <p className="text-sm font-black text-blue-900 uppercase tracking-wider leading-tight">Pertanyaan/Konsep</p>
+                <p className="text-xs text-blue-600 font-medium mt-0.5">Item yang akan dicocokkan</p>
+              </div>
+            </div>
           </div>
-          <div className="divide-y divide-stone-100">
-            {left.filter(Boolean).map((lt, idx) => (
-              <div key={idx} className="flex gap-3 items-center px-4 py-3">
-                <span className="w-1/2 text-sm font-bold text-stone-600 truncate">{lt}</span>
-                <span className="text-stone-300 font-bold">↔</span>
-                <select
-                  value={corState.mapping[lt] || ''}
-                  onChange={e => setCorState({ ...corState, mapping: { ...corState.mapping, [lt]: e.target.value } })}
-                  className="flex-1 px-3 py-2 rounded-lg border border-stone-200 bg-white text-sm focus:border-blue-400 outline-none">
-                  <option value="">-- pilih pasangan --</option>
-                  {right.filter(Boolean).map((rt, ridx) => (
-                    <option key={ridx} value={rt}>{rt}</option>
-                  ))}
-                </select>
+          <div className="p-4 space-y-2.5 max-h-96 overflow-y-auto">
+            {left.map((it, idx) => (
+              <div key={idx} className="flex gap-3 items-center group bg-blue-50 hover:bg-blue-100 p-2.5 rounded-lg transition-all hover:shadow-sm">
+                <span className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white text-xs font-black flex items-center justify-center flex-shrink-0 shadow-sm group-hover:shadow-md transition-all">
+                  {idx + 1}
+                </span>
+                <input
+                  value={it}
+                  onChange={e => updateSide('left', idx, e.target.value)}
+                  className="flex-1 px-3 py-2.5 rounded-lg border-2 border-blue-200 bg-white font-semibold text-sm focus:border-blue-500 focus:bg-blue-50 outline-none transition-all hover:border-blue-300 shadow-sm focus:shadow-md"
+                  placeholder="Ketik pertanyaan..."
+                />
+                <button
+                  type="button"
+                  onClick={() => removeSide('left', idx)}
+                  className="px-3 py-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-500 hover:text-red-700 text-base font-bold border-2 border-red-200 transition-all hover:scale-110 opacity-0 group-hover:opacity-100 shadow-sm"
+                  title="Hapus item"
+                >
+                  ✕
+                </button>
               </div>
             ))}
+            {left.length === 0 && (
+              <div className="text-center py-8 text-blue-300">
+                <span className="text-4xl">❓</span>
+                <p className="text-xs font-semibold text-blue-400 mt-2">Belum ada pertanyaan</p>
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={() => addSide('left')}
+              className="w-full mt-4 px-4 py-3 rounded-lg bg-gradient-to-r from-blue-100 to-blue-50 border-2 border-blue-300 text-blue-700 font-bold text-sm hover:shadow-lg hover:border-blue-400 active:scale-95 transition-all duration-200"
+            >
+              ➕ Tambah Pertanyaan
+            </button>
+          </div>
+        </div>
+
+        {/* RIGHT COLUMN */}
+        <div className="bg-white border-2 border-cyan-300 rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300">
+          <div className="px-4 py-4 bg-gradient-to-br from-cyan-150 via-cyan-50 to-white border-b-2 border-cyan-200">
+            <div className="flex items-center gap-2.5 mb-2">
+              <span className="text-3xl">💡</span>
+              <div>
+                <p className="text-sm font-black text-cyan-900 uppercase tracking-wider leading-tight">Jawaban/Penjelasan</p>
+                <p className="text-xs text-cyan-600 font-medium mt-0.5">Pasangan untuk item di kiri</p>
+              </div>
+            </div>
+          </div>
+          <div className="p-4 space-y-2.5 max-h-96 overflow-y-auto">
+            {right.map((it, idx) => (
+              <div key={idx} className="flex gap-3 items-center group bg-cyan-50 hover:bg-cyan-100 p-2.5 rounded-lg transition-all hover:shadow-sm">
+                <span className="w-7 h-7 rounded-full bg-gradient-to-br from-cyan-500 to-cyan-600 text-white text-xs font-black flex items-center justify-center flex-shrink-0 shadow-sm group-hover:shadow-md transition-all">
+                  {idx + 1}
+                </span>
+                <input
+                  value={it}
+                  onChange={e => updateSide('right', idx, e.target.value)}
+                  className="flex-1 px-3 py-2.5 rounded-lg border-2 border-cyan-200 bg-white font-semibold text-sm focus:border-cyan-500 focus:bg-cyan-50 outline-none transition-all hover:border-cyan-300 shadow-sm focus:shadow-md"
+                  placeholder="Ketik jawaban..."
+                />
+                <button
+                  type="button"
+                  onClick={() => removeSide('right', idx)}
+                  className="px-3 py-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-500 hover:text-red-700 text-base font-bold border-2 border-red-200 transition-all hover:scale-110 opacity-0 group-hover:opacity-100 shadow-sm"
+                  title="Hapus item"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+            {right.length === 0 && (
+              <div className="text-center py-8 text-cyan-300">
+                <span className="text-4xl">💡</span>
+                <p className="text-xs font-semibold text-cyan-400 mt-2">Belum ada jawaban</p>
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={() => addSide('right')}
+              className="w-full mt-4 px-4 py-3 rounded-lg bg-gradient-to-r from-cyan-100 to-cyan-50 border-2 border-cyan-300 text-cyan-700 font-bold text-sm hover:shadow-lg hover:border-cyan-400 active:scale-95 transition-all duration-200"
+            >
+              ➕ Tambah Jawaban
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* STEP 3️⃣ PAIR ITEMS */}
+      {hasItems && (
+        <div className="bg-white border-2 border-purple-300 rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300">
+          <div className="px-4 py-4 bg-gradient-to-br from-purple-150 via-purple-50 to-white border-b-2 border-purple-200">
+            <div className="flex items-center gap-2.5 mb-3">
+              <span className="text-3xl">🔗</span>
+              <div>
+                <p className="text-sm font-black text-purple-900 uppercase tracking-wider leading-tight">Cocokkan Pasangan</p>
+                <p className="text-xs text-purple-600 font-medium mt-0.5">Pilih jawaban yang sesuai untuk setiap pertanyaan</p>
+              </div>
+            </div>
+            {/* Status Summary */}
+            <div className="flex gap-4 text-xs font-bold">
+              <div className="flex items-center gap-1.5 bg-purple-200 text-purple-900 px-3 py-1.5 rounded-full">
+                <span className="text-lg">✓</span>
+                <span>Lengkap: {filledPairs}</span>
+              </div>
+              <div className="flex items-center gap-1.5 bg-stone-200 text-stone-900 px-3 py-1.5 rounded-full">
+                <span className="text-lg">⏳</span>
+                <span>Sisa: {leftItems.length - filledPairs}</span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="p-4 space-y-2.5">
+            {leftItems.map((leftItem, leftIdx) => {
+              const mappedRightIdx = mapping[leftIdx];
+              const unpairedRight = getUnpairedRight(leftIdx);
+              const isComplete = mappedRightIdx !== null && mappedRightIdx !== undefined && mappedRightIdx !== '';
+              const selectedRightItem = isComplete ? rightItems[mappedRightIdx] : '';
+
+              return (
+                <div
+                  key={leftIdx}
+                  className={`border-2 rounded-xl transition-all transform duration-300 overflow-hidden ${
+                    isComplete
+                      ? 'bg-gradient-to-br from-purple-150 to-purple-100 border-purple-500 shadow-lg hover:shadow-xl hover:scale-102'
+                      : 'bg-gradient-to-br from-stone-100 to-white border-stone-300 hover:border-purple-300 hover:shadow-md hover:scale-101'
+                  }`}
+                >
+                  {/* Question + Answer Display */}
+                  <div className="p-4">
+                    {/* Row 1: Question + Connector + Answer */}
+                    <div className="flex gap-3 items-center mb-3">
+                      {/* Question Badge */}
+                      <div className="flex-1">
+                        <div className={`flex gap-2 items-start p-3 rounded-lg transition-all ${isComplete ? 'bg-purple-200' : 'bg-stone-200'}`}>
+                          <span className={`w-7 h-7 rounded-full text-white text-xs font-black flex items-center justify-center flex-shrink-0 shadow-sm transition-all ${isComplete ? 'bg-gradient-to-br from-purple-600 to-purple-700 ring-2 ring-purple-400' : 'bg-gradient-to-br from-stone-500 to-stone-600'}`}>
+                            {leftIdx + 1}
+                          </span>
+                          <p className={`text-sm font-bold break-words transition-colors pt-0.5 ${isComplete ? 'text-purple-900' : 'text-stone-700'}`}>
+                            {leftItem}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Connector */}
+                      <div className="flex flex-col items-center gap-1.5">
+                        <div className={`text-3xl font-bold transition-all duration-300 ${isComplete ? 'text-purple-500 scale-125' : 'text-stone-300 scale-100'}`}>↔</div>
+                        {isComplete && <span className="text-lg text-purple-500 animate-bounce">✓</span>}
+                      </div>
+
+                      {/* Answer Badge */}
+                      <div className="flex-1">
+                        {isComplete ? (
+                          <div className="flex gap-2 items-start p-3 rounded-lg bg-gradient-to-br from-emerald-200 to-green-200 ring-2 ring-green-400 ring-opacity-50">
+                            <span className="text-lg">✓</span>
+                            <p className="text-sm font-bold text-green-900 break-words">
+                              {selectedRightItem}
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="flex gap-2 items-start p-3 rounded-lg bg-stone-200">
+                            <span className="text-lg text-stone-400">?</span>
+                            <p className="text-sm font-medium text-stone-600 italic">
+                              Belum dipilih
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Row 2: Dropdown Selector */}
+                    <div>
+                      <label className={`text-xs font-black uppercase tracking-wider mb-2 block transition-colors ${isComplete ? 'text-purple-700' : 'text-stone-600'}`}>
+                        Pilih jawaban untuk: <span className="text-purple-600">{leftItem}</span>
+                      </label>
+                      <select
+                        value={mappedRightIdx || ''}
+                        onChange={e => setMapping(leftIdx, e.target.value === '' ? '' : parseInt(e.target.value, 10))}
+                        className={`w-full px-4 py-3 rounded-lg border-2 font-semibold text-sm outline-none transition-all shadow-sm focus:shadow-lg ${
+                          isComplete
+                            ? 'bg-gradient-to-br from-purple-300 to-purple-200 border-purple-600 text-purple-900 focus:border-purple-700 cursor-default'
+                            : 'bg-white border-stone-300 text-stone-700 focus:border-purple-400 focus:bg-purple-50 focus:ring-2 focus:ring-purple-200'
+                        }`}
+                      >
+                        <option value="">-- Pilih jawaban --</option>
+                        {unpairedRight.map(rightIdx => (
+                          <option key={rightIdx} value={rightIdx}>
+                            {rightItems[rightIdx]}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Row 3: Action Buttons (Optional) */}
+                    {isComplete && (
+                      <div className="mt-3 flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setMapping(leftIdx, '')}
+                          className="flex-1 px-3 py-2 rounded-lg bg-red-100 hover:bg-red-200 text-red-700 font-semibold text-xs border-2 border-red-300 transition-all hover:shadow-md"
+                        >
+                          🔄 Ubah Jawaban
+                        </button>
+                        <div className="flex-1 px-3 py-2 rounded-lg bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 font-semibold text-xs border-2 border-green-400 text-center">
+                          ✅ Terpasang Benar
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Summary Cards */}
+          {leftItems.length > 0 && (
+            <div className="px-4 pb-4 border-t-2 border-purple-200 mt-2 pt-4">
+              <div className="grid grid-cols-3 gap-3">
+                <div className="bg-gradient-to-br from-purple-100 to-purple-50 border-2 border-purple-300 rounded-lg p-3 text-center">
+                  <p className="text-2xl font-black text-purple-600">{leftItems.length}</p>
+                  <p className="text-xs font-bold text-purple-700 uppercase">Total Soal</p>
+                </div>
+                <div className={`border-2 rounded-lg p-3 text-center transition-all ${filledPairs === leftItems.length ? 'bg-gradient-to-br from-green-100 to-emerald-100 border-green-400' : 'bg-gradient-to-br from-blue-100 to-blue-50 border-blue-300'}`}>
+                  <p className={`text-2xl font-black ${filledPairs === leftItems.length ? 'text-green-600' : 'text-blue-600'}`}>{filledPairs}</p>
+                  <p className={`text-xs font-bold uppercase ${filledPairs === leftItems.length ? 'text-green-700' : 'text-blue-700'}`}>Terpasang</p>
+                </div>
+                <div className="bg-gradient-to-br from-amber-100 to-orange-50 border-2 border-amber-300 rounded-lg p-3 text-center">
+                  <p className="text-2xl font-black text-amber-600">{leftItems.length - filledPairs}</p>
+                  <p className="text-xs font-bold text-amber-700 uppercase">Sisa</p>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* STEP 4️⃣ PREVIEW */}
+      {allPaired && (
+        <div className="bg-white border-2 border-green-300 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
+          <div className="px-4 py-4 bg-gradient-to-br from-green-150 via-green-50 to-white border-b-2 border-green-200">
+            <div className="flex items-center gap-2.5">
+              <span className="text-3xl animate-bounce">✅</span>
+              <div>
+                <p className="text-sm font-black text-green-900 uppercase tracking-wider leading-tight">Pratinjau Pasangan</p>
+                <p className="text-xs text-green-600 font-medium mt-0.5">Semua pasangan sudah dikonfigurasi</p>
+              </div>
+            </div>
+          </div>
+          <div className="p-4">
+            <div className="space-y-3">
+              {leftItems.map((leftItem, leftIdx) => {
+                const rightIdx = mapping[leftIdx];
+                const rightItem = rightIdx !== null && rightIdx !== undefined ? rightItems[rightIdx] : '';
+                return (
+                  <div key={leftIdx} className="flex gap-3 items-center bg-gradient-to-br from-green-150 via-green-100 to-emerald-100 border-2 border-green-400 rounded-xl p-4 shadow-md hover:shadow-lg transition-all hover:scale-102 duration-300">
+                    <span className="w-8 h-8 rounded-full bg-gradient-to-br from-green-500 to-green-600 text-white text-xs font-black flex items-center justify-center flex-shrink-0 shadow-md ring-2 ring-green-300">
+                      {leftIdx + 1}
+                    </span>
+                    <span className="flex-1 text-sm font-bold text-green-900">{leftItem}</span>
+                    <span className="text-2xl font-bold text-green-500">↔</span>
+                    <span className="flex-1 text-sm font-bold text-green-900">{rightItem}</span>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="mt-6 p-4 bg-gradient-to-r from-green-100 via-emerald-100 to-green-100 border-2 border-green-400 rounded-xl text-center shadow-md">
+              <p className="text-lg font-black text-green-800 uppercase tracking-wider">🎉 Sempurna!</p>
+              <p className="text-sm text-green-700 font-semibold mt-2">Semua {leftItems.length} pasangan sudah dikonfigurasi dengan benar</p>
+            </div>
           </div>
         </div>
       )}
