@@ -1,8 +1,10 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { GameContext } from '../context/GameContext';
 import { motion } from 'framer-motion';
+import axios from 'axios';
 
+// Metadata statis: nama level, warna, dan mechanic (fallback emoji jika DB kosong)
 const LEVEL_META = {
   1:  { icon: '⌨️', name: 'Pusat Input',        color: 'from-blue-100 to-cyan-100 text-blue-700',       mechanic: 'KLASIFIKASI' },
   2:  { icon: '🚦', name: 'Jalur Distribusi',   color: 'from-emerald-100 to-green-100 text-green-700',  mechanic: 'URUTAN' },
@@ -22,6 +24,28 @@ const MAX_XP = 100;
 export default function DashboardLevel() {
   const { student, loading, logoutStudent } = useContext(GameContext);
   const navigate = useNavigate();
+  // State untuk menyimpan emoji dari database (dikonfigurasi guru)
+  const [dbLevelEmojis, setDbLevelEmojis] = useState({});
+
+  // Fetch emoji level dari API saat komponen mount
+  useEffect(() => {
+    axios.get(`${import.meta.env.VITE_API_URL}/api/questions/level-emojis`)
+      .then(res => {
+        if (res.data && typeof res.data === 'object') {
+          setDbLevelEmojis(res.data);
+        }
+      })
+      .catch(err => {
+        console.warn('Gagal mengambil emoji level dari DB, menggunakan fallback:', err.message);
+      });
+  }, []);
+
+  // Fungsi untuk mendapatkan icon level: prioritaskan dari DB, fallback ke LEVEL_META
+  const getLevelIcon = (levelNum) => {
+    const dbData = dbLevelEmojis[levelNum];
+    if (dbData?.emoji && dbData.emoji !== '📚') return dbData.emoji;
+    return LEVEL_META[levelNum]?.icon || '📚';
+  };
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center p-4 city-bg font-sans bg-gradient-to-br from-sky-50 via-blue-50 to-cyan-50">
@@ -213,12 +237,12 @@ export default function DashboardLevel() {
                       : isBoss ? 'bg-gradient-to-br from-amber-50/90 to-orange-50/90 border-amber-400/70 hover:border-amber-500 hover:shadow-2xl cursor-pointer shadow-amber-200/40 hover:shadow-amber-300/50'
                       : 'bg-white/70 border-sky-200/60 hover:border-sky-400 hover:shadow-xl cursor-pointer hover:bg-white/90 hover:from-sky-50/50 hover:to-blue-50/50'}`}
                   >
-                    {/* Level Icon */}
+                    {/* Level Icon — diambil dari DB jika dikonfigurasi guru */}
                     <motion.div 
                       whileHover={!isLocked ? { scale: 1.1, rotate: 5 } : {}}
                       className={`w-18 h-18 shrink-0 rounded-2xl flex items-center justify-center text-4xl shadow-lg border-2 border-white/60 transition-all ${isLocked ? 'bg-stone-200/50 text-stone-400 grayscale' : `bg-gradient-to-br ${meta.color} shadow-md`}`}
                     >
-                      {meta.icon}
+                      {getLevelIcon(level)}
                     </motion.div>
 
                     {/* Level Info */}

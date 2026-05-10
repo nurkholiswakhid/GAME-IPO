@@ -7,6 +7,40 @@ const path = require('path');
 // Menggunakan sqlite mentah untuk memotong Prisma Cache (agar tidak perlu restart server)
 const dbPath = path.join(__dirname, '../prisma/dev.db');
 
+// Mengambil emoji & metadata per level (untuk DashboardLevel siswa)
+router.get('/level-emojis', (req, res) => {
+  try {
+    const db = new sqlite3.Database(dbPath, sqlite3.OPEN_READONLY);
+    // Ambil soal pertama per level untuk mendapatkan level_emoji & type
+    db.all(
+      `SELECT level_number, level_emoji, type
+       FROM questions
+       GROUP BY level_number
+       ORDER BY level_number ASC`,
+      [],
+      (err, rows) => {
+        db.close();
+        if (err) {
+          console.error('Level emojis query error:', err);
+          return res.status(500).json({ error: 'Database read error' });
+        }
+        // Kembalikan map: { 1: { emoji: '...', type: '...' }, 2: {...}, ... }
+        const result = {};
+        (rows || []).forEach(row => {
+          result[row.level_number] = {
+            emoji: row.level_emoji || '📚',
+            type: row.type || 'CLASSIFICATION'
+          };
+        });
+        res.json(result);
+      }
+    );
+  } catch (error) {
+    console.error('Level emojis endpoint error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Mengambil total jumlah level
 router.get('/count', (req, res) => {
   try {
