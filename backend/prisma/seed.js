@@ -22,6 +22,7 @@ async function main() {
     {
       level_number: 1,
       type: 'CLASSIFICATION',
+      level_emoji: '⌨️',
       story_json: JSON.stringify({
         scene: 'lab_komputer',
         chapter: 'Level 1: Bahan Baku Sistem',
@@ -57,6 +58,7 @@ async function main() {
     {
       level_number: 2,
       type: 'SEQUENCE',
+      level_emoji: '🚦',
       story_json: JSON.stringify({
         scene: 'data_center',
         chapter: 'Level 2: Jalur Perakitan',
@@ -97,8 +99,7 @@ async function main() {
     // ─────────────────────────────────────────────────────
     {
       level_number: 3,
-      type: 'MATCHING',
-      story_json: JSON.stringify({
+      type: 'MATCHING',      level_emoji: '🧠',      story_json: JSON.stringify({
         scene: 'server_room',
         chapter: 'Level 3: Identifikasi Sang Koki',
         intro: [
@@ -141,8 +142,7 @@ async function main() {
     // ─────────────────────────────────────────────────────
     {
       level_number: 4,
-      type: 'MULTIPLE_CHOICE',
-      story_json: JSON.stringify({
+      type: 'MULTIPLE_CHOICE',      level_emoji: '🖥️',      story_json: JSON.stringify({
         scene: 'lab_storage',
         chapter: 'Level 4: Ruang Kerja',
         intro: [
@@ -175,8 +175,7 @@ async function main() {
     // ─────────────────────────────────────────────────────
     {
       level_number: 5,
-      type: 'TRUE_FALSE',
-      story_json: JSON.stringify({
+      type: 'TRUE_FALSE',      level_emoji: '🏭',      story_json: JSON.stringify({
         scene: 'studio_it',
         chapter: 'Level 5: Kolaborasi Hardware',
         intro: [
@@ -204,8 +203,7 @@ async function main() {
     // ─────────────────────────────────────────────────────
     {
       level_number: 6,
-      type: 'MULTIPLE_CHOICE',
-      story_json: JSON.stringify({
+      type: 'MULTIPLE_CHOICE',      level_emoji: '📄',      story_json: JSON.stringify({
         scene: 'lab_komputer',
         chapter: 'Level 6: Perburuan Kemacetan (Bottleneck)',
         intro: [
@@ -238,8 +236,7 @@ async function main() {
     // ─────────────────────────────────────────────────────
     {
       level_number: 7,
-      type: 'SEQUENCE',
-      story_json: JSON.stringify({
+      type: 'SEQUENCE',      level_emoji: '🏫',      story_json: JSON.stringify({
         scene: 'kelas_smk',
         chapter: 'Level 7: Sang Manajer Hadir',
         intro: [
@@ -281,8 +278,7 @@ async function main() {
     // ─────────────────────────────────────────────────────
     {
       level_number: 8,
-      type: 'TRUE_FALSE',
-      story_json: JSON.stringify({
+      type: 'TRUE_FALSE',      level_emoji: '🔬',      story_json: JSON.stringify({
         scene: 'lab_riset',
         chapter: 'Level 8: Konflik Data (Interrupt)',
         intro: [
@@ -310,8 +306,7 @@ async function main() {
     // ─────────────────────────────────────────────────────
     {
       level_number: 9,
-      type: 'CLASSIFICATION',
-      story_json: JSON.stringify({
+      type: 'CLASSIFICATION',      level_emoji: '🌐',      story_json: JSON.stringify({
         scene: 'perpustakaan',
         chapter: 'Level 9: Bahasa Rahasia Hardware',
         intro: [
@@ -359,8 +354,7 @@ async function main() {
     // ─────────────────────────────────────────────────────
     {
       level_number: 10,
-      type: 'MATCHING',
-      story_json: JSON.stringify({
+      type: 'MATCHING',      level_emoji: '👑',      story_json: JSON.stringify({
         scene: 'final_boss',
         chapter: 'Level 10: Eksekusi Utama',
         intro: [

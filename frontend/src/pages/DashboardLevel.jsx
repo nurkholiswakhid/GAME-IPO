@@ -24,9 +24,9 @@ export default function DashboardLevel() {
   const navigate = useNavigate();
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center p-4 city-bg font-sans">
-      <div className="text-center glass rounded-3xl px-12 py-10 shadow-xl">
-        <div className="w-16 h-16 border-4 border-amber-200 border-t-amber-500 rounded-full animate-spin mb-6 mx-auto"></div>
+    <div className="min-h-screen flex items-center justify-center p-4 city-bg font-sans bg-gradient-to-br from-sky-50 via-blue-50 to-cyan-50">
+      <div className="text-center backdrop-blur-md bg-white/70 rounded-3xl px-12 py-10 shadow-xl border border-white/50">
+        <div className="w-16 h-16 border-4 border-sky-200 border-t-sky-500 rounded-full animate-spin mb-6 mx-auto"></div>
         <h2 className="text-2xl font-black text-stone-800 tracking-tight">MEMUAT PETA</h2>
         <p className="font-bold text-stone-500 text-sm tracking-widest animate-pulse mt-2 uppercase">Menyiapkan Petualangan...</p>
       </div>
@@ -49,85 +49,130 @@ export default function DashboardLevel() {
   const heroLevel = Math.max(1, Math.ceil(completedCount / 2));
 
   return (
-    <div className="min-h-screen text-stone-800 relative xl:overflow-hidden city-bg bg-network font-sans">
+    <div className="min-h-screen text-stone-800 relative xl:overflow-hidden city-bg bg-network font-sans bg-gradient-to-br from-sky-50 via-blue-50 to-cyan-50">
+      {/* Animated background orbs for theme consistency */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full bg-gradient-to-br from-blue-300/15 to-orange-300/8 blur-3xl animate-pulse" />
+        <div className="absolute bottom-0 right-1/4 w-80 h-80 rounded-full bg-gradient-to-tl from-orange-300/12 to-blue-300/5 blur-3xl animate-pulse" style={{animationDelay:'1.5s'}} />
+        <div className="absolute top-1/3 right-0 w-72 h-72 rounded-full bg-gradient-to-l from-yellow-400/8 to-transparent blur-3xl animate-pulse" style={{animationDelay:'0.7s'}} />
+      </div>
 
-      <div className="relative z-10 max-w-5xl mx-auto px-4 py-8 md:py-12">
-
+      <div className="relative z-10 max-w-6xl mx-auto px-4 py-8 md:py-12">
         {/* ── HERO CARD / PLAYER HUD ── */}
-        <motion.div initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
-          className="glass rounded-3xl p-6 md:p-8 mb-12 shadow-md hover:shadow-lg transition-all">
-          <div className="flex flex-col md:flex-row items-center gap-8">
-
-            {/* Avatar */}
+        <motion.div 
+          initial={{ y: -20, opacity: 0 }} 
+          animate={{ y: 0, opacity: 1 }}
+          className="backdrop-blur-xl bg-white/70 rounded-3xl p-8 md:p-10 mb-12 shadow-lg hover:shadow-xl transition-all border border-white/50 hover:border-sky-200/70"
+        >
+          <div className="flex flex-col md:flex-row items-center gap-10">
+            {/* Avatar Section */}
             <div className="relative shrink-0">
-              <div className="w-24 h-24 md:w-32 md:h-32 rounded-[2rem] bg-amber-100 flex items-center justify-center text-5xl md:text-6xl font-black text-amber-700 shadow-inner border-[6px] border-white">
+              <div className="w-28 h-28 md:w-36 md:h-36 rounded-[2rem] bg-gradient-to-br from-sky-100 to-blue-100 flex items-center justify-center text-6xl md:text-7xl font-black text-blue-700 shadow-lg hover:shadow-2xl transition-shadow border-4 border-white/70">
                 {student.name.charAt(0).toUpperCase()}
               </div>
-              <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-emerald-500 text-white text-sm font-bold px-4 py-1 rounded-full shadow-md border-2 border-white whitespace-nowrap">
-                LEVEL {heroLevel}
-              </div>
+              <motion.div 
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: 'spring', delay: 0.3 }}
+                className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-emerald-400 to-emerald-500 text-white text-sm font-bold px-5 py-2 rounded-full shadow-lg border-3 border-white whitespace-nowrap"
+              >
+                ⭐ LEVEL {heroLevel}
+              </motion.div>
             </div>
 
-            {/* Info */}
+            {/* Info Section */}
             <div className="flex-1 w-full">
-              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-6">
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-8">
                 <div className="text-center md:text-left">
-                  <h1 className="text-3xl md:text-4xl font-serif font-black text-stone-800 tracking-tight mb-1">{student.name}</h1>
-                  <p className="text-stone-500 text-sm font-bold uppercase tracking-wider">
-                    Warga Kota #{student.absen} <span className="mx-2 opacity-50">|</span> Sesi {student.session_id.slice(0,8)}
+                  <h1 className="text-3xl md:text-4xl font-black text-stone-800 tracking-tight mb-1">{student.name}</h1>
+                  <p className="text-stone-500 text-sm font-semibold uppercase tracking-wider">
+                    👤 Warga Kota #{student.absen} <span className="mx-2 opacity-40">•</span> Sesi {student.session_id.slice(0,8)}
                   </p>
                 </div>
                 
-                <div className="flex justify-center md:justify-start gap-3 md:gap-4">
-                  <div className="bg-white px-5 py-3 rounded-2xl text-center border border-stone-100 shadow-sm min-w-[80px]">
-                    <p className="text-[10px] text-blue-500 font-bold uppercase tracking-widest mb-1">POIN</p>
-                    <p className="text-2xl font-black text-blue-700 leading-none">{student.total_poin}</p>
-                  </div>
-                  <div className="bg-white px-5 py-3 rounded-2xl text-center border border-stone-100 shadow-sm min-w-[80px]">
-                    <p className="text-[10px] text-amber-500 font-bold uppercase tracking-widest mb-1">BINTANG</p>
-                    <p className="text-2xl font-black text-amber-600 leading-none">★ {student.total_bintang}</p>
-                  </div>
-                  <div className="bg-white px-5 py-3 rounded-2xl text-center border border-stone-100 shadow-sm min-w-[80px]">
-                    <p className="text-[10px] text-emerald-500 font-bold uppercase tracking-widest mb-1">PROGRES</p>
-                    <p className="text-2xl font-black text-emerald-700 leading-none">{completedCount}<span className="text-lg opacity-50">/10</span></p>
-                  </div>
-                </div>
-              </div>
-
-              {/* XP Bar */}
-              <div className="bg-white p-4 rounded-2xl border border-stone-100 shadow-sm">
-                <div className="flex justify-between text-[10px] text-stone-400 mb-2 font-bold uppercase tracking-widest">
-                  <span>PENGALAMAN (XP)</span>
-                  <span className="text-amber-600 bg-amber-100 px-2 py-0.5 rounded-md">{xp} / {MAX_XP} XP</span>
-                </div>
-                <div className="h-4 bg-stone-100 rounded-full overflow-hidden border border-stone-200">
+                {/* Stats Cards */}
+                <div className="flex justify-center md:justify-start gap-3 md:gap-4 flex-wrap">
                   <motion.div 
-                    initial={{width:0}} animate={{width:`${xp}%`}} transition={{duration:1, ease:'easeOut'}} 
-                    className="h-full bg-gradient-to-r from-amber-400 to-amber-300 relative"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className="backdrop-blur-md bg-gradient-to-br from-blue-50 to-blue-100 px-6 py-3 rounded-2xl text-center border border-blue-200/60 shadow-md hover:shadow-lg transition-all hover:from-blue-100 hover:to-blue-150 min-w-[90px]"
                   >
-                    <div className="absolute inset-0 bg-white/20" style={{ backgroundImage: 'linear-gradient(45deg, rgba(255,255,255,.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.15) 50%, rgba(255,255,255,.15) 75%, transparent 75%, transparent)', backgroundSize: '1rem 1rem' }} />
+                    <p className="text-[10px] text-blue-600 font-black uppercase tracking-widest mb-1">💰 POIN</p>
+                    <p className="text-2xl font-black text-blue-700 leading-none">{student.total_poin}</p>
+                  </motion.div>
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.15 }}
+                    className="backdrop-blur-md bg-gradient-to-br from-amber-50 to-amber-100 px-6 py-3 rounded-2xl text-center border border-amber-200/60 shadow-md hover:shadow-lg transition-all hover:from-amber-100 hover:to-amber-150 min-w-[90px]"
+                  >
+                    <p className="text-[10px] text-amber-600 font-black uppercase tracking-widest mb-1">⭐ BINTANG</p>
+                    <p className="text-2xl font-black text-amber-700 leading-none">{student.total_bintang}</p>
+                  </motion.div>
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="backdrop-blur-md bg-gradient-to-br from-emerald-50 to-emerald-100 px-6 py-3 rounded-2xl text-center border border-emerald-200/60 shadow-md hover:shadow-lg transition-all hover:from-emerald-100 hover:to-emerald-150 min-w-[90px]"
+                  >
+                    <p className="text-[10px] text-emerald-600 font-black uppercase tracking-widest mb-1">📊 PROGRES</p>
+                    <p className="text-2xl font-black text-emerald-700 leading-none">{completedCount}<span className="text-lg opacity-50">/10</span></p>
                   </motion.div>
                 </div>
               </div>
+
+              {/* XP Bar - Enhanced */}
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                className="backdrop-blur-md bg-white/60 p-5 rounded-2xl border border-white/60 shadow-md hover:shadow-lg transition-all"
+              >
+                <div className="flex justify-between text-[10px] text-stone-500 mb-2.5 font-bold uppercase tracking-widest">
+                  <span className="flex items-center gap-1">🚀 Pengalaman (XP)</span>
+                  <span className="bg-gradient-to-r from-amber-100 to-orange-100 text-amber-700 px-3 py-1 rounded-lg border border-amber-200/60 font-black">{xp} / {MAX_XP} XP</span>
+                </div>
+                <div className="h-5 bg-gradient-to-r from-stone-100 to-stone-200 rounded-full overflow-hidden border-2 border-stone-300/50 shadow-inner">
+                  <motion.div 
+                    initial={{width:0}} 
+                    animate={{width:`${xp}%`}} 
+                    transition={{duration:1.2, ease:'easeOut'}} 
+                    className="h-full bg-gradient-to-r from-sky-400 via-blue-400 to-emerald-400 relative shadow-lg"
+                  >
+                    <div className="absolute inset-0 bg-white/30" style={{ backgroundImage: 'linear-gradient(45deg, rgba(255,255,255,.2) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.2) 50%, rgba(255,255,255,.2) 75%, transparent 75%, transparent)', backgroundSize: '1.5rem 1.5rem' }} />
+                  </motion.div>
+                </div>
+              </motion.div>
             </div>
           </div>
         </motion.div>
 
         {/* ── WORLD MAP TITLE ── */}
-        <div className="text-center mb-16">
-          <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2, type: 'spring' }} className="inline-block mb-3">
-            <span className="bg-amber-100 text-amber-700 font-bold text-xs px-4 py-1.5 rounded-full uppercase tracking-widest shadow-sm border border-amber-200">
-              Jelajahi Sistem
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="text-center mb-20"
+        >
+          <motion.div 
+            initial={{ scale: 0 }} 
+            animate={{ scale: 1 }} 
+            transition={{ delay: 0.5, type: 'spring' }} 
+            className="inline-block mb-4"
+          >
+            <span className="backdrop-blur-md bg-gradient-to-r from-amber-100 to-orange-100 text-amber-700 font-black text-xs px-5 py-2 rounded-full uppercase tracking-widest shadow-md border border-amber-200/60 hover:shadow-lg transition-all">
+              🗺️ Jelajahi Sistem
             </span>
           </motion.div>
-          <h2 className="text-4xl md:text-6xl font-serif font-black text-stone-800 tracking-tight">Peta Kota Digital</h2>
-          <p className="text-stone-600 text-base md:text-lg mt-4 max-w-lg mx-auto font-medium">Kuasai arsitektur komputer dan logika sistem dalam ArchiLogic Challenge!</p>
-        </div>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-stone-800 tracking-tight mb-3">Peta Kota Digital</h2>
+          <p className="text-stone-600 text-base md:text-lg mt-4 max-w-2xl mx-auto font-medium leading-relaxed">Kuasai arsitektur komputer dan logika sistem dalam 🎮 ArchiLogic Challenge!</p>
+        </motion.div>
 
         {/* ── ELEGANT ZIGZAG LEVEL TIMELINE ── */}
-        <div className="relative w-full max-w-4xl mx-auto py-4">
+        <div className="relative w-full max-w-4xl mx-auto py-8">
           {/* The central dashed line */}
-          <div className="absolute top-0 bottom-0 left-[40px] md:left-1/2 md:-ml-[2px] w-0 border-l-4 border-dashed border-stone-300/60 z-0" />
+          <div className="absolute top-0 bottom-0 left-[40px] md:left-1/2 md:-ml-[2px] w-0 border-l-4 border-dashed border-sky-300/70 z-0" />
 
           {[...Array(10)].map((_, i) => {
             const level = i + 1;
@@ -159,53 +204,83 @@ export default function DashboardLevel() {
                     initial={{ opacity: 0, x: isRight ? 40 : -40 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.1 + 0.2, type: 'spring', stiffness: 100 }}
-                    whileHover={!isLocked ? { scale: 1.03, y: -4 } : {}}
-                    whileTap={!isLocked ? { scale: 0.97 } : {}}
+                    whileHover={!isLocked ? { scale: 1.05, y: -6 } : {}}
+                    whileTap={!isLocked ? { scale: 0.95 } : {}}
                     onClick={() => !isLocked && navigate(`/game/${level}`)}
-                    className={`relative flex flex-col sm:flex-row items-center sm:items-start gap-4 p-5 md:p-6 rounded-[2rem] border shadow-sm transition-all duration-300 group
-                      ${isLocked ? 'bg-white/50 border-stone-200 opacity-60 grayscale cursor-not-allowed'
-                      : isDone ? 'bg-white border-emerald-200 hover:border-emerald-400 hover:shadow-lg cursor-pointer'
-                      : isBoss ? 'bg-gradient-to-br from-amber-50 to-orange-50 border-amber-300 hover:border-amber-500 hover:shadow-xl cursor-pointer shadow-amber-100/50'
-                      : 'bg-white border-stone-200 hover:border-amber-400 hover:shadow-xl cursor-pointer ring-4 ring-transparent hover:ring-amber-50'}`}
+                    className={`relative flex flex-col sm:flex-row items-center sm:items-start gap-5 p-6 md:p-7 rounded-2xl border-2 shadow-lg transition-all duration-300 group backdrop-blur-lg
+                      ${isLocked ? 'bg-white/30 border-stone-200/40 opacity-50 grayscale cursor-not-allowed shadow-sm hover:shadow-md'
+                      : isDone ? 'bg-gradient-to-br from-emerald-50/80 to-green-50/80 border-emerald-300/70 hover:border-emerald-400 hover:shadow-xl cursor-pointer hover:from-emerald-100/80 hover:to-green-100/80'
+                      : isBoss ? 'bg-gradient-to-br from-amber-50/90 to-orange-50/90 border-amber-400/70 hover:border-amber-500 hover:shadow-2xl cursor-pointer shadow-amber-200/40 hover:shadow-amber-300/50'
+                      : 'bg-white/70 border-sky-200/60 hover:border-sky-400 hover:shadow-xl cursor-pointer hover:bg-white/90 hover:from-sky-50/50 hover:to-blue-50/50'}`}
                   >
                     {/* Level Icon */}
-                    <div className={`w-16 h-16 shrink-0 rounded-2xl flex items-center justify-center text-3xl shadow-inner border border-white/50
-                      ${isLocked ? 'bg-stone-200 text-stone-400' : `bg-gradient-to-br ${meta.color}`}`}>
+                    <motion.div 
+                      whileHover={!isLocked ? { scale: 1.1, rotate: 5 } : {}}
+                      className={`w-18 h-18 shrink-0 rounded-2xl flex items-center justify-center text-4xl shadow-lg border-2 border-white/60 transition-all ${isLocked ? 'bg-stone-200/50 text-stone-400 grayscale' : `bg-gradient-to-br ${meta.color} shadow-md`}`}
+                    >
                       {meta.icon}
-                    </div>
+                    </motion.div>
 
                     {/* Level Info */}
                     <div className="flex-1 w-full text-center sm:text-left">
-                      <div className="flex items-center justify-center sm:justify-start gap-2 mb-1.5">
-                        <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-lg ${isDone ? 'bg-emerald-100 text-emerald-700' : isBoss ? 'bg-amber-500 text-white shadow-sm' : isLocked ? 'bg-stone-200 text-stone-500' : 'bg-amber-100 text-amber-700 border border-amber-200'}`}>
+                      <div className="flex items-center justify-center sm:justify-start gap-2.5 mb-2">
+                        <motion.span 
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          transition={{ delay: i * 0.1 + 0.3 }}
+                          className={`text-[11px] font-black px-3 py-1 rounded-lg border backdrop-blur-sm transition-all ${isDone ? 'bg-emerald-100/80 text-emerald-700 border-emerald-300/60' : isBoss ? 'bg-gradient-to-r from-amber-400 to-orange-400 text-white shadow-lg border-amber-500/60' : isLocked ? 'bg-stone-200/60 text-stone-500 border-stone-300/40' : 'bg-sky-100/80 text-sky-700 border-sky-300/60'}`}
+                        >
                           BAB {level}
-                        </span>
-                        {isBoss && !isLocked && <span className="text-[10px] font-bold px-2 py-0.5 rounded-lg bg-red-100 text-red-600 animate-pulse border border-red-200">UJIAN</span>}
+                        </motion.span>
+                        {isBoss && !isLocked && <motion.span 
+                          animate={{ scale: [1, 1.05, 1] }}
+                          transition={{ duration: 2, repeat: Infinity }}
+                          className="text-[11px] font-black px-2.5 py-1 rounded-lg bg-gradient-to-r from-red-400 to-rose-400 text-white shadow-md border border-red-400/60 animate-pulse uppercase tracking-wide">👑 UJIAN</motion.span>}
                       </div>
-                      <h3 className={`font-serif font-black text-lg md:text-xl leading-tight mb-1 ${isLocked ? 'text-stone-500' : 'text-stone-800'}`}>
+                      <h3 className={`font-black text-lg md:text-xl leading-tight mb-1.5 transition-colors ${isLocked ? 'text-stone-500' : isDone ? 'text-emerald-800' : 'text-stone-800'}`}>
                         {meta.name}
                       </h3>
-                      <p className={`text-[10px] font-bold uppercase tracking-widest ${isLocked ? 'text-stone-400' : 'text-stone-500'}`}>
-                        {meta.mechanic}
+                      <p className={`text-[10px] font-bold uppercase tracking-widest transition-colors ${isLocked ? 'text-stone-400' : isDone ? 'text-emerald-600' : 'text-stone-600'}`}>
+                        📋 {meta.mechanic}
                       </p>
                     </div>
 
                     {/* Actions / Stars */}
-                    <div className="flex sm:flex-col justify-between items-center sm:items-end w-full sm:w-auto shrink-0 mt-2 sm:mt-0 pt-3 sm:pt-0 border-t sm:border-t-0 border-stone-100">
-                      <div className="flex gap-0.5">
+                    <div className="flex sm:flex-col justify-between items-center sm:items-end w-full sm:w-auto shrink-0 mt-3 sm:mt-0 pt-3 sm:pt-0 border-t-2 sm:border-t-0 border-stone-200/40">
+                      <motion.div 
+                        className="flex gap-1"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: i * 0.1 + 0.4 }}
+                      >
                         {[1,2,3].map(s => (
-                          <span key={s} className={`text-xl ${s <= stars ? 'text-amber-400 drop-shadow-sm' : 'text-stone-200'}`}>★</span>
+                          <motion.span 
+                            key={s} 
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ delay: (i * 0.1 + 0.4) + (s * 0.05) }}
+                            className={`text-2xl transition-all ${s <= stars ? 'text-amber-400 drop-shadow-lg scale-110' : 'text-stone-200'}`}
+                          >
+                            ★
+                          </motion.span>
                         ))}
-                      </div>
+                      </motion.div>
                       {!isLocked && !isDone && (
-                        <span className="text-[10px] font-bold bg-amber-400 text-white shadow-sm px-3 py-1.5 rounded-xl sm:mt-2 group-hover:bg-amber-500 transition-colors uppercase tracking-widest">
-                          MAIN ▶
-                        </span>
+                        <motion.span 
+                          whileHover={{ scale: 1.08, y: -2 }}
+                          whileTap={{ scale: 0.95 }}
+                          className="text-[11px] font-black bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white shadow-lg hover:shadow-xl px-4 py-2 rounded-xl sm:mt-2 transition-all uppercase tracking-widest border border-sky-300/60"
+                        >
+                          ▶ MAIN
+                        </motion.span>
                       )}
                       {isDone && (
-                        <span className="text-[10px] font-bold bg-stone-100 text-stone-500 px-3 py-1.5 rounded-xl sm:mt-2 group-hover:bg-amber-100 group-hover:text-amber-700 transition-colors uppercase tracking-widest hidden sm:inline-block">
-                          ULANGI ↺
-                        </span>
+                        <motion.span 
+                          whileHover={{ scale: 1.08, y: -2 }}
+                          className="text-[11px] font-black bg-emerald-100/80 text-emerald-700 hover:bg-emerald-200/80 px-4 py-2 rounded-xl sm:mt-2 transition-all uppercase tracking-widest hidden sm:inline-block border border-emerald-300/60"
+                        >
+                          ↺ ULANGI
+                        </motion.span>
                       )}
                     </div>
                   </motion.div>
@@ -215,9 +290,30 @@ export default function DashboardLevel() {
           })}
         </div>
 
-        
-
-
+        {/* ── FOOTER / ACTION SECTION ── */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8 }}
+          className="mt-20 mb-12 flex flex-col sm:flex-row gap-4 justify-center items-center max-w-2xl mx-auto"
+        >
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => navigate('/')}
+            className="flex items-center gap-2 backdrop-blur-lg bg-white/70 hover:bg-white/90 text-stone-700 font-black px-6 py-3 rounded-2xl border-2 border-stone-200/60 shadow-lg hover:shadow-xl transition-all uppercase tracking-wide text-sm"
+          >
+            ← Kembali
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={logoutStudent}
+            className="flex items-center gap-2 backdrop-blur-lg bg-gradient-to-r from-red-400/80 to-rose-400/80 hover:from-red-500 hover:to-rose-500 text-white font-black px-6 py-3 rounded-2xl border-2 border-red-300/60 shadow-lg hover:shadow-xl transition-all uppercase tracking-wide text-sm"
+          >
+            🚪 Keluar
+          </motion.button>
+        </motion.div>
       </div>
     </div>
   );

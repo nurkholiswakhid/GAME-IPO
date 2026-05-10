@@ -1289,10 +1289,19 @@ export default function GameLevel() {
               className="relative overflow-hidden rounded-2xl border border-stone-200 bg-white/95 backdrop-blur-md p-6 shadow-xl">
               <div className="absolute top-0 left-0 w-1.5 h-full bg-emerald-400" />
               
-              <div className="flex flex-wrap gap-2 mb-4">
-                <span className="bg-emerald-50 text-emerald-600 text-xs font-bold px-3 py-1.5 rounded border border-emerald-200 uppercase tracking-widest flex items-center gap-1.5"><span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"/> TUGAS AKTIF</span>
-                <span className="text-xs font-bold px-3 py-1.5 rounded bg-stone-100 text-stone-500 border border-stone-200 uppercase">{question.topic}</span>
-                <span className="text-xs font-bold px-3 py-1.5 rounded bg-stone-100 text-stone-500 border border-stone-200 uppercase">{question.bloom_level}</span>
+              <div className="flex flex-wrap items-start gap-3 mb-4">
+                {question.level_emoji && (
+                  <div className="text-5xl md:text-6xl" style={{filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.15))'}}>
+                    {question.level_emoji}
+                  </div>
+                )}
+                <div className="flex-1">
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    <span className="bg-emerald-50 text-emerald-600 text-xs font-bold px-3 py-1.5 rounded border border-emerald-200 uppercase tracking-widest flex items-center gap-1.5"><span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"/> TUGAS AKTIF</span>
+                    <span className="text-xs font-bold px-3 py-1.5 rounded bg-stone-100 text-stone-500 border border-stone-200 uppercase">{question.topic}</span>
+                    <span className="text-xs font-bold px-3 py-1.5 rounded bg-stone-100 text-stone-500 border border-stone-200 uppercase">{question.bloom_level}</span>
+                  </div>
+                </div>
               </div>
               
               <p className="text-lg md:text-xl font-medium text-stone-800 leading-relaxed font-serif">{question.question_text}</p>
