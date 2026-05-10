@@ -1076,7 +1076,7 @@ export default function GameLevel() {
             {phase === 'INTRO' && (
               <button onClick={() => { setPhase('PRE_GAME_ANIM'); setTimeout(()=>setPhase('GAME'), 1500); setDialogIdx(0); }}
                 className="group flex items-center gap-2 text-xs font-bold text-sky-600 border border-sky-300 bg-white/80 backdrop-blur-md px-4 py-2 rounded-full hover:bg-sky-50 hover:border-sky-400 transition-all shadow-sm">
-                Lewati Cerita <span className="group-hover:translate-x-1 transition-transform">▶▶</span>
+                Lewati Cerita <span className="group-hover:translate-x-1 transition-transform"></span>
               </button>
             )}
             {phase === 'OUTRO' && (
@@ -1084,7 +1084,7 @@ export default function GameLevel() {
                 <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-300">✨ Percakapan Akhir</span>
                 <button onClick={() => setPhase('COMPLETE')}
                   className="group flex items-center gap-2 text-xs font-bold text-stone-500 border border-stone-300 bg-white/80 backdrop-blur-md px-4 py-2 rounded-full hover:bg-stone-50 transition-all shadow-sm">
-                  Lewati <span className="group-hover:translate-x-1 transition-transform">▶▶</span>
+                  Lewati <span className="group-hover:translate-x-1 transition-transform"></span>
                 </button>
               </div>
             )}
@@ -1281,13 +1281,13 @@ export default function GameLevel() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, transition: { duration: 0.4 } }}
-            className={`fixed inset-0 z-[300] flex justify-center p-4 sm:p-6 overflow-y-auto font-sans city-bg ${bgClass}`}
+            className={`fixed inset-0 z-[300] font-sans city-bg ${bgClass}`}
           >
             {/* Full screen dark blur overlay */}
-            <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md pointer-events-none" />
+            <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md pointer-events-none" />
             
             {/* Confetti (Di luar popup agar meriah di seluruh layar) */}
-            <div className="fixed top-0 w-full pointer-events-none z-0">
+            <div className="absolute top-0 inset-x-0 w-full pointer-events-none z-0">
               {[...Array(24)].map((_, i) => (
                 <motion.div key={i}
                   className="absolute top-0 rounded-sm"
@@ -1300,15 +1300,17 @@ export default function GameLevel() {
               ))}
             </div>
 
-            {/* POPUP CARD */}
-            <motion.div
-              initial={{ scale: 0.85, y: 30, opacity: 0 }}
-              animate={{ scale: 1, y: 0, opacity: 1 }}
-              exit={{ scale: 0.85, opacity: 0 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-              className="relative m-auto z-10 w-full max-w-lg bg-white rounded-[2rem] p-8 md:p-10 text-center shadow-2xl border-4 overflow-hidden"
-              style={{ borderColor: winData.bintang === 3 ? '#A7F3D0' : winData.bintang === 2 ? '#FDE68A' : '#FECDD3' }}
-            >
+            {/* Flex container khusus untuk Pop Up agar tidak terganggu elemen absolute */}
+            <div className="absolute inset-0 flex items-center justify-center p-4 sm:p-6 overflow-y-auto z-10 pointer-events-none">
+              {/* POPUP CARD */}
+              <motion.div
+                initial={{ scale: 0.85, y: 30, opacity: 0 }}
+                animate={{ scale: 1, y: 0, opacity: 1 }}
+                exit={{ scale: 0.85, opacity: 0 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                className="relative w-full max-w-lg bg-white rounded-[2rem] p-8 md:p-10 text-center shadow-2xl border-4 overflow-hidden pointer-events-auto"
+                style={{ borderColor: winData.bintang === 3 ? '#A7F3D0' : winData.bintang === 2 ? '#FDE68A' : '#FECDD3' }}
+              >
               {/* Top accent bar */}
               <div className="absolute top-0 left-0 w-full h-3" 
                    style={{ background: winData.bintang === 3 ? 'linear-gradient(90deg, #34D399, #10B981)' : winData.bintang === 2 ? 'linear-gradient(90deg, #FCD34D, #F59E0B)' : 'linear-gradient(90deg, #FB7185, #E11D48)' }} />
@@ -1429,6 +1431,7 @@ export default function GameLevel() {
 
               </div>
             </motion.div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
