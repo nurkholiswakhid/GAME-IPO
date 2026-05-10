@@ -60,6 +60,7 @@ model Question {
   explanation       String?
   failure_message   String?
   story_json        String?
+  level_emoji       String  @default("📚")
 
   @@map("questions")
 }

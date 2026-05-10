@@ -23,6 +23,7 @@ export default function DashboardGuru() {
     explanation: '',
     failure_message: '',
     bloom_level: 'REMEMBER',
+    level_emoji: '📚',
     topic: 'GENERAL',
     storyState: emptyStoryState(),
     showStory: false,
@@ -38,6 +39,7 @@ export default function DashboardGuru() {
     options_json: '', 
     correct_config: '', 
     bloom_level: 'REMEMBER',
+    level_emoji: '📚',
     topic: 'GENERAL',
     explanation: '',
     failure_message: '',
@@ -112,6 +114,7 @@ export default function DashboardGuru() {
       explanation: q.explanation || '',
       failure_message: q.failure_message || '',
       bloom_level: q.bloom_level || 'REMEMBER',
+      level_emoji: q.level_emoji || '📚',
       topic: q.topic || 'GENERAL',
       storyState: storyState,
       showStory: hasStoryData,
@@ -138,6 +141,7 @@ export default function DashboardGuru() {
       explanation: editForm.explanation,
       failure_message: editForm.failure_message,
       bloom_level: editForm.bloom_level,
+      level_emoji: editForm.level_emoji,
       topic: editForm.topic,
       story_json,
       options_json,
@@ -179,6 +183,7 @@ export default function DashboardGuru() {
       type: createForm.type,
       question_text: createForm.question_text,
       bloom_level: createForm.bloom_level,
+      level_emoji: createForm.level_emoji,
       topic: createForm.topic,
       explanation: createForm.explanation,
       failure_message: createForm.failure_message,
@@ -203,6 +208,7 @@ export default function DashboardGuru() {
         options_json: '', 
         correct_config: '', 
         bloom_level: 'REMEMBER',
+        level_emoji: '📚',
         topic: 'GENERAL',
         explanation: '',
         failure_message: '',
@@ -487,7 +493,6 @@ export default function DashboardGuru() {
                           {q.topic && <span className="inline-block px-3 py-1 bg-green-100 text-green-700 rounded-lg text-xs font-bold">{q.topic}</span>}
                         </div>
                         <h3 className="font-bold text-stone-800 text-lg">{q.question_text}</h3>
-                        {q.explanation && <p className="text-sm text-stone-600 mt-2 italic">✅ {q.explanation}</p>}
                       </div>
                       <div className="flex gap-2">
                         <button 
@@ -535,13 +540,17 @@ export default function DashboardGuru() {
                 </motion.div>
               )}
               <form onSubmit={handleSaveQuestion} className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6 city-bg relative">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                  <div className="glass p-6 rounded-2xl">
-                    <label className="block text-sm font-black text-stone-800 mb-2">Bloom Level</label>
+                {/* Bloom Level & Topic */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="bg-white border-2 border-blue-200 p-6 rounded-2xl shadow-sm">
+                    <div className="flex items-center justify-between mb-3">
+                      <label className="block text-xs font-black text-blue-900 uppercase tracking-wider">Tingkat Kognitif (Bloom)</label>
+                      <div className="text-3xl">{editForm.level_emoji}</div>
+                    </div>
                     <select 
                       value={editForm.bloom_level}
                       onChange={(e) => setEditForm({...editForm, bloom_level: e.target.value})}
-                      className="w-full px-4 py-3 rounded-xl border-2 border-transparent bg-white shadow-sm focus:border-blue-400 outline-none transition-all">
+                      className="w-full px-4 py-3 rounded-lg border-2 border-blue-300 bg-blue-50 text-sm font-semibold focus:border-blue-500 focus:bg-white outline-none transition-all mb-4">
                       <option>REMEMBER</option>
                       <option>UNDERSTAND</option>
                       <option>APPLY</option>
@@ -549,43 +558,62 @@ export default function DashboardGuru() {
                       <option>EVALUATE</option>
                       <option>CREATE</option>
                     </select>
+                    <div className="grid grid-cols-6 gap-2">
+                      {['📚', '🧠', '🎯', '🔍', '⚖️', '💡', '🚀', '📖', '🎨', '🔬', '📊', '🏆'].map((emoji) => (
+                        <button
+                          key={emoji}
+                          type="button"
+                          onClick={() => setEditForm({...editForm, level_emoji: emoji})}
+                          className={`text-2xl py-2 px-2 rounded-lg border-2 transition-all ${
+                            editForm.level_emoji === emoji 
+                              ? 'border-blue-500 bg-blue-100 scale-110' 
+                              : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50'
+                          }`}
+                        >
+                          {emoji}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                  <div className="glass p-6 rounded-2xl">
-                    <label className="block text-sm font-black text-stone-800 mb-2">Topik</label>
+                  <div className="bg-white border-2 border-purple-200 p-6 rounded-2xl shadow-sm">
+                    <label className="block text-xs font-black text-purple-900 uppercase tracking-wider mb-3">Topik Pembelajaran</label>
                     <input 
                       type="text"
                       value={editForm.topic}
                       onChange={(e) => setEditForm({...editForm, topic: e.target.value})}
-                      className="w-full px-4 py-3 rounded-xl border-2 border-transparent bg-white shadow-sm focus:border-blue-400 outline-none transition-all"
+                      className="w-full px-4 py-3 rounded-lg border-2 border-purple-300 bg-purple-50 text-sm font-semibold focus:border-purple-500 focus:bg-white outline-none transition-all"
                       placeholder="Contoh: Input & Output, Interrupt Handling" />
                   </div>
                 </div>
                 
-                <div className="glass p-6 rounded-2xl">
-                  <label className="block text-sm font-black text-stone-800 mb-2">Pertanyaan Utama (Instruksi)</label>
+                {/* Main Question */}
+                <div className="bg-white border-2 border-blue-300 p-6 rounded-2xl shadow-sm">
+                  <label className="block text-xs font-black text-blue-900 uppercase tracking-wider mb-3">Pertanyaan Utama (Instruksi)</label>
                   <textarea 
                     value={editForm.question_text}
                     onChange={(e) => setEditForm({...editForm, question_text: e.target.value})}
-                    className="w-full px-4 py-3 rounded-xl border-2 border-transparent bg-white shadow-sm focus:border-blue-400 outline-none transition-all resize-y"
-                    rows="2" />
+                    className="w-full px-4 py-3 rounded-lg border-2 border-blue-300 bg-blue-50 text-sm font-semibold focus:border-blue-500 focus:bg-white outline-none transition-all resize-none"
+                    rows="3" />
                 </div>
                 
-                <div className="glass p-6 rounded-2xl">
-                  <label className="block text-sm font-black text-stone-800 mb-2">Penjelasan / Pesan Sukses ✅</label>
+                {/* Success Message */}
+                <div className="bg-white border-2 border-green-300 p-6 rounded-2xl shadow-sm">
+                  <label className="block text-xs font-black text-green-900 uppercase tracking-wider mb-3">Pesan Sukses (Jawaban Benar)</label>
                   <textarea 
                     value={editForm.explanation}
                     onChange={(e) => setEditForm({...editForm, explanation: e.target.value})}
-                    className="w-full px-4 py-3 rounded-xl border-2 border-transparent bg-white shadow-sm focus:border-blue-400 outline-none transition-all resize-y"
+                    className="w-full px-4 py-3 rounded-lg border-2 border-green-300 bg-green-50 text-sm font-semibold focus:border-green-500 focus:bg-white outline-none transition-all resize-none"
                     rows="2"
                     placeholder="Pesan penyemangat yang muncul saat siswa menjawab BENAR" />
                 </div>
 
-                <div className="glass p-6 rounded-2xl border border-red-100">
-                  <label className="block text-sm font-black text-red-700 mb-2">Pesan Gagal / Salah ❌</label>
+                {/* Failure Message */}
+                <div className="bg-white border-2 border-red-300 p-6 rounded-2xl shadow-sm">
+                  <label className="block text-xs font-black text-red-900 uppercase tracking-wider mb-3">Pesan Gagal (Jawaban Salah)</label>
                   <textarea 
                     value={editForm.failure_message}
                     onChange={(e) => setEditForm({...editForm, failure_message: e.target.value})}
-                    className="w-full px-4 py-3 rounded-xl border-2 border-transparent bg-red-50 shadow-sm focus:border-red-400 outline-none transition-all resize-y"
+                    className="w-full px-4 py-3 rounded-lg border-2 border-red-300 bg-red-50 text-sm font-semibold focus:border-red-500 focus:bg-white outline-none transition-all resize-none"
                     rows="2"
                     placeholder="Pesan yang muncul saat siswa menjawab SALAH atau gagal" />
                 </div>
@@ -695,33 +723,36 @@ export default function DashboardGuru() {
                   </div>
                 </div>
 
-                <div className="glass p-6 rounded-2xl border border-blue-100">
-                  <label className="block text-sm font-black text-blue-800 mb-2">Pertanyaan Utama (Instruksi) *</label>
+                {/* Main Question */}
+                <div className="bg-white border-2 border-blue-300 p-6 rounded-2xl shadow-sm">
+                  <label className="block text-xs font-black text-blue-900 uppercase tracking-wider mb-3">Pertanyaan Utama (Instruksi) *</label>
                   <textarea 
                     required
                     value={createForm.question_text}
                     onChange={(e) => setCreateForm({...createForm, question_text: e.target.value})}
-                    className="w-full px-4 py-3 rounded-xl border-2 border-transparent bg-blue-50 shadow-sm focus:border-blue-400 outline-none transition-all resize-y"
-                    rows="2" 
+                    className="w-full px-4 py-3 rounded-lg border-2 border-blue-300 bg-blue-50 text-sm font-semibold focus:border-blue-500 focus:bg-white outline-none transition-all resize-none"
+                    rows="3" 
                     placeholder="Tulis instruksi/pertanyaan untuk siswa..."/>
                 </div>
                 
-                <div className="glass p-6 rounded-2xl">
-                  <label className="block text-sm font-black text-stone-800 mb-2">Penjelasan / Pesan Sukses ✅</label>
+                {/* Success Message */}
+                <div className="bg-white border-2 border-green-300 p-6 rounded-2xl shadow-sm">
+                  <label className="block text-xs font-black text-green-900 uppercase tracking-wider mb-3">Pesan Sukses (Jawaban Benar)</label>
                   <textarea 
                     value={createForm.explanation}
                     onChange={(e) => setCreateForm({...createForm, explanation: e.target.value})}
-                    className="w-full px-4 py-3 rounded-xl border-2 border-transparent bg-white shadow-sm focus:border-blue-400 outline-none transition-all resize-y"
+                    className="w-full px-4 py-3 rounded-lg border-2 border-green-300 bg-green-50 text-sm font-semibold focus:border-green-500 focus:bg-white outline-none transition-all resize-none"
                     rows="2"
                     placeholder="Pesan penyemangat yang muncul saat siswa menjawab BENAR" />
                 </div>
 
-                <div className="glass p-6 rounded-2xl border border-red-100">
-                  <label className="block text-sm font-black text-red-700 mb-2">Pesan Gagal / Salah ❌</label>
+                {/* Failure Message */}
+                <div className="bg-white border-2 border-red-300 p-6 rounded-2xl shadow-sm">
+                  <label className="block text-xs font-black text-red-900 uppercase tracking-wider mb-3">Pesan Gagal (Jawaban Salah)</label>
                   <textarea 
                     value={createForm.failure_message}
                     onChange={(e) => setCreateForm({...createForm, failure_message: e.target.value})}
-                    className="w-full px-4 py-3 rounded-xl border-2 border-transparent bg-red-50 shadow-sm focus:border-red-400 outline-none transition-all resize-y"
+                    className="w-full px-4 py-3 rounded-lg border-2 border-red-300 bg-red-50 text-sm font-semibold focus:border-red-500 focus:bg-white outline-none transition-all resize-none"
                     rows="2"
                     placeholder="Pesan yang muncul saat siswa menjawab SALAH atau gagal" />
                 </div>
@@ -755,13 +786,17 @@ export default function DashboardGuru() {
                   />
                 </div>
 
+                {/* Bloom Level & Topic */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="glass p-6 rounded-2xl">
-                    <label className="block text-sm font-black text-stone-800 mb-2">Bloom Level</label>
+                  <div className="bg-white border-2 border-blue-200 p-6 rounded-2xl shadow-sm">
+                    <div className="flex items-center justify-between mb-3">
+                      <label className="block text-xs font-black text-blue-900 uppercase tracking-wider">Tingkat Kognitif (Bloom)</label>
+                      <div className="text-3xl">{createForm.level_emoji}</div>
+                    </div>
                     <select 
                       value={createForm.bloom_level}
                       onChange={(e) => setCreateForm({...createForm, bloom_level: e.target.value})}
-                      className="w-full px-4 py-3 rounded-xl border-2 border-transparent bg-white shadow-sm focus:border-blue-400 outline-none transition-all">
+                      className="w-full px-4 py-3 rounded-lg border-2 border-blue-300 bg-blue-50 text-sm font-semibold focus:border-blue-500 focus:bg-white outline-none transition-all mb-4">
                       <option>REMEMBER</option>
                       <option>UNDERSTAND</option>
                       <option>APPLY</option>
@@ -769,14 +804,30 @@ export default function DashboardGuru() {
                       <option>EVALUATE</option>
                       <option>CREATE</option>
                     </select>
+                    <div className="grid grid-cols-6 gap-2">
+                      {['📚', '🧠', '🎯', '🔍', '⚖️', '💡', '🚀', '📖', '🎨', '🔬', '📊', '🏆'].map((emoji) => (
+                        <button
+                          key={emoji}
+                          type="button"
+                          onClick={() => setCreateForm({...createForm, level_emoji: emoji})}
+                          className={`text-2xl py-2 px-2 rounded-lg border-2 transition-all ${
+                            createForm.level_emoji === emoji 
+                              ? 'border-blue-500 bg-blue-100 scale-110' 
+                              : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50'
+                          }`}
+                        >
+                          {emoji}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                  <div className="glass p-6 rounded-2xl">
-                    <label className="block text-sm font-black text-stone-800 mb-2">Topik</label>
+                  <div className="bg-white border-2 border-purple-200 p-6 rounded-2xl shadow-sm">
+                    <label className="block text-xs font-black text-purple-900 uppercase tracking-wider mb-3">Topik Pembelajaran</label>
                     <input 
                       type="text"
                       value={createForm.topic}
                       onChange={(e) => setCreateForm({...createForm, topic: e.target.value})}
-                      className="w-full px-4 py-3 rounded-xl border-2 border-transparent bg-white shadow-sm focus:border-blue-400 outline-none transition-all"
+                      className="w-full px-4 py-3 rounded-lg border-2 border-purple-300 bg-purple-50 text-sm font-semibold focus:border-purple-500 focus:bg-white outline-none transition-all"
                       placeholder="Contoh: IPA, Matematika, Bahasa..." />
                   </div>
                 </div>

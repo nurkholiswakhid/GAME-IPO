@@ -1977,53 +1977,139 @@ export function StoryFormFields({ storyState, setStoryState }) {
     setStoryState({ ...storyState, [phase]: storyState[phase].filter((_, i) => i !== idx) });
   };
 
-  const renderDialogList = (phase, title) => (
-    <div className="bg-emerald-50/50 p-4 rounded-xl border border-emerald-100">
-      <div className="flex justify-between items-center mb-3">
-        <h4 className="text-sm font-bold text-emerald-800">{title}</h4>
-        <button type="button" onClick={() => addDialog(phase)} className={smBtn('emerald')}>+ Tambah Dialog</button>
-      </div>
-      <div className="space-y-2">
-        {storyState[phase].map((d, idx) => (
-          <div key={idx} className="bg-white rounded-lg border border-emerald-200 p-3 space-y-2">
-            {/* Row 1: Character picker + mood + delete */}
-            <div className="flex items-center gap-2 flex-wrap">
-              {/* Visual character picker — auto-syncs speaker + npcName */}
-              <CharacterPicker
-                value={d.npcName || ''}
-                onChange={(npc) => pickCharacter(phase, idx, npc)}
-              />
-              {/* Speaker text (editable manually if needed) */}
-              <input
-                value={d.speaker}
-                onChange={e => updateDialog(phase, idx, 'speaker', e.target.value)}
-                className="w-28 px-2 py-1.5 rounded border border-stone-200 text-xs font-bold outline-none focus:border-emerald-400"
-                placeholder="Nama speaker"
-              />
-              {/* Mood */}
-              <select value={d.mood} onChange={e => updateDialog(phase, idx, 'mood', e.target.value)}
-                className="w-28 px-2 py-1.5 rounded border border-stone-200 text-xs outline-none focus:border-emerald-400">
-                <option value="normal">😐 Normal</option>
-                <option value="happy">😄 Happy</option>
-                <option value="sad">😢 Sad</option>
-                <option value="thinking">🤔 Thinking</option>
-                <option value="confident">😎 Confident</option>
-                <option value="panic">😱 Panic</option>
-              </select>
-              <button type="button" onClick={() => removeDialog(phase, idx)}
-                className="ml-auto px-2 py-1.5 rounded bg-red-50 hover:bg-red-100 text-red-500 text-xs font-bold transition-all">✕</button>
-            </div>
-            {/* Row 2: Dialog text */}
-            <input
-              value={d.text}
-              onChange={e => updateDialog(phase, idx, 'text', e.target.value)}
-              className="w-full px-3 py-2 rounded border border-stone-200 text-xs outline-none focus:border-emerald-400"
-              placeholder="Isi percakapan..."
-            />
+  const hasIntro = storyState.intro && storyState.intro.length > 0;
+  const hasOutro = storyState.outro && storyState.outro.length > 0;
+  const hasScene = storyState.scene && storyState.scene.trim() !== '';
+  const hasChapter = storyState.chapter && storyState.chapter.trim() !== '';
+  const isComplete = hasScene && hasChapter && hasIntro && hasOutro;
+
+  const renderDialogList = (phase, emoji, title, description) => (
+    <div className="bg-white border-2 border-orange-300 rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300">
+      <div className="px-4 py-4 bg-gradient-to-br from-orange-150 via-orange-50 to-white border-b-2 border-orange-200">
+        <div className="flex items-center gap-2.5 mb-3">
+          <span className="text-3xl">{emoji}</span>
+          <div>
+            <p className="text-sm font-black text-orange-900 uppercase tracking-wider leading-tight">{title}</p>
+            <p className="text-xs text-orange-600 font-medium mt-0.5">{description}</p>
           </div>
-        ))}
-        {storyState[phase].length === 0 && (
-          <p className="text-xs text-stone-400 text-center py-3 italic">Belum ada dialog.</p>
+        </div>
+        {/* Status Summary */}
+        <div className="flex gap-2 text-xs font-bold">
+          <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full ${
+            storyState[phase].filter(d => d.text && d.text.trim()).length > 0
+              ? 'bg-orange-200 text-orange-900'
+              : 'bg-stone-200 text-stone-900'
+          }`}>
+            <span className="text-lg">💬</span>
+            <span>Dialog: {storyState[phase].filter(d => d.text && d.text.trim()).length}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Dialog List */}
+      <div className="p-4 space-y-3">
+        {storyState[phase].length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-4xl mb-2">📭</p>
+            <p className="text-stone-500 font-medium">Belum ada dialog</p>
+            <button
+              type="button"
+              onClick={() => addDialog(phase)}
+              className="mt-4 px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all active:scale-95"
+            >
+              + Tambah Dialog Pertama
+            </button>
+          </div>
+        ) : (
+          <>
+            {storyState[phase].map((d, idx) => {
+              const isFilled = d.speaker && d.text && d.text.trim() !== '';
+              return (
+                <div
+                  key={idx}
+                  className={`border-2 rounded-xl p-4 transition-all ${
+                    isFilled
+                      ? 'bg-gradient-to-r from-orange-100 to-orange-50 border-orange-400 shadow-md'
+                      : 'bg-gradient-to-r from-stone-100 to-white border-stone-300 hover:border-orange-300 hover:shadow-sm'
+                  }`}
+                >
+                  {/* Character + Mood + Delete */}
+                  <div className="flex items-center gap-2 flex-wrap mb-3">
+                    <CharacterPicker
+                      value={d.npcName || ''}
+                      onChange={(npc) => pickCharacter(phase, idx, npc)}
+                    />
+                    <input
+                      value={d.speaker}
+                      onChange={e => updateDialog(phase, idx, 'speaker', e.target.value)}
+                      className={`flex-1 px-3 py-2 rounded-lg border-2 font-bold text-xs outline-none transition-all ${
+                        isFilled
+                          ? 'border-orange-400 bg-orange-50 focus:border-orange-500'
+                          : 'border-stone-300 focus:border-orange-400 focus:bg-orange-50'
+                      }`}
+                      placeholder="Nama speaker"
+                    />
+                    <select
+                      value={d.mood}
+                      onChange={e => updateDialog(phase, idx, 'mood', e.target.value)}
+                      className={`px-3 py-2 rounded-lg border-2 text-xs outline-none transition-all ${
+                        isFilled
+                          ? 'border-orange-400 bg-orange-50 focus:border-orange-500'
+                          : 'border-stone-300 focus:border-orange-400 focus:bg-orange-50'
+                      }`}
+                    >
+                      <option value="normal">😐 Normal</option>
+                      <option value="happy">😄 Happy</option>
+                      <option value="sad">😢 Sad</option>
+                      <option value="thinking">🤔 Thinking</option>
+                      <option value="confident">😎 Confident</option>
+                      <option value="panic">😱 Panic</option>
+                    </select>
+                    <button
+                      type="button"
+                      onClick={() => removeDialog(phase, idx)}
+                      className="px-3 py-2 rounded-lg bg-red-100 hover:bg-red-200 text-red-600 font-bold text-sm border-2 border-red-300 transition-all hover:shadow-md active:scale-95"
+                      title="Hapus dialog"
+                    >
+                      ✕
+                    </button>
+                  </div>
+
+                  {/* Dialog Text */}
+                  <textarea
+                    value={d.text}
+                    onChange={e => updateDialog(phase, idx, 'text', e.target.value)}
+                    className={`w-full px-3 py-2.5 rounded-lg border-2 text-sm outline-none transition-all resize-none ${
+                      isFilled
+                        ? 'border-orange-400 bg-white focus:border-orange-500 focus:shadow-lg'
+                        : 'border-stone-300 focus:border-orange-400 focus:bg-white focus:shadow-md'
+                    }`}
+                    placeholder="Isi percakapan karakter..."
+                    rows="3"
+                  />
+
+                  {/* Status Indicator */}
+                  {isFilled && (
+                    <div className="mt-2 text-right">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-orange-200 text-orange-800 rounded-full text-xs font-bold">
+                        <span className="animate-bounce">✓</span>
+                        Dialog Lengkap
+                      </span>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+
+            {/* Add Button */}
+            <button
+              type="button"
+              onClick={() => addDialog(phase)}
+              className="w-full px-4 py-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all active:scale-95"
+            >
+              + Tambah Dialog
+            </button>
+          </>
         )}
       </div>
     </div>
@@ -2031,19 +2117,125 @@ export function StoryFormFields({ storyState, setStoryState }) {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-xs font-bold text-stone-600 mb-1">Latar Tempat (Scene)</label>
-          <ScenePicker value={storyState.scene} onChange={(val) => updateField('scene', val)} />
+      {/* STEP 1️⃣ SCENE & CHAPTER */}
+      <div className="bg-white border-2 border-amber-300 rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300">
+        <div className="px-4 py-4 bg-gradient-to-br from-amber-150 via-amber-50 to-white border-b-2 border-amber-200">
+          <div className="flex items-center gap-2.5 mb-3">
+            <span className="text-3xl">🎬</span>
+            <div>
+              <p className="text-sm font-black text-amber-900 uppercase tracking-wider leading-tight">Latar & Judul Chapter</p>
+              <p className="text-xs text-amber-600 font-medium mt-0.5">Pilih latar tempat dan beri judul untuk cerita ini</p>
+            </div>
+          </div>
+          {/* Progress Info */}
+          <div className="flex gap-2 text-xs font-bold">
+            {hasScene && (
+              <div className="flex items-center gap-1.5 bg-amber-200 text-amber-900 px-3 py-1.5 rounded-full">
+                <span className="text-lg">✓</span>
+                <span>Scene Dipilih</span>
+              </div>
+            )}
+            {hasChapter && (
+              <div className="flex items-center gap-1.5 bg-amber-200 text-amber-900 px-3 py-1.5 rounded-full">
+                <span className="text-lg">✓</span>
+                <span>Judul Diisi</span>
+              </div>
+            )}
+          </div>
         </div>
-        <div>
-          <label className="block text-xs font-bold text-stone-600 mb-1">Judul Chapter</label>
-          <input value={storyState.chapter} onChange={e => updateField('chapter', e.target.value)}
-            className={inp} placeholder="misal: Level 1: Bahan Baku Sistem" />
+
+        <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-black text-amber-900 uppercase tracking-wider mb-2.5">Latar Tempat (Scene)</label>
+            <ScenePicker value={storyState.scene} onChange={(val) => updateField('scene', val)} />
+          </div>
+          <div>
+            <label className="block text-xs font-black text-amber-900 uppercase tracking-wider mb-2.5">Judul Chapter</label>
+            <input
+              value={storyState.chapter}
+              onChange={e => updateField('chapter', e.target.value)}
+              className={inp + ' border-2 focus:border-amber-400 focus:bg-amber-50'}
+              placeholder="misal: Level 1: Bahan Baku Sistem"
+            />
+          </div>
         </div>
+
+        {/* Status */}
+        {hasScene && hasChapter && (
+          <div className="px-4 pb-4 border-t-2 border-amber-200 pt-4">
+            <div className="bg-gradient-to-r from-amber-150 to-orange-100 border-2 border-amber-400 rounded-xl p-3 text-center">
+              <p className="text-xs font-black text-amber-900 uppercase tracking-wider">✅ Latar & Judul Lengkap</p>
+            </div>
+          </div>
+        )}
       </div>
-      {renderDialogList('intro', '🎬 Percakapan Awal (Intro)')}
-      {renderDialogList('outro', '🏁 Percakapan Akhir (Outro)')}
+
+      {/* STEP 2️⃣ INTRO DIALOGS */}
+      {hasScene && hasChapter && renderDialogList('intro', '💬', 'Percakapan Awal (Intro)', 'Dialog yang muncul di awal cerita')}
+
+      {/* STEP 3️⃣ OUTRO DIALOGS */}
+      {hasIntro && renderDialogList('outro', '🏁', 'Percakapan Akhir (Outro)', 'Dialog yang muncul di akhir cerita')}
+
+      {/* STEP 4️⃣ PREVIEW */}
+      {isComplete && (
+        <div className="bg-white border-2 border-green-300 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
+          <div className="px-4 py-4 bg-gradient-to-br from-green-150 via-green-50 to-white border-b-2 border-green-200">
+            <div className="flex items-center gap-2.5">
+              <span className="text-3xl animate-bounce">👁️</span>
+              <div>
+                <p className="text-sm font-black text-green-900 uppercase tracking-wider leading-tight">Preview Cerita</p>
+                <p className="text-xs text-green-600 font-medium mt-0.5">Cara siswa akan melihat cerita ini</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-6 space-y-4">
+            {/* Stats */}
+            <div className="grid grid-cols-4 gap-2">
+              <div className="bg-gradient-to-br from-amber-100 to-amber-50 border-2 border-amber-300 rounded-lg p-3 text-center">
+                <p className="text-lg font-black text-amber-600">🎬</p>
+                <p className="text-xs font-bold text-amber-700 uppercase mt-1">Scene</p>
+              </div>
+              <div className="bg-gradient-to-br from-blue-100 to-blue-50 border-2 border-blue-300 rounded-lg p-3 text-center">
+                <p className="text-lg font-black text-blue-600">{storyState.intro.length}</p>
+                <p className="text-xs font-bold text-blue-700 uppercase mt-1">Intro</p>
+              </div>
+              <div className="bg-gradient-to-br from-purple-100 to-purple-50 border-2 border-purple-300 rounded-lg p-3 text-center">
+                <p className="text-lg font-black text-purple-600">{storyState.outro.length}</p>
+                <p className="text-xs font-bold text-purple-700 uppercase mt-1">Outro</p>
+              </div>
+              <div className="bg-gradient-to-br from-green-100 to-emerald-50 border-2 border-green-400 rounded-lg p-3 text-center">
+                <p className="text-lg font-black text-green-600">✓</p>
+                <p className="text-xs font-bold text-green-700 uppercase mt-1">Lengkap</p>
+              </div>
+            </div>
+
+            {/* Story Summary */}
+            <div className="bg-gradient-to-br from-orange-100 to-amber-50 border-2 border-orange-400 rounded-xl p-4 space-y-3">
+              <div>
+                <p className="text-xs font-black text-orange-900 uppercase tracking-wider mb-1">Chapter</p>
+                <p className="text-sm font-bold text-orange-900">{storyState.chapter}</p>
+              </div>
+              <div>
+                <p className="text-xs font-black text-orange-900 uppercase tracking-wider mb-1">Latar Tempat</p>
+                <p className="text-sm font-bold text-orange-900">
+                  {SCENE_LIST.find(s => s.id === storyState.scene)?.label || storyState.scene}
+                </p>
+              </div>
+            </div>
+
+            {/* Success Message */}
+            <div className="bg-gradient-to-r from-green-150 via-emerald-100 to-green-100 border-2 border-green-400 rounded-xl p-4 text-center">
+              <p className="text-sm font-black text-green-900 uppercase tracking-wider">
+                ✅ Cerita Siap Disimpan
+              </p>
+              <p className="text-xs text-green-700 font-medium mt-2">
+                Cerita dengan {storyState.intro.length} dialog intro dan {storyState.outro.length} dialog outro siap ditampilkan
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
