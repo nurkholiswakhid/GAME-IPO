@@ -539,6 +539,7 @@ export default function GameLevel() {
   const [classAns, setClassAns]     = useState({});
   const [matchAns, setMatchAns]     = useState({});
   const [isNavigating, setIsNavigating] = useState(false);
+  const [showGameOverPopup, setShowGameOverPopup] = useState(false);
 
   // ── Load question & total levels ─────────────────────────
   useEffect(() => {
@@ -712,8 +713,7 @@ export default function GameLevel() {
             is_complete: false,
             attempts: 1
           }).catch(e => console.error('Game over submit failed:', e.message));
-          setWinData({ pts: 0, bintang: 0 });
-          setPhase('COMPLETE');
+          setShowGameOverPopup(true);
         }, 2800);
       } else {
         setTimeout(() => setFeedback(null), 3000);
