@@ -78,7 +78,7 @@ router.get('/questions', async (req, res) => {
 router.put('/questions/:id', async (req, res) => {
   try {
     const id = parseInt(req.params.id);
-    const { question_text, story_json, options_json, correct_config, explanation, failure_message } = req.body;
+    const { question_text, story_json, options_json, correct_config, explanation, failure_message, type, level_number, bloom_level, topic } = req.body;
     
     const updated = await prisma.question.update({
       where: { id },
@@ -88,7 +88,11 @@ router.put('/questions/:id', async (req, res) => {
         options_json,
         correct_config,
         explanation,
-        failure_message
+        failure_message,
+        type,
+        bloom_level: bloom_level || undefined,
+        topic: topic || undefined,
+        level_number: level_number ? parseInt(level_number) : undefined
       }
     });
     res.json({ message: 'Soal berhasil diperbarui', question: updated });
@@ -120,7 +124,7 @@ router.post('/questions', async (req, res) => {
         topic: topic || 'GENERAL',
         explanation,
         failure_message,
-        story_json
+        story_json: story_json || null
       }
     });
     res.json({ message: 'Soal baru berhasil dibuat', question: newQuestion });

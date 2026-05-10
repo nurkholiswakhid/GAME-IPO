@@ -167,17 +167,18 @@ const smBtn = (color='stone') => `px-3 py-1 text-xs font-bold rounded-lg bg-${co
 // CLASSIFICATION FIELDS
 // ════════════════════════════════════════════════════════════════════════════
 function ClassificationFields({ optState, setOptState, corState, setCorState }) {
-  const items = optState.items;
+  const items = optState.items.filter(Boolean);
+  const allItems = optState.items;
 
   const updateItem = (idx, val) => {
-    const oldVal = items[idx];
-    const next = [...items];
+    const oldVal = allItems[idx];
+    const next = [...allItems];
     next[idx] = val;
     setOptState({ ...optState, items: next });
     
-    if (oldVal !== val) {
+    if (oldVal !== val && oldVal) {
       const map = { ...corState.mapping };
-      if (oldVal && map[oldVal] !== undefined) {
+      if (map[oldVal] !== undefined) {
         map[val] = map[oldVal];
         delete map[oldVal];
       }
@@ -185,54 +186,111 @@ function ClassificationFields({ optState, setOptState, corState, setCorState }) 
     }
   };
 
-  const addItem = () => setOptState({ ...optState, items: [...items, ''] });
+  const addItem = () => setOptState({ ...optState, items: [...allItems, ''] });
   const removeItem = (idx) => {
-    const removed = items[idx];
-    const next = items.filter((_, i) => i !== idx);
+    const removed = allItems[idx];
+    const next = allItems.filter((_, i) => i !== idx);
     const map = { ...corState.mapping };
     delete map[removed];
     setOptState({ ...optState, items: next });
     setCorState({ ...corState, mapping: map });
   };
 
+  const getCategories = () => {
+    const cats = {};
+    Object.values(corState.mapping).forEach(cat => {
+      if (cat) cats[cat] = true;
+    });
+    return Object.keys(cats);
+  };
+
+  const getItemsByCategory = (cat) => {
+    return Object.entries(corState.mapping)
+      .filter(([_, c]) => c === cat)
+      .map(([item, _]) => item);
+  };
+
   return (
     <div className="space-y-4">
-      <div className="bg-white border border-stone-200 rounded-xl overflow-hidden">
+      {/* ITEMS INPUT SECTION */}
+      <div className="bg-white border border-violet-200 rounded-xl overflow-hidden">
         <div className="px-4 py-3 bg-violet-50 border-b border-violet-100 flex justify-between items-center">
-          <span className="text-xs font-black text-violet-700 uppercase tracking-widest">Item yang Dikelompokkan</span>
+          <div>
+            <span className="text-xs font-black text-violet-700 uppercase tracking-widest">Item yang Dikelompokkan</span>
+            <p className="text-xs text-violet-500 mt-0.5">Daftar item yang akan siswa kelompokkan</p>
+          </div>
           <button type="button" onClick={addItem} className={smBtn('violet')}>+ Tambah Item</button>
         </div>
         <div className="divide-y divide-stone-100">
-          {items.map((it, idx) => (
-            <div key={idx} className="flex gap-2 items-center px-4 py-3">
-              <input value={it} onChange={e => updateItem(idx, e.target.value)}
-                className={inp + ' flex-1'} placeholder="Teks item (contoh: Keyboard)" />
+          {allItems.map((it, idx) => (
+            <div key={idx} className="flex gap-2 items-center px-4 py-3 hover:bg-violet-50 transition-colors">
+              <span className="text-xs font-bold text-stone-400 w-5">{idx + 1}.</span>
+              <input 
+                value={it} 
+                onChange={e => updateItem(idx, e.target.value)}
+                className={inp + ' flex-1'} 
+                placeholder="Contoh: Keyboard, Monitor, Printer..." />
               <button type="button" onClick={() => removeItem(idx)}
-                className="px-2 py-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-500 text-xs font-bold border border-red-100">✕</button>
+                className="px-2 py-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-500 text-xs font-bold border border-red-100 transition-all">✕</button>
             </div>
           ))}
+          {allItems.length === 0 && (
+            <div className="px-4 py-6 text-center text-stone-400 text-xs italic">Belum ada item. Klik "Tambah Item" untuk mulai.</div>
+          )}
         </div>
       </div>
 
-      {items.filter(Boolean).length > 0 && (
+      {/* CATEGORY ASSIGNMENT SECTION */}
+      {items.length > 0 && (
         <div className="bg-white border border-violet-200 rounded-xl overflow-hidden">
           <div className="px-4 py-3 bg-violet-50 border-b border-violet-100">
-            <span className="text-xs font-black text-violet-700 uppercase tracking-widest">Kategori Benar Tiap Item</span>
-            <p className="text-xs text-violet-500 mt-1">Tulis nama kategori (misal: INPUT, OUTPUT)</p>
+            <div>
+              <span className="text-xs font-black text-violet-700 uppercase tracking-widest">Kategori Tiap Item</span>
+              <p className="text-xs text-violet-500 mt-0.5">Tentukan kategori untuk setiap item (contoh: INPUT, OUTPUT, INTERNAL)</p>
+            </div>
           </div>
           <div className="divide-y divide-stone-100">
-            {items.filter(Boolean).map((it, idx) => (
-              <div key={idx} className="flex gap-3 items-center px-4 py-3">
-                <span className="w-1/2 text-sm font-bold text-stone-600 truncate">{it}</span>
-                <span className="text-stone-300">→</span>
+            {items.map((it, pidx) => (
+              <div key={it || pidx} className="flex gap-3 items-center px-4 py-3 hover:bg-violet-50 transition-colors">
+                <span className="text-xs font-bold text-stone-400 w-5">{pidx + 1}.</span>
+                <span className="flex-shrink-0 w-32 text-sm font-bold text-stone-700 bg-stone-100 px-3 py-2 rounded-lg border border-stone-200">{it}</span>
+                <span className="text-stone-300 font-bold">→</span>
                 <input
                   value={corState.mapping[it] || ''}
                   onChange={e => setCorState({ ...corState, mapping: { ...corState.mapping, [it]: e.target.value } })}
                   className={inp + ' flex-1'}
-                  placeholder="Nama Kategori..." />
+                  placeholder="Ketik nama kategori..." />
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* CATEGORY SUMMARY SECTION */}
+      {items.length > 0 && getCategories().length > 0 && (
+        <div className="bg-gradient-to-br from-violet-50 to-purple-50 border border-violet-200 rounded-xl overflow-hidden p-4">
+          <div className="text-xs font-black text-violet-700 uppercase tracking-widest mb-3">📊 Ringkasan Kategori</div>
+          <div className="space-y-2">
+            {getCategories().map(cat => (
+              <div key={cat} className="flex gap-2 items-start">
+                <span className="inline-block px-2 py-1 bg-violet-500 text-white text-xs font-black rounded-full min-w-max">{cat}</span>
+                <div className="flex flex-wrap gap-1 flex-1">
+                  {getItemsByCategory(cat).map(item => (
+                    <span key={item} className="inline-block px-2 py-1 bg-white text-stone-700 text-xs font-bold rounded border border-stone-200">
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* VALIDATION MESSAGE */}
+      {items.length > 0 && Object.values(corState.mapping).filter(Boolean).length < items.length && (
+        <div className="px-4 py-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-700 font-bold">
+          ⚠️ {items.length - Object.values(corState.mapping).filter(Boolean).length} item masih belum memiliki kategori
         </div>
       )}
     </div>
@@ -506,6 +564,46 @@ function MultipleChoiceFields({ optState, setOptState, corState, setCorState }) 
 }
 
 // ════════════════════════════════════════════════════════════════════════════
+// TRUE/FALSE FIELDS
+// ════════════════════════════════════════════════════════════════════════════
+function TrueFalseFields({ optState, setOptState, corState, setCorState }) {
+  const options = [
+    { label: 'BENAR ✓', value: 'BENAR' },
+    { label: 'SALAH ✗', value: 'SALAH' }
+  ];
+
+  return (
+    <div className="space-y-4">
+      <div className="bg-white border border-teal-200 rounded-xl overflow-hidden">
+        <div className="px-4 py-3 bg-teal-50 border-b border-teal-100">
+          <span className="text-xs font-black text-teal-700 uppercase tracking-widest">Pilih Jawaban Benar</span>
+          <p className="text-xs text-teal-500 mt-1">Tentukan apakah pernyataan adalah BENAR atau SALAH</p>
+        </div>
+        <div className="divide-y divide-stone-100">
+          {options.map((opt, idx) => {
+            const isCorrect = corState.selected === opt.value;
+            return (
+              <div key={idx} className={`flex gap-3 items-center px-4 py-3 transition-colors ${isCorrect ? 'bg-teal-50' : ''}`}>
+                <button
+                  type="button"
+                  onClick={() => setCorState({ ...corState, selected: opt.value })}
+                  title="Tandai sebagai jawaban benar"
+                  className={`w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs font-black transition-all flex-shrink-0 ${
+                    isCorrect ? 'bg-teal-500 border-teal-500 text-white' : 'border-stone-300 text-stone-300 hover:border-teal-400'
+                  }`}>
+                  ✓
+                </button>
+                <span className="text-sm font-bold text-stone-700">{opt.label}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ════════════════════════════════════════════════════════════════════════════
 // MAIN EXPORT: QuestionFormFields
 // ════════════════════════════════════════════════════════════════════════════
 export default function QuestionFormFields({ type, optState, setOptState, corState, setCorState }) {
@@ -520,7 +618,8 @@ export default function QuestionFormFields({ type, optState, setOptState, corSta
       {type === 'CLASSIFICATION'  && <ClassificationFields  optState={optState} setOptState={setOptState} corState={corState} setCorState={setCorState} />}
       {type === 'MATCHING'        && <MatchingFields        optState={optState} setOptState={setOptState} corState={corState} setCorState={setCorState} />}
       {(type === 'SEQUENCE' || type === 'SEQUENCING') && <SequenceFields      optState={optState} setOptState={setOptState} corState={corState} setCorState={setCorState} />}
-      {(type === 'MULTIPLE_CHOICE' || type === 'TRUE_FALSE') && <MultipleChoiceFields  optState={optState} setOptState={setOptState} corState={corState} setCorState={setCorState} />}
+      {type === 'MULTIPLE_CHOICE' && <MultipleChoiceFields  optState={optState} setOptState={setOptState} corState={corState} setCorState={setCorState} />}
+      {type === 'TRUE_FALSE'      && <TrueFalseFields       optState={optState} setOptState={setOptState} corState={corState} setCorState={setCorState} />}
     </div>
   );
 }

@@ -22,6 +22,8 @@ export default function DashboardGuru() {
     correct_config: '', 
     explanation: '',
     failure_message: '',
+    bloom_level: 'REMEMBER',
+    topic: 'GENERAL',
     storyState: emptyStoryState(),
     showStory: false,
     optState: emptyOptState('CLASSIFICATION'),
@@ -108,6 +110,8 @@ export default function DashboardGuru() {
       correct_config: q.correct_config || '',
       explanation: q.explanation || '',
       failure_message: q.failure_message || '',
+      bloom_level: q.bloom_level || 'REMEMBER',
+      topic: q.topic || 'GENERAL',
       storyState: storyState,
       showStory: hasStoryData,
       optState: parseOptionsState(qType, q.options_json || '[]'),
@@ -132,6 +136,8 @@ export default function DashboardGuru() {
       question_text: editForm.question_text,
       explanation: editForm.explanation,
       failure_message: editForm.failure_message,
+      bloom_level: editForm.bloom_level,
+      topic: editForm.topic,
       story_json,
       options_json,
       correct_config
@@ -473,9 +479,14 @@ export default function DashboardGuru() {
                   <div key={q.id} className="p-6 bg-white border border-stone-200 rounded-2xl hover:shadow-md transition-shadow">
                     <div className="flex flex-col sm:flex-row justify-between sm:items-start mb-4 gap-4">
                       <div className="flex-1">
-                        <span className="inline-block px-3 py-1 bg-sky-100 text-sky-700 rounded-lg text-xs font-bold mb-2">Level {q.level_number}</span>
-                        <span className="inline-block px-3 py-1 bg-purple-100 text-purple-700 rounded-lg text-xs font-bold mb-2 ml-2">{q.type}</span>
-                        <h3 className="font-bold text-stone-800 mt-1 text-lg">{q.question_text}</h3>
+                        <div className="flex flex-wrap gap-2 mb-3">
+                          <span className="inline-block px-3 py-1 bg-sky-100 text-sky-700 rounded-lg text-xs font-bold">Level {q.level_number}</span>
+                          <span className="inline-block px-3 py-1 bg-purple-100 text-purple-700 rounded-lg text-xs font-bold">{q.type}</span>
+                          {q.bloom_level && <span className="inline-block px-3 py-1 bg-orange-100 text-orange-700 rounded-lg text-xs font-bold">{q.bloom_level}</span>}
+                          {q.topic && <span className="inline-block px-3 py-1 bg-green-100 text-green-700 rounded-lg text-xs font-bold">{q.topic}</span>}
+                        </div>
+                        <h3 className="font-bold text-stone-800 text-lg">{q.question_text}</h3>
+                        {q.explanation && <p className="text-sm text-stone-600 mt-2 italic">✅ {q.explanation}</p>}
                       </div>
                       <div className="flex gap-2">
                         <button 
@@ -488,16 +499,6 @@ export default function DashboardGuru() {
                           className="whitespace-nowrap px-6 py-2 h-max bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 rounded-xl text-sm font-bold transition-all flex border-b-4 active:border-b hover:-translate-y-1 active:translate-y-0">
                           🗑️ Hapus
                         </button>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
-                      <div className="bg-stone-50 p-4 rounded-xl border border-stone-100">
-                        <p className="text-xs font-bold text-stone-400 uppercase tracking-widest mb-2">Story JSON (Visual Novel)</p>
-                        <p className="text-sm font-mono text-stone-600 line-clamp-3">{q.story_json || '-'}</p>
-                      </div>
-                      <div className="bg-stone-50 p-4 rounded-xl border border-stone-100">
-                        <p className="text-xs font-bold text-stone-400 uppercase tracking-widest mb-2">Options JSON</p>
-                        <p className="text-sm font-mono text-stone-600 line-clamp-3">{q.options_json || '-'}</p>
                       </div>
                     </div>
                   </div>
@@ -533,6 +534,32 @@ export default function DashboardGuru() {
                 </motion.div>
               )}
               <form onSubmit={handleSaveQuestion} className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6 city-bg relative">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div className="glass p-6 rounded-2xl">
+                    <label className="block text-sm font-black text-stone-800 mb-2">Bloom Level</label>
+                    <select 
+                      value={editForm.bloom_level}
+                      onChange={(e) => setEditForm({...editForm, bloom_level: e.target.value})}
+                      className="w-full px-4 py-3 rounded-xl border-2 border-transparent bg-white shadow-sm focus:border-blue-400 outline-none transition-all">
+                      <option>REMEMBER</option>
+                      <option>UNDERSTAND</option>
+                      <option>APPLY</option>
+                      <option>ANALYZE</option>
+                      <option>EVALUATE</option>
+                      <option>CREATE</option>
+                    </select>
+                  </div>
+                  <div className="glass p-6 rounded-2xl">
+                    <label className="block text-sm font-black text-stone-800 mb-2">Topik</label>
+                    <input 
+                      type="text"
+                      value={editForm.topic}
+                      onChange={(e) => setEditForm({...editForm, topic: e.target.value})}
+                      className="w-full px-4 py-3 rounded-xl border-2 border-transparent bg-white shadow-sm focus:border-blue-400 outline-none transition-all"
+                      placeholder="Contoh: Input & Output, Interrupt Handling" />
+                  </div>
+                </div>
+                
                 <div className="glass p-6 rounded-2xl">
                   <label className="block text-sm font-black text-stone-800 mb-2">Pertanyaan Utama (Instruksi)</label>
                   <textarea 
