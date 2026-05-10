@@ -818,22 +818,42 @@ export default function GameLevel() {
   // ── Guards ────────────────────────────────────────────────
   if (loading || loadingQ || !dataReady) {
     return (
-      <div className={`min-h-screen flex flex-col items-center justify-center text-stone-800 city-bg ${bgClass} font-sans`}>
-        <div className="text-center glass rounded-3xl px-12 py-10 shadow-xl">
-          <div className="w-20 h-20 border-4 border-sky-200 border-t-sky-500 rounded-full animate-spin mb-8 mx-auto shadow-sm" />
-          <h2 className="text-2xl font-black text-stone-800 tracking-tight">MENYIAPKAN MISI</h2>
-          <p className="text-stone-500 mt-2 text-sm font-bold uppercase tracking-widest">MEMUAT BAB {lvl} ...</p>
+      <div className="fixed inset-0 flex flex-col items-center justify-center font-sans" style={{ background: 'linear-gradient(135deg, #0a0a1a 0%, #12082a 50%, #0a1520 100%)' }}>
+        <div className="absolute inset-0" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px)', backgroundSize: '44px 44px' }} />
+        <div className="relative z-10 flex flex-col items-center gap-8 w-full max-w-sm px-8">
+          <div className="relative w-36 h-36 flex items-center justify-center">
+            <div className="absolute inset-0 rounded-full border border-dashed border-indigo-400/30 animate-spin" style={{ animationDuration: '12s' }} />
+            <div className="absolute inset-3 rounded-full border-[3px] border-transparent border-t-indigo-400 border-r-sky-400/60 animate-spin" style={{ animationDuration: '1.4s' }} />
+            <div className="absolute inset-8 rounded-full border-2 border-transparent border-t-white/70 animate-spin" style={{ animationDuration: '0.9s', animationDirection: 'reverse' }} />
+            <span className="text-5xl relative z-10" style={{ filter: 'drop-shadow(0 0 20px #6366f1) drop-shadow(0 0 40px #6366f180)' }}>⚡</span>
+          </div>
+          <div className="text-center space-y-3">
+            <p className="text-[10px] font-black uppercase tracking-[0.5em] text-indigo-400/70">MEMUAT MISI</p>
+            <h2 className="text-3xl font-black text-white tracking-widest uppercase" style={{ textShadow: '0 0 30px rgba(99,102,241,0.8)' }}>MENYIAPKAN</h2>
+            <p className="text-indigo-300/60 text-xs font-bold uppercase tracking-[0.4em]">BAB {lvl}</p>
+          </div>
+          <div className="w-full space-y-2">
+            <div className="flex justify-between text-[10px] font-mono uppercase tracking-widest text-white/30">
+              <span>Memuat data...</span><span className="text-indigo-400">100%</span>
+            </div>
+            <div className="w-full h-[3px] bg-white/10 rounded-full overflow-hidden">
+              <div className="h-full rounded-full animate-pulse" style={{ width: '65%', background: 'linear-gradient(90deg, #6366f1, #0ea5e9)', boxShadow: '0 0 12px #6366f1' }} />
+            </div>
+          </div>
+          <p className="text-white/20 text-[10px] font-mono uppercase tracking-[0.3em]">Tunggu sebentar...</p>
         </div>
       </div>
     );
   }
   if (!student) return <Navigate to="/register" replace />;
   if (!question) return (
-    <div className={`min-h-screen flex flex-col items-center justify-center text-stone-800 city-bg ${bgClass} font-sans`}>
-      <div className="text-center glass rounded-3xl p-10 shadow-xl">
-        <div className="text-amber-500 text-6xl mb-4 animate-bounce">🙈</div>
-        <p className="mb-8 text-xl text-stone-600 font-bold">Ups! Modul untuk Bab {lvl} tidak ditemukan.</p>
-        <button onClick={()=>navigate('/dashboard')} className="px-8 py-3 bg-gradient-to-r from-sky-400 to-blue-500 text-white font-bold hover:from-sky-500 hover:to-blue-600 rounded-xl tracking-wide shadow-md transition-all">KEMBALI KE PETA</button>
+    <div className="fixed inset-0 flex flex-col items-center justify-center font-sans" style={{ background: 'linear-gradient(135deg, #0a0a1a 0%, #12082a 50%, #0a1520 100%)' }}>
+      <div className="absolute inset-0" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)', backgroundSize: '44px 44px' }} />
+      <div className="relative z-10 text-center space-y-6 px-8 max-w-sm w-full">
+        <div className="text-7xl mx-auto" style={{ filter: 'drop-shadow(0 0 20px rgba(251,191,36,0.6))' }}>🗺️</div>
+        <h2 className="text-2xl font-black text-white tracking-wide">Modul Tidak Ditemukan</h2>
+        <p className="text-white/40 text-sm">Bab {lvl} belum tersedia di sistem.</p>
+        <button onClick={()=>navigate('/dashboard')} className="w-full px-8 py-3 rounded-xl font-bold text-white text-sm uppercase tracking-widest transition-all hover:scale-105 active:scale-95" style={{ background: 'linear-gradient(135deg, #6366f1, #0ea5e9)', boxShadow: '0 8px 32px rgba(99,102,241,0.4)' }}>KEMBALI KE PETA</button>
       </div>
     </div>
   );
@@ -850,369 +870,88 @@ export default function GameLevel() {
         />
       </div>
 
-      {/* ════════════════ PRE-GAME TRANSITION ANIMATION - ELEGANT MINIMAL STYLE ════════════════ */}
+      {/* ════════════════ PRE-GAME TRANSITION ANIMATION — ULTRA PREMIUM ════════════════ */}
       <AnimatePresence>
         {phase === 'PRE_GAME_ANIM' && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0, transition: { duration: 1 } }}
-            className="absolute inset-0 z-50 flex items-center justify-center overflow-hidden city-bg bg-white/70 backdrop-blur-md"
+            exit={{ opacity: 0, scale: 1.04, transition: { duration: 0.65, ease: [0.4,0,0.2,1] } }}
+            className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden"
+            style={{ background: 'linear-gradient(135deg, rgba(5,5,20,0.97) 0%, rgba(15,10,40,0.97) 50%, rgba(5,20,30,0.97) 100%)', backdropFilter: 'blur(24px)' }}
           >
-            {/* Background mesh pattern - subtle consistency element */}
-            <div 
-              className="absolute inset-0 pointer-events-none opacity-5"
-              style={{
-                backgroundImage: `linear-gradient(45deg, ${scene.glow} 1px, transparent 1px)`,
-                backgroundSize: '30px 30px'
-              }}
-            />
-            
-            {/* Enhanced dual glow backdrops for better contrast */}
-            <motion.div
-              animate={{ scale: [1, 1.35, 1], opacity: [0.35, 0.55, 0.35] }}
-              transition={{ duration: 6.5, repeat: Infinity, ease: 'easeInOut' }}
-              className="absolute w-[900px] h-[900px] rounded-full blur-3xl pointer-events-none"
-              style={{ background: scene.glow, left: '-300px', top: '-200px' }}
-            />
-            <motion.div
-              animate={{ scale: [1.15, 0.95, 1.15], opacity: [0.28, 0.45, 0.28] }}
-              transition={{ duration: 7.2, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
-              className="absolute w-[700px] h-[700px] rounded-full blur-3xl pointer-events-none"
-              style={{ background: '#fbbf24', right: '-180px', bottom: '-150px' }}
-            />
-            
-            {/* Enhanced secondary accent glow */}
-            <motion.div
-              animate={{ scale: [1.2, 1, 1.2], opacity: [0.15, 0.28, 0.15] }}
-              transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-              className="absolute w-[500px] h-[500px] rounded-full blur-3xl pointer-events-none"
-              style={{ background: '#f97316', left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}
-            />
-            
-            {/* Vibrant floating particles with stronger glow */}
-            <div className="absolute inset-0 pointer-events-none overflow-hidden">
-              {[...Array(12)].map((_, i) => {
-                const colors = ['#fbbf24', '#f97316', '#fb7185', '#fca5a5', scene.glow];
-                const color = colors[i % colors.length];
-                return (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, y: '100vh', x: Math.random() * window.innerWidth }}
-                    animate={{ 
-                      opacity: [0, 0.9, 0.9, 0],
-                      y: '-100vh',
-                      x: Math.random() * window.innerWidth,
-                      rotate: [0, 360]
-                    }}
-                    transition={{
-                      delay: i * 0.2,
-                      duration: 7,
-                      repeat: Infinity,
-                      ease: 'easeInCubic'
-                    }}
-                    className="absolute w-4 h-4 rounded-full"
-                    style={{ 
-                      background: color, 
-                      boxShadow: `0 0 24px ${color}, 0 0 48px ${color}80`
-                    }}
-                  />
-                )
-              })}
+            {/* Grid */}
+            <div className="absolute inset-0" style={{ backgroundImage: `linear-gradient(${scene.glow}15 1px, transparent 1px), linear-gradient(90deg, ${scene.glow}15 1px, transparent 1px)`, backgroundSize: '48px 48px' }} />
+            {/* Mega glow */}
+            <motion.div animate={{ scale: [1,1.3,1], opacity:[0.12,0.3,0.12] }} transition={{ duration:5, repeat:Infinity, ease:'easeInOut' }} className="absolute w-[600px] h-[600px] rounded-full pointer-events-none" style={{ background:`radial-gradient(circle, ${scene.glow}50 0%, transparent 65%)`, filter:'blur(80px)' }} />
+            {/* Secondary glow */}
+            <motion.div animate={{ scale:[1.2,0.85,1.2], opacity:[0.08,0.22,0.08] }} transition={{ duration:7, repeat:Infinity, ease:'easeInOut', delay:1 }} className="absolute w-[380px] h-[380px] rounded-full pointer-events-none" style={{ background:'radial-gradient(circle, #6366f180 0%, transparent 70%)', filter:'blur(60px)', top:'25%', right:'15%' }} />
+            {/* Floating particles */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+              {[0,1,2,3,4,5,6,7].map(i => (
+                <motion.div key={i} initial={{ opacity:0, y:'110vh', x:`${8+i*12}vw` }} animate={{ opacity:[0,0.8,0.8,0], y:'-10vh' }} transition={{ delay:i*0.3, duration:5+i*0.5, repeat:Infinity, ease:'easeOut' }} className="absolute w-1.5 h-1.5 rounded-full" style={{ background:scene.glow, boxShadow:`0 0 10px ${scene.glow}, 0 0 20px ${scene.glow}60` }} />
+              ))}
             </div>
-            
-            <div className="relative z-10 text-center px-6 max-w-4xl">
-              {/* Top decorative system - enhanced consistency */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.05, duration: 0.7 }}
-                className="mb-6"
-              >
-                {/* Geometric accent bar */}
-                <motion.div
-                  animate={{ scaleX: [0, 1, 1] }}
-                  transition={{ delay: 0.08, duration: 0.8 }}
-                  className="h-1 mx-auto mb-5 origin-left rounded-full"
-                  style={{ width: '70px', background: `linear-gradient(90deg, ${scene.glow}, transparent)`, boxShadow: `0 0 16px ${scene.glow}60` }}
-                />
-              </motion.div>
-              
-              {/* Protocol Header - Professional styling */}
-              <motion.div
-                initial={{ opacity: 0, y: -25 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.12, duration: 0.9 }}
-                className="mb-4"
-              >
-                <motion.p
-                  animate={{ opacity: [0.6, 1, 0.6] }}
-                  transition={{ delay: 0.25, duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
-                  className="text-xs font-serif uppercase tracking-[0.6em] font-extrabold"
-                  style={{ 
-                    color: scene.glow,
-                    textShadow: `0 2px 12px rgba(0, 0, 0, 0.4), 0 0 12px ${scene.glow}40`
-                  }}
-                >
-                  Problem Solving Protocol
-                </motion.p>
-              </motion.div>
-              
-              {/* Separator line - visual consistency */}
-              <motion.div
-                animate={{ scaleX: [0, 1] }}
-                transition={{ delay: 0.2, duration: 1 }}
-                className="h-1.5 mx-auto mb-8 origin-center rounded-full"
-                style={{ 
-                  width: '100px',
-                  background: scene.glow, 
-                  boxShadow: `0 0 24px ${scene.glow}, 0 0 12px ${scene.glow}60` 
-                }}
-              />
-              
-              {/* Main title - Balanced sizing */}
-              <motion.h1
-                initial={{ opacity: 0, scale: 0.75, y: 40 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                transition={{ delay: 0.35, duration: 1.2, ease: 'easeOut' }}
-                className="font-serif font-black text-6xl md:text-7xl leading-tight mb-6"
-                style={{ 
-                  color: scene.glow,
-                  textShadow: `0 6px 16px rgba(0, 0, 0, 0.5), 0 0 20px ${scene.glow}40`,
-                  filter: `drop-shadow(0 0 20px ${scene.glow}30)`
-                }}
-              >
-                Ready<br/>to<br/>Solve
-              </motion.h1>
-              
-              {/* Subtitle - Consistent with theme */}
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5, duration: 0.9 }}
-                className="text-xs md:text-sm font-serif italic font-semibold tracking-wide mb-5"
-                style={{ 
-                  color: '#e8d9cc',
-                  textShadow: `0 2px 6px rgba(0, 0, 0, 0.4)`
-                }}
-              >
-                Master the Challenge
-              </motion.p>
-              
-              {/* Decorative underline */}
-              <motion.div
-                animate={{ scaleX: [0, 1] }}
-                transition={{ delay: 0.6, duration: 1 }}
-                className="h-0.5 mx-auto mb-12 origin-center"
-                style={{ width: '70px', background: `linear-gradient(90deg, transparent, ${scene.glow}, transparent)` }}
-              />
-              
-              {/* Enhanced loading indicator */}
-              <motion.div
-                initial={{ opacity: 0, y: 25 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.65, duration: 0.9 }}
-                className="flex flex-col items-center gap-8"
-              >
-                {/* Level & Challenge Info Card */}
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.7, duration: 0.8 }}
-                  className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl px-8 py-6 mb-4"
-                  style={{ boxShadow: `0 8px 32px ${scene.glow}25` }}
-                >
-                  <div className="flex items-center justify-center gap-6">
-                    {/* Level Badge */}
-                    <div className="text-center">
-                      <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 6, repeat: Infinity, ease: 'linear' }}
-                        className="w-14 h-14 rounded-full flex items-center justify-center text-2xl font-black mb-2"
-                        style={{ 
-                          background: `linear-gradient(135deg, ${scene.glow}, ${scene.glow}40)`,
-                          boxShadow: `0 0 24px ${scene.glow}60`
-                        }}
-                      >
-                        {lvl}
-                      </motion.div>
-                      <p className="text-xs uppercase font-bold tracking-widest" style={{ color: scene.glow }}>Level</p>
-                    </div>
-
-                    {/* Separator */}
-                    <div className="h-12 w-px" style={{ background: `${scene.glow}40` }} />
-
-                    {/* Solver & Progress */}
-                    <div className="text-center">
-                      <motion.div
-                        animate={{ scale: [1, 1.1, 1] }}
-                        transition={{ delay: 0.8, duration: 2, repeat: Infinity }}
-                        className="text-3xl mb-1"
-                      >
-                        {selectedSolver === 'ARKA' && '⚡'}
-                        {selectedSolver === 'NEXA' && '🧠'}
-                        {selectedSolver === 'DIRA' && '🎨'}
-                        {!selectedSolver && '🎯'}
-                      </motion.div>
-                      <p className="text-xs uppercase font-bold tracking-widest" style={{ color: scene.glow }}>Ready</p>
-                    </div>
-                  </div>
+            {/* Card */}
+            <motion.div
+              initial={{ scale:0.88, opacity:0, y:28 }}
+              animate={{ scale:1, opacity:1, y:0 }}
+              transition={{ duration:0.65, ease:[0.16,1,0.3,1] }}
+              className="relative z-10 flex flex-col items-center w-full max-w-sm px-8 py-4"
+            >
+              {/* Orbiting rings + icon */}
+              <div className="relative w-40 h-40 flex items-center justify-center mb-8 flex-shrink-0">
+                <motion.div animate={{ rotate:-360 }} transition={{ duration:14, repeat:Infinity, ease:'linear' }} className="absolute inset-0 rounded-full border border-dashed" style={{ borderColor:`${scene.glow}50` }} />
+                <motion.div animate={{ rotate:360 }} transition={{ duration:3, repeat:Infinity, ease:'linear' }} className="absolute inset-[14px] rounded-full" style={{ borderWidth:'3px', borderStyle:'solid', borderColor:'transparent', borderTopColor:scene.glow, borderRightColor:`${scene.glow}60`, boxShadow:`0 0 20px ${scene.glow}50` }} />
+                <motion.div animate={{ rotate:-360 }} transition={{ duration:1.8, repeat:Infinity, ease:'linear' }} className="absolute inset-[34px] rounded-full" style={{ borderWidth:'2px', borderStyle:'solid', borderColor:'transparent', borderTopColor:'rgba(255,255,255,0.8)', borderLeftColor:'rgba(255,255,255,0.3)' }} />
+                <motion.div animate={{ scale:[0.9,1.1,0.9] }} transition={{ duration:2.5, repeat:Infinity, ease:'easeInOut' }} className="text-5xl relative z-10" style={{ filter:`drop-shadow(0 0 16px ${scene.glow}) drop-shadow(0 0 32px ${scene.glow}70)` }}>
+                  {question?.level_emoji || scene.icon}
                 </motion.div>
+              </div>
 
-                {/* Premium triple orbiting system */}
-                <div className="relative w-40 h-40 flex items-center justify-center">
-                  {/* Outer decorative ring with gradient */}
-                  <motion.div
-                    animate={{ rotate: -360 }}
-                    transition={{ duration: 6, repeat: Infinity, ease: 'linear' }}
-                    className="absolute w-40 h-40 rounded-full border-2 border-dashed"
-                    style={{ 
-                      borderColor: `${scene.glow}85`,
-                      boxShadow: `inset 0 0 20px ${scene.glow}25, 0 0 16px ${scene.glow}30`
-                    }}
-                  />
-                  
-                  {/* Primary vibrant orbit - thicker and more prominent */}
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
-                    className="absolute w-32 h-32 rounded-full border-4"
-                    style={{ 
-                      borderColor: scene.glow,
-                      opacity: 1,
-                      boxShadow: `0 0 28px ${scene.glow}, 0 0 56px ${scene.glow}60, inset 0 0 12px ${scene.glow}30`
-                    }}
-                  />
-                  
-                  {/* Secondary vibrant orbit - golden accent */}
-                  <motion.div
-                    animate={{ rotate: -360 }}
-                    transition={{ duration: 5.5, repeat: Infinity, ease: 'linear' }}
-                    className="absolute w-24 h-24 rounded-full border-3"
-                    style={{ 
-                      borderColor: '#fbbf24',
-                      opacity: 1,
-                      boxShadow: `0 0 24px #fbbf24, 0 0 48px #fbbf2460, inset 0 0 10px #fbbf2440`
-                    }}
-                  />
-                  
-                  {/* Tertiary orbit for visual richness */}
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 7, repeat: Infinity, ease: 'linear' }}
-                    className="absolute w-14 h-14 rounded-full border-2"
-                    style={{ 
-                      borderColor: `${scene.glow}`,
-                      opacity: 0.75,
-                      boxShadow: `0 0 16px ${scene.glow}60`
-                    }}
-                  />
-                  
-                  {/* Central luminous core with multi-layer glow */}
-                  <motion.div
-                    animate={{ scale: [0.8, 1.5, 0.8] }}
-                    transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
-                    className="w-10 h-10 rounded-full"
-                    style={{ 
-                      background: scene.glow,
-                      boxShadow: `0 0 32px ${scene.glow}, 0 0 64px ${scene.glow}70, inset 0 0 12px rgba(255, 255, 255, 0.6)`
-                    }}
-                  />
+              {/* Text block */}
+              <motion.div initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.2, duration:0.55 }} className="text-center w-full space-y-3">
+                <p className="text-[10px] font-black uppercase tracking-[0.5em]" style={{ color:`${scene.glow}` }}>PROBLEM SOLVING PROTOCOL</p>
+                <h2 className="text-4xl font-black text-white leading-tight" style={{ textShadow:`0 2px 20px ${scene.glow}60, 0 4px 40px rgba(0,0,0,0.6)` }}>SIAP<br/>BERTARUNG</h2>
+                <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 pt-1">
+                  <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest">BAB {lvl}</span>
+                  <span className="w-1 h-1 rounded-full bg-white/30" />
+                  <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color:scene.glow }}>{scene.label}</span>
+                  <span className="w-1 h-1 rounded-full bg-white/30" />
+                  <span className="text-[11px] font-bold text-white/40 uppercase tracking-widest">{lvl>=7?'🔥 HARD':lvl>=4?'⭐ MEDIUM':'💚 EASY'}</span>
                 </div>
-                
-                {/* Status text with enhanced styling */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.75, duration: 0.7 }}
-                  className="text-center"
-                >
-                  <motion.div
-                    animate={{ opacity: [0.4, 1, 0.4] }}
-                    transition={{ delay: 0.8, duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
-                    className="text-xs font-serif uppercase tracking-[0.4em] font-bold"
-                    style={{ 
-                      color: scene.glow,
-                      textShadow: `0 2px 10px rgba(0, 0, 0, 0.35), 0 0 8px ${scene.glow}40`
-                    }}
-                  >
-                    Initializing Challenge
-                  </motion.div>
-                  
-                  {/* Animated progress dots */}
-                  <div className="flex gap-4 justify-center mt-6">
-                    {[0, 1, 2].map((i) => (
-                      <motion.div
-                        key={i}
-                        animate={{ 
-                          scale: [0.5, 1.4, 0.5], 
-                          opacity: [0.4, 1, 0.4],
-                          y: [0, -8, 0]
-                        }}
-                        transition={{
-                          delay: i * 0.18,
-                          duration: 1.6,
-                          repeat: Infinity,
-                          ease: 'easeInOut'
-                        }}
-                        className="w-3.5 h-3.5 rounded-full"
-                        style={{ 
-                          background: ['#fbbf24', scene.glow, '#f97316'][i],
-                          boxShadow: `0 0 16px ${['#fbbf24', scene.glow, '#f97316'][i]}`
-                        }}
-                      />
-                    ))}
-                  </div>
-                </motion.div>
+              </motion.div>
 
-                {/* Motivational Tip */}
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 1.2, duration: 0.8 }}
-                  className="text-center max-w-sm"
-                >
-                  <p className="text-xs italic font-medium opacity-80">
-                    💡 Ingat: Fokus pada petunjuk dan jangan terburu-buru!
-                  </p>
-                </motion.div>
+              {/* Progress bar */}
+              <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.3 }} className="w-full mt-10 space-y-2">
+                <div className="flex justify-between text-[10px] font-mono uppercase tracking-widest">
+                  <span className="text-white/30">Memuat soal...</span>
+                  <motion.span style={{ color:scene.glow }} animate={{ opacity:[0.5,1,0.5] }} transition={{ duration:1.5, repeat:Infinity }}>100%</motion.span>
+                </div>
+                <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
+                  <motion.div
+                    initial={{ width:0 }}
+                    animate={{ width:'100%' }}
+                    transition={{ duration:3.2, ease:'easeInOut', delay:0.1 }}
+                    className="h-full rounded-full relative overflow-hidden"
+                    style={{ background:`linear-gradient(90deg, ${scene.glow}, #ffffff88, ${scene.glow})`, boxShadow:`0 0 12px ${scene.glow}` }}
+                  >
+                    <motion.div animate={{ x:['-100%','200%'] }} transition={{ duration:1.1, repeat:Infinity, ease:'easeInOut', delay:0.4 }} className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+                  </motion.div>
+                </div>
               </motion.div>
-              
-              {/* Bottom decorative system - consistent with top */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.85, duration: 0.7 }}
-                className="mt-10 flex flex-col items-center gap-3"
-              >
-                {/* Left accent bar */}
-                <motion.div
-                  animate={{ scaleX: [0, 1, 1] }}
-                  transition={{ delay: 0.9, duration: 0.8 }}
-                  className="h-1 origin-center rounded-full"
-                  style={{ width: '70px', background: `linear-gradient(90deg, transparent, ${scene.glow})`, boxShadow: `0 0 16px ${scene.glow}60` }}
-                />
-                
-                {/* Center accent point */}
-                <motion.div
-                  animate={{ scale: [0.5, 1, 0.5] }}
-                  transition={{ delay: 0.95, duration: 2.8, repeat: Infinity }}
-                  className="w-1.5 h-1.5 rounded-full"
-                  style={{ background: scene.glow, boxShadow: `0 0 12px ${scene.glow}, 0 0 24px ${scene.glow}50` }}
-                />
-                
-                {/* Right accent bar */}
-                <motion.div
-                  animate={{ scaleX: [1, 1, 0] }}
-                  transition={{ delay: 1, duration: 0.8 }}
-                  className="h-1 origin-center rounded-full"
-                  style={{ width: '70px', background: `linear-gradient(90deg, ${scene.glow}, transparent)`, boxShadow: `0 0 16px ${scene.glow}60` }}
-                />
+
+              {/* Bouncing dots */}
+              <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.45 }} className="flex gap-3 mt-8">
+                {[0,1,2,3].map(i => (
+                  <motion.div key={i} animate={{ y:[0,-10,0], opacity:[0.3,1,0.3] }} transition={{ duration:0.9, delay:i*0.18, repeat:Infinity, ease:'easeInOut' }} className="w-2.5 h-2.5 rounded-full" style={{ background:i%2===0?scene.glow:'rgba(255,255,255,0.4)', boxShadow:i%2===0?`0 0 8px ${scene.glow}`:undefined }} />
+                ))}
               </motion.div>
-            </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
+
 
       {/* ════════════════ VN PHASE (INTRO / OUTRO) ════════════════ */}
       {(phase === 'INTRO' || phase === 'OUTRO') && (
