@@ -521,10 +521,10 @@ export default function GameLevel() {
   const [loadingQ, setLoadingQ]     = useState(true);
   const [dataReady, setDataReady]   = useState(false);
 
-  // 'INTRO' | 'CHAR_SELECT' | 'PRE_GAME_ANIM' | 'GAME' | 'OUTRO' | 'COMPLETE'
+  // 'INTRO' | 'PRE_GAME_ANIM' | 'GAME' | 'OUTRO' | 'COMPLETE'
   const [phase, setPhase]           = useState('INTRO');
   const [dialogIdx, setDialogIdx]   = useState(0);
-  const [selectedSolver, setSelectedSolver] = useState(null);
+  // Character selection removed — using default game settings (300s, 3 lives)
 
   const [timeLeft, setTimeLeft]     = useState(300);
   const [lives, setLives]           = useState(3);
@@ -550,7 +550,6 @@ export default function GameLevel() {
     setDataReady(false);
     setPhase('INTRO');
     setDialogIdx(0);
-    setSelectedSolver(null);
     setTimeLeft(300);
     setLives(3);
     setSubmitted(false);
@@ -605,19 +604,18 @@ export default function GameLevel() {
   }, [lvl, student]);
 
   // ── Adaptive Mechanics Setup ─────────────────────────────
+  // ── Game Setup (default: 300s timer, 3 lives) ─────────────
   useEffect(() => {
     if (phase === 'GAME') {
-      if (selectedSolver === 'ARKA') { setTimeLeft(180); setLives(999); }
-      else if (selectedSolver === 'NEXA') { setTimeLeft(240); setLives(1); }
-      else if (selectedSolver === 'DIRA') { setTimeLeft(999); setLives(3); }
-      else { setTimeLeft(300); setLives(3); }
+      setTimeLeft(300);
+      setLives(3);
     }
-  }, [phase, selectedSolver]);
+  }, [phase]);
 
   // ── Timer ─────────────────────────────────────────────────
   useEffect(() => {
     if (phase !== 'GAME' || submitted || gameOverRef.current) return;
-    if ((lives <= 0 && selectedSolver !== 'ARKA') || timeLeft <= 0) {
+    if (lives <= 0 || timeLeft <= 0) {
       if (!gameOverRef.current) {
           gameOverRef.current = true;
           setFeedback(null);
@@ -634,7 +632,7 @@ export default function GameLevel() {
     }
     const id = setTimeout(() => setTimeLeft(t => t - 1), 1000);
     return () => clearTimeout(id);
-  }, [timeLeft, lives, phase, submitted, selectedSolver]);
+  }, [timeLeft, lives, phase, submitted]);
 
   // ── Dialog data ───────────────────────────────────────────
   const introDialogs = storyData?.intro  || [];
@@ -695,21 +693,20 @@ export default function GameLevel() {
     const ok = verifyAnswer(question.type, question.correct_config, ans);
     if (ok) {
       setFeedback({ type: 'success', text: 'KERJA BAGUS!', explanation: question.explanation });
+      // Auto-dismiss after 2s, then proceed to outro VN → success popup
       setTimeout(() => { 
         if (!submitted) {
           setFeedback(null); 
           handleLevelComplete(); 
         }
-      }, 10000);
+      }, 2000);
     } else {
       let nl = lives;
-      if (selectedSolver !== 'ARKA') {
-        nl -= 1;
-        setLives(nl);
-      }
-      setFeedback({ type: 'error', text: `JAWABAN KURANG TEPAT. ${selectedSolver !== 'ARKA' ? `KESEMPATAN: ${nl}` : 'WAKTU TERUS BERJALAN!' }`, explanation: question.failure_message || question.explanation });
+      nl -= 1;
+      setLives(nl);
+      setFeedback({ type: 'error', text: `JAWABAN KURANG TEPAT. KESEMPATAN: ${nl}`, explanation: question.failure_message || question.explanation });
       setSeqAns([]); setClassAns({}); setMatchAns({});
-      if (nl <= 0 && selectedSolver !== 'ARKA') {
+      if (nl <= 0) {
         // Game over: submit dengan poin 0
         setTimeout(() => {
           gameOverRef.current = true;
@@ -736,12 +733,9 @@ export default function GameLevel() {
     if (submitted) return;
     setSubmitted(true);
     let baseTime = 300;
-    if (selectedSolver === 'ARKA') baseTime = 180;
-    if (selectedSolver === 'DIRA') baseTime = 999;
     
     // Default ratio scoring
     let r = timeLeft / baseTime;
-    if (selectedSolver === 'DIRA') r = 0.5; // Dira scores standard/middle speed always
     
     let pts = 0, st = 0;
     if (r > 0.75) { pts = 100; st = 3; } 
@@ -750,8 +744,6 @@ export default function GameLevel() {
     else { pts = 40; st = 1; }
 
     // ✅ BALANCED Character Impacts - All equal at ~1.3x bonus for fairness
-    if (selectedSolver === 'ARKA') pts = Math.floor(pts * 1.3); // Speed bonus
-    if (selectedSolver === 'NEXA') pts = Math.floor(pts * 1.3); // Precision bonus (same as Arka, different challenge)
     
     // Zeno Hint Impacts
     if (hintsUsed > 0) {
@@ -1114,18 +1106,16 @@ export default function GameLevel() {
 
 
               <div className="flex items-center gap-1.5 bg-stone-100 px-4 py-2 rounded-full border border-stone-200 shadow-inner">
-                {[...Array(selectedSolver === 'ARKA' ? 1 : 3)].map((_,i)=>(
+                {[...Array(3)].map((_,i)=>(
                   <motion.div key={i} 
                     initial={{scale:0.8, opacity:0}} animate={{scale:1, opacity:1}} transition={{delay: i*0.1}}
                     className={`relative w-4 h-4 rounded-full border ${
-                      selectedSolver === 'ARKA' ? 'bg-blue-400 border-blue-300' :
                       i < lives 
                         ? 'bg-rose-400 border-rose-300 shadow-[0_2px_4px_rgba(251,113,133,0.3)]' 
                         : 'bg-stone-300 border-stone-200'
                     }`} 
                   />
                 ))}
-                {selectedSolver === 'ARKA' && <span className="text-blue-500 font-bold ml-1 text-sm">∞</span>}
               </div>
               
               <div className="flex flex-col items-end">

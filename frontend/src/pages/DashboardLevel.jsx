@@ -59,14 +59,20 @@ export default function DashboardLevel() {
   if (!student) return <Navigate to="/register" replace />;
 
   const getLevelStatus = (n) => {
-    const cur = student.level_results?.find(r => r.level_number === n);
-    if (cur?.is_complete) return 'COMPLETED';
+    const results = student.level_results?.filter(r => r.level_number === n) || [];
+    const bestResult = results.find(r => r.is_complete);
+    if (bestResult) return 'COMPLETED';
     if (n === 1) return 'UNLOCKED';
-    const prev = student.level_results?.find(r => r.level_number === n - 1);
-    if (prev?.is_complete) return 'UNLOCKED';
+    const prevResults = student.level_results?.filter(r => r.level_number === n - 1) || [];
+    if (prevResults.some(r => r.is_complete)) return 'UNLOCKED';
     return 'LOCKED';
   };
-  const getStars = (n) => student.level_results?.find(r => r.level_number === n)?.bintang || 0;
+  // Ambil bintang tertinggi dari semua percobaan di level tersebut
+  const getStars = (n) => {
+    const results = student.level_results?.filter(r => r.level_number === n) || [];
+    if (results.length === 0) return 0;
+    return Math.max(...results.map(r => r.bintang || 0));
+  };
 
   const completedCount = [...Array(10)].filter((_, i) => getLevelStatus(i + 1) === 'COMPLETED').length;
   const xp = completedCount * 10;
