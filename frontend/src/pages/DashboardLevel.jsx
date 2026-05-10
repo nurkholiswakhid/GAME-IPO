@@ -6,12 +6,12 @@ import axios from 'axios';
 
 // Metadata statis: nama level, warna, dan mechanic (fallback emoji jika DB kosong)
 const LEVEL_META = {
-  1:  { icon: '⌨️', name: 'Pusat Input',        color: 'from-blue-100 to-cyan-100 text-blue-700',       mechanic: 'KLASIFIKASI' },
+  1:  { icon: '🎯', name: 'Pusat Input',        color: 'from-blue-100 to-cyan-100 text-blue-700',       mechanic: 'KLASIFIKASI' },
   2:  { icon: '🚦', name: 'Jalur Distribusi',   color: 'from-emerald-100 to-green-100 text-green-700',  mechanic: 'URUTAN' },
   3:  { icon: '🧠', name: 'Pusat Proses (CPU)', color: 'from-pink-100 to-rose-100 text-pink-700',       mechanic: 'ANALISIS' },
   4:  { icon: '🖥️', name: 'Terminal Output',    color: 'from-orange-100 to-amber-100 text-orange-700',  mechanic: 'BENAR/SALAH' },
   5:  { icon: '🏭', name: 'Pabrik Perangkat',   color: 'from-amber-100 to-yellow-100 text-amber-700',   mechanic: 'MENJODOHKAN' },
-  6:  { icon: '🗄️', name: 'Gudang Storage',     color: 'from-cyan-100 to-sky-100 text-sky-700',         mechanic: 'KLASIFIKASI' },
+  6:  { icon: '📄', name: 'Gudang Storage',     color: 'from-cyan-100 to-sky-100 text-sky-700',         mechanic: 'KLASIFIKASI' },
   7:  { icon: '🏫', name: 'Akademi Sistem',     color: 'from-fuchsia-100 to-purple-100 text-purple-700',mechanic: 'URUTAN' },
   8:  { icon: '🔬', name: 'Lab Inovasi IT',     color: 'from-indigo-100 to-violet-100 text-violet-700', mechanic: 'ANALISIS' },
   9:  { icon: '🌐', name: 'Jaringan Kota',      color: 'from-stone-200 to-stone-300 text-stone-700',    mechanic: 'BENAR/SALAH' },

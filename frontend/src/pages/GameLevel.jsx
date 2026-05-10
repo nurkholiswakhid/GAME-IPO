@@ -33,12 +33,12 @@ const MOOD = {
 };
 
 const SCENES = {
-  lab_komputer:     { bg: 'transparent', glow: '#87ceeb', label: 'Pusat Input Data',   icon: '⌨️', accent: 'from-blue-100/40 to-blue-50/20',    grid: 'rgba(135,206,235,0.1)' },
+  lab_komputer:     { bg: 'transparent', glow: '#87ceeb', label: 'Pusat Input Data',   icon: '🎯', accent: 'from-blue-100/40 to-blue-50/20',    grid: 'rgba(135,206,235,0.1)' },
   server_room:      { bg: 'transparent', glow: '#98fb98', label: 'Jalur Distribusi',   icon: '🚦', accent: 'from-green-100/40 to-green-50/20',   grid: 'rgba(152,251,152,0.1)' },
   studio_it:        { bg: 'transparent', glow: '#ffb6c1', label: 'Pusat Proses (CPU)', icon: '🧠', accent: 'from-pink-100/40 to-pink-50/20',     grid: 'rgba(255,182,193,0.1)' },
   rumah_user:       { bg: 'transparent', glow: '#ffa07a', label: 'Terminal Output',    icon: '🖥️', accent: 'from-orange-100/40 to-orange-50/20', grid: 'rgba(255,160,122,0.1)' },
   data_center:      { bg: 'transparent', glow: '#ffd700', label: 'Pabrik Perangkat',   icon: '🏭', accent: 'from-amber-100/40 to-amber-50/20',   grid: 'rgba(255,215,0,0.1)'   },
-  lab_storage:      { bg: 'transparent', glow: '#a7f3d0', label: 'Gudang Storage',     icon: '🗄️', accent: 'from-emerald-100/40 to-emerald-50/20', grid: 'rgba(167,243,208,0.1)' },
+  lab_storage:      { bg: 'transparent', glow: '#a7f3d0', label: 'Gudang Storage',     icon: '📄', accent: 'from-emerald-100/40 to-emerald-50/20', grid: 'rgba(167,243,208,0.1)' },
   kelas_smk:        { bg: 'transparent', glow: '#e9d5ff', label: 'Akademi Sistem',    icon: '🏫', accent: 'from-purple-100/40 to-purple-50/20', grid: 'rgba(233,213,255,0.1)' },
   lab_riset:        { bg: 'transparent', glow: '#c7d2fe', label: 'Lab Inovasi IT',    icon: '🔬', accent: 'from-indigo-100/40 to-indigo-50/20', grid: 'rgba(199,210,254,0.1)' },
   perpustakaan:     { bg: 'transparent', glow: '#cbd5e1', label: 'Jaringan Kota',     icon: '🌐', accent: 'from-slate-100/40 to-slate-50/20',   grid: 'rgba(203,213,225,0.1)' },
@@ -839,6 +839,7 @@ export default function GameLevel() {
   );
 
   return (
+    <>
     <div className={`min-h-screen w-full flex flex-col relative overflow-hidden text-stone-800 font-sans city-bg ${bgClass}`}>
 
       {/* ── MODERN KODOMO CITY AMBIENT BACKGROUND OVERLAY ── */}
@@ -1011,15 +1012,60 @@ export default function GameLevel() {
                 initial={{ opacity: 0, y: 25 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.65, duration: 0.9 }}
-                className="flex flex-col items-center gap-12"
+                className="flex flex-col items-center gap-8"
               >
+                {/* Level & Challenge Info Card */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.7, duration: 0.8 }}
+                  className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl px-8 py-6 mb-4"
+                  style={{ boxShadow: `0 8px 32px ${scene.glow}25` }}
+                >
+                  <div className="flex items-center justify-center gap-6">
+                    {/* Level Badge */}
+                    <div className="text-center">
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 6, repeat: Infinity, ease: 'linear' }}
+                        className="w-14 h-14 rounded-full flex items-center justify-center text-2xl font-black mb-2"
+                        style={{ 
+                          background: `linear-gradient(135deg, ${scene.glow}, ${scene.glow}40)`,
+                          boxShadow: `0 0 24px ${scene.glow}60`
+                        }}
+                      >
+                        {lvl}
+                      </motion.div>
+                      <p className="text-xs uppercase font-bold tracking-widest" style={{ color: scene.glow }}>Level</p>
+                    </div>
+
+                    {/* Separator */}
+                    <div className="h-12 w-px" style={{ background: `${scene.glow}40` }} />
+
+                    {/* Solver & Progress */}
+                    <div className="text-center">
+                      <motion.div
+                        animate={{ scale: [1, 1.1, 1] }}
+                        transition={{ delay: 0.8, duration: 2, repeat: Infinity }}
+                        className="text-3xl mb-1"
+                      >
+                        {selectedSolver === 'ARKA' && '⚡'}
+                        {selectedSolver === 'NEXA' && '🧠'}
+                        {selectedSolver === 'DIRA' && '🎨'}
+                        {!selectedSolver && '🎯'}
+                      </motion.div>
+                      <p className="text-xs uppercase font-bold tracking-widest" style={{ color: scene.glow }}>Ready</p>
+                    </div>
+                  </div>
+                </motion.div>
+
                 {/* Premium triple orbiting system */}
-                <div className="relative w-36 h-36 flex items-center justify-center">
+                <div className="relative w-40 h-40 flex items-center justify-center">
                   {/* Outer decorative ring with gradient */}
                   <motion.div
                     animate={{ rotate: -360 }}
                     transition={{ duration: 6, repeat: Infinity, ease: 'linear' }}
-                    className="absolute w-36 h-36 rounded-full border-2 border-dashed"
+                    className="absolute w-40 h-40 rounded-full border-2 border-dashed"
                     style={{ 
                       borderColor: `${scene.glow}85`,
                       boxShadow: `inset 0 0 20px ${scene.glow}25, 0 0 16px ${scene.glow}30`
@@ -1066,7 +1112,7 @@ export default function GameLevel() {
                   <motion.div
                     animate={{ scale: [0.8, 1.5, 0.8] }}
                     transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
-                    className="w-8 h-8 rounded-full"
+                    className="w-10 h-10 rounded-full"
                     style={{ 
                       background: scene.glow,
                       boxShadow: `0 0 32px ${scene.glow}, 0 0 64px ${scene.glow}70, inset 0 0 12px rgba(255, 255, 255, 0.6)`
@@ -1090,11 +1136,11 @@ export default function GameLevel() {
                       textShadow: `0 2px 10px rgba(0, 0, 0, 0.35), 0 0 8px ${scene.glow}40`
                     }}
                   >
-                    Initializing
+                    Initializing Challenge
                   </motion.div>
                   
                   {/* Animated progress dots */}
-                  <div className="flex gap-4 justify-center mt-5">
+                  <div className="flex gap-4 justify-center mt-6">
                     {[0, 1, 2].map((i) => (
                       <motion.div
                         key={i}
@@ -1117,6 +1163,18 @@ export default function GameLevel() {
                       />
                     ))}
                   </div>
+                </motion.div>
+
+                {/* Motivational Tip */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1.2, duration: 0.8 }}
+                  className="text-center max-w-sm"
+                >
+                  <p className="text-xs italic font-medium opacity-80">
+                    💡 Ingat: Fokus pada petunjuk dan jangan terburu-buru!
+                  </p>
                 </motion.div>
               </motion.div>
               
@@ -1163,7 +1221,7 @@ export default function GameLevel() {
           <div className="relative z-30 px-6 py-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div className="flex items-center gap-3 glass px-5 py-2.5 rounded-full shadow-md">
               <div className="w-9 h-9 rounded-full flex items-center justify-center text-lg bg-white/80 shadow-sm border border-white/90" style={{ borderColor: scene.glow }}>
-                {scene.icon}
+                {question?.level_emoji || scene.icon}
               </div>
               <div>
                 <p className="text-[10px] font-bold text-stone-500 uppercase tracking-widest">{storyData?.chapter}</p>
@@ -1257,7 +1315,7 @@ export default function GameLevel() {
               <div>
                 <p className="text-[11px] font-bold text-emerald-600 uppercase tracking-widest">{storyData?.chapter || `CHAPTER ${lvl}`}</p>
                 <p className="text-base font-serif font-black text-stone-800 flex items-center gap-2">
-                  <span className="opacity-90">{scene.icon}</span>{scene.label}
+                  <span className="opacity-90">{question?.level_emoji || scene.icon}</span>{scene.label}
                 </p>
               </div>
             </div>
@@ -1510,41 +1568,86 @@ export default function GameLevel() {
         )}
       </AnimatePresence>
 
-      {/* ════════════════ TERMINAL FEEDBACK OVERLAY ════════════════ */}
-      <AnimatePresence>
-        {feedback && (
-          <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}}
-            className="fixed inset-0 z-[100] bg-white/60 backdrop-blur-md flex items-center justify-center p-4">
+    </div>
+
+    {/* ════════════════ TERMINAL FEEDBACK OVERLAY (Fixed to Viewport) ════════════════ */}
+    <AnimatePresence>
+      {feedback && (
+        <motion.div 
+          initial={{opacity:0}} 
+          animate={{opacity:1}} 
+          exit={{opacity:0}}
+          className="fixed inset-0 z-[9999] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 pointer-events-auto"
+        >
             
-            <motion.div initial={{scale:0.9, y: 20}} animate={{scale:1, y: 0}} exit={{scale:0.9, opacity:0}}
-              className={`relative max-w-2xl w-full p-8 md:p-10 rounded-2xl border shadow-xl overflow-hidden bg-white ${
+            <motion.div initial={{scale:0.85, y: 30}} animate={{scale:1, y: 0}} exit={{scale:0.85, opacity:0}} transition={{type: 'spring', stiffness: 300, damping: 30}}
+              className={`relative max-w-2xl w-full p-8 md:p-10 rounded-3xl border shadow-2xl overflow-hidden bg-white ${
                 feedback.type==='success'
-                  ? 'border-emerald-300'
-                  : 'border-rose-300'
+                  ? 'border-emerald-200'
+                  : 'border-rose-200'
               }`}>
               
-              <div className={`absolute top-0 left-0 w-full h-2 ${feedback.type==='success'?'bg-emerald-400':'bg-rose-400'}`} />
+              {/* Close Button */}
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setFeedback(null)}
+                className={`absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center text-xl font-bold transition-all hover:shadow-md ${
+                  feedback.type==='success' 
+                    ? 'bg-emerald-100 text-emerald-600 hover:bg-emerald-200' 
+                    : 'bg-rose-100 text-rose-600 hover:bg-rose-200'
+                }`}
+              >
+                ✕
+              </motion.button>
+              
+              {/* Top accent bar */}
+              <div className={`absolute top-0 left-0 w-full h-2 rounded-t-3xl ${feedback.type==='success'?'bg-gradient-to-r from-emerald-400 to-emerald-500':'bg-gradient-to-r from-rose-400 to-rose-500'}`} />
               
               <div className="flex flex-col items-center text-center font-sans">
-                <div className={`w-20 h-20 rounded-full flex items-center justify-center text-4xl mb-6 shadow-md border ${
-                  feedback.type==='success' ? 'bg-emerald-50 border-emerald-200 text-emerald-500' : 'bg-rose-50 border-rose-200 text-rose-500'
-                }`}>
-                  {feedback.type==='success'?'✓':'✕'}
-                </div>
-                
-                <h3 className={`text-2xl md:text-3xl font-black mb-6 tracking-wide uppercase ${feedback.type==='success'?'text-emerald-600':'text-rose-600'}`}>
-                  {feedback.text}
-                </h3>
-                
-                {feedback.explanation && (
-                  <div className={`text-left w-full p-5 rounded-xl border leading-relaxed text-sm md:text-base mb-6 ${
-                    feedback.type==='success'?'bg-emerald-50 border-emerald-200 text-emerald-800':'bg-rose-50 border-rose-200 text-rose-800'
+                {/* Icon Circle */}
+                <motion.div 
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
+                  className={`w-24 h-24 rounded-full flex items-center justify-center text-5xl mb-6 shadow-lg border-2 ${
+                    feedback.type==='success' 
+                      ? 'bg-emerald-50 border-emerald-200 text-emerald-500' 
+                      : 'bg-rose-50 border-rose-200 text-rose-500'
                   }`}>
-                    <p className={`font-bold mb-2 uppercase tracking-wide text-xs flex items-center gap-2 ${feedback.type==='success'?'text-emerald-700':'text-rose-700'}`}>
-                      <span className={`w-1.5 h-1.5 rounded-full ${feedback.type==='success'?'bg-emerald-500':'bg-rose-500'}`} /> PENJELASAN:
+                  {feedback.type==='success'?'✓':'✕'}
+                </motion.div>
+                
+                {/* Main Title */}
+                <motion.h3 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className={`text-3xl md:text-4xl font-black mb-4 tracking-tight ${feedback.type==='success'?'text-emerald-600':'text-rose-600'}`}>
+                  {feedback.text}
+                </motion.h3>
+                
+                {/* Explanation Box */}
+                {feedback.explanation && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className={`text-left w-full p-5 rounded-2xl border-2 leading-relaxed text-sm md:text-base mb-8 ${
+                      feedback.type==='success'
+                        ?'bg-emerald-50/50 border-emerald-200 text-emerald-900'
+                        :'bg-rose-50/50 border-rose-200 text-rose-900'
+                    }`}>
+                    <p className={`font-bold mb-3 uppercase tracking-wide text-xs flex items-center gap-2 ${feedback.type==='success'?'text-emerald-700':'text-rose-700'}`}>
+                      <motion.span 
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+                        className={`w-2 h-2 rounded-full ${feedback.type==='success'?'bg-emerald-500':'bg-rose-500'}`} 
+                      />
+                      PENJELASAN
                     </p>
-                    {feedback.explanation}
-                  </div>
+                    <p className="font-medium leading-relaxed">{feedback.explanation}</p>
+                  </motion.div>
                 )}
 
                 {/* Success Action Buttons */}
@@ -1552,59 +1655,94 @@ export default function GameLevel() {
                   <motion.div 
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 1.2 }}
-                    className="w-full flex flex-col sm:flex-row gap-3 mt-4"
+                    transition={{ delay: 0.9 }}
+                    className="w-full flex flex-col sm:flex-row gap-3"
                   >
                     {lvl < (totalLevels || 10) && (
                       <motion.button
-                        whileHover={{ scale: 1.04 }}
-                        whileTap={{ scale: 0.96 }}
+                        whileHover={{ scale: 1.05, y: -2 }}
+                        whileTap={{ scale: 0.95 }}
                         onClick={async () => {
                           setIsNavigating(true);
-                          // Ensure level completion is submitted before navigating
                           if (!submitted) {
                             await handleLevelComplete();
                           }
                           setFeedback(null);
                           setTimeout(() => navigate(`/game/${lvl + 1}`), 300);
                         }}
-                        className="flex-1 py-3 rounded-lg font-bold text-base uppercase tracking-wide border transition-all shadow-md flex items-center justify-center gap-2 bg-emerald-50 border-emerald-300 text-emerald-700 hover:bg-emerald-100"
+                        className="flex-1 py-4 rounded-xl font-bold text-base uppercase tracking-wide border-2 transition-all shadow-lg flex items-center justify-center gap-2 bg-gradient-to-br from-emerald-400 to-emerald-500 border-emerald-600 text-white hover:shadow-xl active:shadow-md"
                       >
-                        <span>Lanjut ke Berikutnya</span>
-                        <span>▶</span>
+                        <span>▶ Lanjut Level</span>
                       </motion.button>
                     )}
                     <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.97 }}
+                      whileHover={{ scale: 1.05, y: -2 }}
+                      whileTap={{ scale: 0.95 }}
                       onClick={async () => {
                         setIsNavigating(true);
-                        // Ensure level completion is submitted before navigating
                         if (!submitted) {
                           await handleLevelComplete();
                         }
                         setFeedback(null);
                         setTimeout(() => navigate('/dashboard'), 300);
                       }}
-                      className="flex-1 py-3 rounded-lg font-bold text-base uppercase tracking-wide border border-stone-300 bg-white hover:bg-stone-50 text-stone-600 hover:text-stone-800 transition-all flex items-center justify-center gap-2 shadow-sm"
+                      className="flex-1 py-4 rounded-xl font-bold text-base uppercase tracking-wide border-2 border-stone-300 bg-white hover:bg-stone-50 text-stone-700 hover:text-stone-900 transition-all flex items-center justify-center gap-2 shadow-md hover:shadow-lg active:shadow-sm"
                     >
-                      <span>◁</span>
-                      <span>{lvl >= (totalLevels || 10) ? 'Selesai' : 'Dashboard'}</span>
+                      <span>◁ {lvl >= (totalLevels || 10) ? 'Selesai' : 'Dashboard'}</span>
+                    </motion.button>
+                  </motion.div>
+                )}
+                
+                {/* Error Action Buttons */}
+                {feedback.type === 'error' && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.6 }}
+                    className="w-full flex flex-col sm:flex-row gap-3"
+                  >
+                    <motion.button
+                      whileHover={{ scale: 1.05, y: -2 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setFeedback(null)}
+                      className="flex-1 py-4 rounded-xl font-bold text-base uppercase tracking-wide border-2 transition-all shadow-lg flex items-center justify-center gap-2 bg-gradient-to-br from-rose-400 to-rose-500 border-rose-600 text-white hover:shadow-xl active:shadow-md"
+                    >
+                      <span>↻ Coba Lagi</span>
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.05, y: -2 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => {
+                        setFeedback(null);
+                        navigate('/dashboard');
+                      }}
+                      className="flex-1 py-4 rounded-xl font-bold text-base uppercase tracking-wide border-2 border-stone-300 bg-white hover:bg-stone-50 text-stone-700 hover:text-stone-900 transition-all flex items-center justify-center gap-2 shadow-md hover:shadow-lg active:shadow-sm"
+                    >
+                      <span>◁ Dashboard</span>
                     </motion.button>
                   </motion.div>
                 )}
                 
                 {feedback.type==='success' && (
-                  <div className="mt-8 flex items-center gap-3 text-emerald-600 text-xs font-bold uppercase tracking-wide">
-                    <span className="w-4 h-4 rounded-full border border-emerald-200 border-t-emerald-500 animate-spin" />
-                    MEMPROSES...
-                  </div>
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 1.5 }}
+                    className="mt-6 flex items-center justify-center gap-3 text-emerald-600 text-xs font-bold uppercase tracking-wide"
+                  >
+                    <motion.span 
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+                      className="w-4 h-4 rounded-full border-2 border-emerald-300 border-t-emerald-600" 
+                    />
+                    Memproses Poin & Bintang...
+                  </motion.div>
                 )}
               </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </>
   );
 }
