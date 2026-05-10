@@ -1,59 +1,59 @@
-import React, { useState, useEffect, useContext, useRef, useCallback } from 'react';
+﻿import React, { useState, useEffect, useContext, useRef, useCallback } from 'react';
 import { useParams, useNavigate, Navigate } from 'react-router-dom';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { GameContext } from '../context/GameContext';
 
-// ─────────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 //  CHARACTER DEFINITIONS & MOODS
-// ─────────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 const CHARS = {
-  NARASI:       { img: null,                  name: 'SYSTEM',     color: '#94a3b8', side: 'center', emoji: '⚙️' },
-  ARKA:         { img: '/char_arka.png',       name: 'Arka',       color: '#3b82f6', side: 'left',   emoji: '🧑‍🔧' },
-  NEXA:         { img: '/char_nexa.png',       name: 'Nexa',       color: '#8b5cf6', side: 'right',  emoji: '👩‍💻' },
-  DIRA:         { img: '/char_dira.png',       name: 'Dira',       color: '#10b981', side: 'left',   emoji: '👩‍🎨' },
-  RIVO:         { img: '/char_rivo.png',       name: 'Rivo',       color: '#f97316', side: 'right',  emoji: '👨‍✈️' },
-  ZENO:         { img: '/char_zeno.png',       name: 'Zeno',       color: '#06b6d4', side: 'left',   emoji: '🤖' },
-  ARDI:         { img: '/char_ardi.png',       name: 'Ardi',       color: '#f59e0b', side: 'right',  emoji: '👦' },
-  BUDI:         { img: '/char_budi.png',       name: 'Budi',       color: '#84cc16', side: 'left',   emoji: '👨' },
-  NPC_MALE:     { img: '/char_npc_male.png',   name: 'NPC Pria',   color: '#64748b', side: 'left',   emoji: '🧑' },
-  NPC_FEMALE:   { img: '/char_npc_female.png', name: 'NPC Wanita', color: '#ec4899', side: 'right',  emoji: '👩' },
-  NPC:          { img: null,                   name: 'NPC',        color: '#94a3b8', side: 'left',   emoji: '🧑' },
+  NARASI:       { img: null,                  name: 'SYSTEM',     color: '#94a3b8', side: 'center', emoji: 'ΓÜÖ∩╕Å' },
+  ARKA:         { img: '/char_arka.png',       name: 'Arka',       color: '#3b82f6', side: 'left',   emoji: '≡ƒºæΓÇì≡ƒöº' },
+  NEXA:         { img: '/char_nexa.png',       name: 'Nexa',       color: '#8b5cf6', side: 'right',  emoji: '≡ƒæ⌐ΓÇì≡ƒÆ╗' },
+  DIRA:         { img: '/char_dira.png',       name: 'Dira',       color: '#10b981', side: 'left',   emoji: '≡ƒæ⌐ΓÇì≡ƒÄ¿' },
+  RIVO:         { img: '/char_rivo.png',       name: 'Rivo',       color: '#f97316', side: 'right',  emoji: '≡ƒæ¿ΓÇìΓ£ê∩╕Å' },
+  ZENO:         { img: '/char_zeno.png',       name: 'Zeno',       color: '#06b6d4', side: 'left',   emoji: '≡ƒñû' },
+  ARDI:         { img: '/char_ardi.png',       name: 'Ardi',       color: '#f59e0b', side: 'right',  emoji: '≡ƒæª' },
+  BUDI:         { img: '/char_budi.png',       name: 'Budi',       color: '#84cc16', side: 'left',   emoji: '≡ƒæ¿' },
+  NPC_MALE:     { img: '/char_npc_male.png',   name: 'NPC Pria',   color: '#64748b', side: 'left',   emoji: '≡ƒºæ' },
+  NPC_FEMALE:   { img: '/char_npc_female.png', name: 'NPC Wanita', color: '#ec4899', side: 'right',  emoji: '≡ƒæ⌐' },
+  NPC:          { img: null,                   name: 'NPC',        color: '#94a3b8', side: 'left',   emoji: '≡ƒºæ' },
 };
 
 const MOOD = {
-  panic:     { emoji: '😰', filter: 'saturate(0.8) brightness(0.9)', label: 'PANIC'      },
-  happy:     { emoji: '😊', filter: 'saturate(1.2) brightness(1.05)', label: 'HAPPY'     },
-  thinking:  { emoji: '🤔', filter: 'saturate(0.9)',                  label: 'THINKING'  },
-  sad:       { emoji: '😢', filter: 'saturate(0.6) brightness(0.85)', label: 'SAD'       },
-  confident: { emoji: '😤', filter: 'saturate(1.1) brightness(1.1)',  label: 'CONFIDENT' },
+  panic:     { emoji: '≡ƒÿ░', filter: 'saturate(0.8) brightness(0.9)', label: 'PANIC'      },
+  happy:     { emoji: '≡ƒÿè', filter: 'saturate(1.2) brightness(1.05)', label: 'HAPPY'     },
+  thinking:  { emoji: '≡ƒñö', filter: 'saturate(0.9)',                  label: 'THINKING'  },
+  sad:       { emoji: '≡ƒÿó', filter: 'saturate(0.6) brightness(0.85)', label: 'SAD'       },
+  confident: { emoji: '≡ƒÿñ', filter: 'saturate(1.1) brightness(1.1)',  label: 'CONFIDENT' },
   normal:    { emoji: '',   filter: '',                                label: 'IDLE'      },
-  angry:     { emoji: '😠', filter: 'saturate(1.3) hue-rotate(10deg)', label: 'ANGRY'   },
-  surprised: { emoji: '😲', filter: 'brightness(1.15)',               label: 'SURPRISED' },
+  angry:     { emoji: '≡ƒÿá', filter: 'saturate(1.3) hue-rotate(10deg)', label: 'ANGRY'   },
+  surprised: { emoji: '≡ƒÿ▓', filter: 'brightness(1.15)',               label: 'SURPRISED' },
 };
 
 const SCENES = {
-  lab_komputer:     { bg: 'transparent', glow: '#87ceeb', label: 'Pusat Input Data',   icon: '🎯', accent: 'from-blue-100/40 to-blue-50/20',    grid: 'rgba(135,206,235,0.1)' },
-  server_room:      { bg: 'transparent', glow: '#98fb98', label: 'Jalur Distribusi',   icon: '🚦', accent: 'from-green-100/40 to-green-50/20',   grid: 'rgba(152,251,152,0.1)' },
-  studio_it:        { bg: 'transparent', glow: '#ffb6c1', label: 'Pusat Proses (CPU)', icon: '🧠', accent: 'from-pink-100/40 to-pink-50/20',     grid: 'rgba(255,182,193,0.1)' },
-  rumah_user:       { bg: 'transparent', glow: '#ffa07a', label: 'Terminal Output',    icon: '🖥️', accent: 'from-orange-100/40 to-orange-50/20', grid: 'rgba(255,160,122,0.1)' },
-  data_center:      { bg: 'transparent', glow: '#ffd700', label: 'Pabrik Perangkat',   icon: '🏭', accent: 'from-amber-100/40 to-amber-50/20',   grid: 'rgba(255,215,0,0.1)'   },
-  lab_storage:      { bg: 'transparent', glow: '#a7f3d0', label: 'Gudang Storage',     icon: '📄', accent: 'from-emerald-100/40 to-emerald-50/20', grid: 'rgba(167,243,208,0.1)' },
-  kelas_smk:        { bg: 'transparent', glow: '#e9d5ff', label: 'Akademi Sistem',    icon: '🏫', accent: 'from-purple-100/40 to-purple-50/20', grid: 'rgba(233,213,255,0.1)' },
-  lab_riset:        { bg: 'transparent', glow: '#c7d2fe', label: 'Lab Inovasi IT',    icon: '🔬', accent: 'from-indigo-100/40 to-indigo-50/20', grid: 'rgba(199,210,254,0.1)' },
-  perpustakaan:     { bg: 'transparent', glow: '#cbd5e1', label: 'Jaringan Kota',     icon: '🌐', accent: 'from-slate-100/40 to-slate-50/20',   grid: 'rgba(203,213,225,0.1)' },
-  final_boss:       { bg: 'transparent', glow: '#fef08a', label: 'Ujian Arsitektur',  icon: '👑', accent: 'from-yellow-100/40 to-yellow-50/20', grid: 'rgba(254,240,138,0.1)' },
+  lab_komputer:     { bg: 'transparent', glow: '#87ceeb', label: 'Pusat Input Data',   icon: '≡ƒÄ»', accent: 'from-blue-100/40 to-blue-50/20',    grid: 'rgba(135,206,235,0.1)' },
+  server_room:      { bg: 'transparent', glow: '#98fb98', label: 'Jalur Distribusi',   icon: '≡ƒÜª', accent: 'from-green-100/40 to-green-50/20',   grid: 'rgba(152,251,152,0.1)' },
+  studio_it:        { bg: 'transparent', glow: '#ffb6c1', label: 'Pusat Proses (CPU)', icon: '≡ƒºá', accent: 'from-pink-100/40 to-pink-50/20',     grid: 'rgba(255,182,193,0.1)' },
+  rumah_user:       { bg: 'transparent', glow: '#ffa07a', label: 'Terminal Output',    icon: '≡ƒûÑ∩╕Å', accent: 'from-orange-100/40 to-orange-50/20', grid: 'rgba(255,160,122,0.1)' },
+  data_center:      { bg: 'transparent', glow: '#ffd700', label: 'Pabrik Perangkat',   icon: '≡ƒÅ¡', accent: 'from-amber-100/40 to-amber-50/20',   grid: 'rgba(255,215,0,0.1)'   },
+  lab_storage:      { bg: 'transparent', glow: '#a7f3d0', label: 'Gudang Storage',     icon: '≡ƒôä', accent: 'from-emerald-100/40 to-emerald-50/20', grid: 'rgba(167,243,208,0.1)' },
+  kelas_smk:        { bg: 'transparent', glow: '#e9d5ff', label: 'Akademi Sistem',    icon: '≡ƒÅ½', accent: 'from-purple-100/40 to-purple-50/20', grid: 'rgba(233,213,255,0.1)' },
+  lab_riset:        { bg: 'transparent', glow: '#c7d2fe', label: 'Lab Inovasi IT',    icon: '≡ƒö¼', accent: 'from-indigo-100/40 to-indigo-50/20', grid: 'rgba(199,210,254,0.1)' },
+  perpustakaan:     { bg: 'transparent', glow: '#cbd5e1', label: 'Jaringan Kota',     icon: '≡ƒîÉ', accent: 'from-slate-100/40 to-slate-50/20',   grid: 'rgba(203,213,225,0.1)' },
+  final_boss:       { bg: 'transparent', glow: '#fef08a', label: 'Ujian Arsitektur',  icon: '≡ƒææ', accent: 'from-yellow-100/40 to-yellow-50/20', grid: 'rgba(254,240,138,0.1)' },
   // Alias: scene dari form guru (SCENE_LIST) yang memakai nama berbeda
-  academy_kodomo:   { bg: 'transparent', glow: '#e9d5ff', label: 'Akademi Sistem',    icon: '🏫', accent: 'from-purple-100/40 to-purple-50/20', grid: 'rgba(233,213,255,0.1)' },
-  core_kodomo:      { bg: 'transparent', glow: '#ffb6c1', label: 'Pusat Proses (CPU)', icon: '🧠', accent: 'from-pink-100/40 to-pink-50/20',    grid: 'rgba(255,182,193,0.1)' },
-  hardware_kodomo:  { bg: 'transparent', glow: '#ffd700', label: 'Pabrik Perangkat',  icon: '🏭', accent: 'from-amber-100/40 to-amber-50/20',   grid: 'rgba(255,215,0,0.1)'   },
-  home_kodomo:      { bg: 'transparent', glow: '#ffa07a', label: 'Terminal Output',   icon: '🖥️', accent: 'from-orange-100/40 to-orange-50/20', grid: 'rgba(255,160,122,0.1)' },
-  network_kodomo:   { bg: 'transparent', glow: '#cbd5e1', label: 'Jaringan Kota',     icon: '🌐', accent: 'from-slate-100/40 to-slate-50/20',   grid: 'rgba(203,213,225,0.1)' },
+  academy_kodomo:   { bg: 'transparent', glow: '#e9d5ff', label: 'Akademi Sistem',    icon: '≡ƒÅ½', accent: 'from-purple-100/40 to-purple-50/20', grid: 'rgba(233,213,255,0.1)' },
+  core_kodomo:      { bg: 'transparent', glow: '#ffb6c1', label: 'Pusat Proses (CPU)', icon: '≡ƒºá', accent: 'from-pink-100/40 to-pink-50/20',    grid: 'rgba(255,182,193,0.1)' },
+  hardware_kodomo:  { bg: 'transparent', glow: '#ffd700', label: 'Pabrik Perangkat',  icon: '≡ƒÅ¡', accent: 'from-amber-100/40 to-amber-50/20',   grid: 'rgba(255,215,0,0.1)'   },
+  home_kodomo:      { bg: 'transparent', glow: '#ffa07a', label: 'Terminal Output',   icon: '≡ƒûÑ∩╕Å', accent: 'from-orange-100/40 to-orange-50/20', grid: 'rgba(255,160,122,0.1)' },
+  network_kodomo:   { bg: 'transparent', glow: '#cbd5e1', label: 'Jaringan Kota',     icon: '≡ƒîÉ', accent: 'from-slate-100/40 to-slate-50/20',   grid: 'rgba(203,213,225,0.1)' },
 };
 
-// ─────────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 //  TYPEWRITER HOOK
-// ─────────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 function useTypewriter(text, speed = 25) {
   const [chars, setChars] = useState('');
   const [done, setDone] = useState(false);
@@ -71,9 +71,9 @@ function useTypewriter(text, speed = 25) {
   return [chars, done];
 }
 
-// ─────────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 //  CHARACTER SPRITE COMPONENT
-// ─────────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 function CharacterSprite({ charKey, isActive, side, mood }) {
   const def = CHARS[charKey] || CHARS['NPC'];
   const moodDef = MOOD[mood] || MOOD.normal;
@@ -162,9 +162,9 @@ function CharacterSprite({ charKey, isActive, side, mood }) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 //  FUTURISTIC DIALOG BOX
-// ─────────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 function DialogBox({ dialog, onNext, isLast, sceneGlow }) {
   const speakerKey = dialog.npcName || dialog.speaker;
   const def = CHARS[speakerKey] || CHARS['NPC'];
@@ -204,7 +204,7 @@ function DialogBox({ dialog, onNext, isLast, sceneGlow }) {
               {typedText}
               {!done && <span className="inline-block w-1.5 h-4 bg-slate-400 ml-1 align-middle animate-pulse rounded-full" />}
             </p>
-            {done && <p className="text-slate-400 text-[10px] uppercase font-bold tracking-[0.2em] mt-4 animate-pulse">▼ klik untuk lanjut</p>}
+            {done && <p className="text-slate-400 text-[10px] uppercase font-bold tracking-[0.2em] mt-4 animate-pulse">Γû╝ klik untuk lanjut</p>}
           </div>
         ) : (
           <div>
@@ -224,7 +224,7 @@ function DialogBox({ dialog, onNext, isLast, sceneGlow }) {
               </motion.div>
               <div className="flex-1 min-w-0">
                 <span className="block text-[10px] font-mono font-bold tracking-[0.25em] uppercase opacity-60 mb-0.5" style={{ color: def.color }}>
-                  {speakerKey} · {moodDef.label}
+                  {speakerKey} ┬╖ {moodDef.label}
                 </span>
                 <span className="font-black text-base md:text-lg font-sans tracking-wide text-stone-800 truncate block">
                   {def.name || speakerKey}
@@ -247,7 +247,7 @@ function DialogBox({ dialog, onNext, isLast, sceneGlow }) {
                     className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.2em] ml-3"
                     style={{ color: def.color }}
                   >
-                    {isLast ? <><span>MULAI MISI</span><span>▶</span></> : <><span>lanjut</span><span>▼</span></>}
+                    {isLast ? <><span>MULAI MISI</span><span>Γû╢</span></> : <><span>lanjut</span><span>Γû╝</span></>}
                   </motion.div>
                 </div>
               )}
@@ -259,9 +259,9 @@ function DialogBox({ dialog, onNext, isLast, sceneGlow }) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 //  VERIFY ENGINE
-// ─────────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 function verifyAnswer(type, correctConfig, userAnswer) {
   try {
     const correct = JSON.parse(correctConfig);
@@ -288,9 +288,9 @@ function verifyAnswer(type, correctConfig, userAnswer) {
   return false;
 }
 
-// ─────────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 //  MECHANIC COMPONENTS (Redesigned Cyberpunk / Glassmorphism)
-// ─────────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 function MultipleChoice({ options, onAnswer }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -322,7 +322,7 @@ function TrueFalse({ onAnswer }) {
               : 'bg-rose-50 border-rose-300 text-rose-700 hover:border-rose-500 hover:bg-rose-100'
           }`}>
           <span className="relative z-10 flex items-center justify-center gap-3">
-            <span className="text-3xl">{opt === 'BENAR' ? '✓' : '✕'}</span>
+            <span className="text-3xl">{opt === 'BENAR' ? 'Γ£ô' : 'Γ£ò'}</span>
             {opt === 'BENAR' ? 'BENAR' : 'SALAH'}
           </span>
         </motion.button>
@@ -337,11 +337,11 @@ function Sequence({ options, userAnswer, setUserAnswer }) {
   return (
     <div className="space-y-6">
       <div className="space-y-3 min-h-[6rem] p-4 rounded-xl border border-dashed border-stone-300 bg-white shadow-inner">
-        <p className="text-xs font-bold text-stone-500 uppercase tracking-widest mb-2">» Urutan Solusi [Execution Order]</p>
+        <p className="text-xs font-bold text-stone-500 uppercase tracking-widest mb-2">┬╗ Urutan Solusi [Execution Order]</p>
         
         {userAnswer.length===0 && (
           <div className="flex flex-col items-center justify-center py-6 opacity-40 text-stone-600">
-            <span className="text-3xl mb-2">⬇️</span>
+            <span className="text-3xl mb-2">Γ¼ç∩╕Å</span>
             <p className="text-sm font-medium">AREA KOSONG</p>
           </div>
         )}
@@ -353,13 +353,13 @@ function Sequence({ options, userAnswer, setUserAnswer }) {
               {i + 1}
             </div>
             <span className="flex-1 text-sm md:text-base text-stone-800 font-medium">{item}</span>
-            <button onClick={()=>rem(i)} className="opacity-0 group-hover:opacity-100 w-8 h-8 rounded-full hover:bg-rose-100 text-rose-500 hover:text-rose-600 transition-all flex items-center justify-center">✕</button>
+            <button onClick={()=>rem(i)} className="opacity-0 group-hover:opacity-100 w-8 h-8 rounded-full hover:bg-rose-100 text-rose-500 hover:text-rose-600 transition-all flex items-center justify-center">Γ£ò</button>
           </motion.div>
         ))}
       </div>
       
       <div>
-        <p className="text-xs font-bold text-stone-400 uppercase tracking-widest mb-3">» Pilihan Instruksi</p>
+        <p className="text-xs font-bold text-stone-400 uppercase tracking-widest mb-3">┬╗ Pilihan Instruksi</p>
         <div className="grid gap-2">
           {options.map((opt,i)=>{
             const used=userAnswer.includes(opt);
@@ -409,7 +409,7 @@ function Classification({ categories, options, userAnswer, setUserAnswer }) {
                     idx%2===0 ? 'bg-amber-50 border-amber-200' : 'bg-emerald-50 border-emerald-200'
                   }`}>
                   {item}
-                  <button onClick={()=>remove(cat,item)} className="ml-1 w-5 h-5 rounded-full hover:bg-black/5 flex items-center justify-center transition-colors">✕</button>
+                  <button onClick={()=>remove(cat,item)} className="ml-1 w-5 h-5 rounded-full hover:bg-black/5 flex items-center justify-center transition-colors">Γ£ò</button>
                 </motion.div>
               ))}
               {!(userAnswer[cat]||[]).length && (
@@ -424,7 +424,7 @@ function Classification({ categories, options, userAnswer, setUserAnswer }) {
       
       {unused.length>0&&(
         <div className="pt-4 border-t border-stone-200">
-          <p className="text-xs font-bold text-stone-400 uppercase tracking-widest mb-4">» Objek Belum Diklasifikasikan</p>
+          <p className="text-xs font-bold text-stone-400 uppercase tracking-widest mb-4">┬╗ Objek Belum Diklasifikasikan</p>
           <div className="space-y-3">
             {unused.map((opt,i)=>(
               <div key={i} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 bg-white border border-stone-200 rounded-xl hover:bg-stone-50 transition-colors shadow-sm">
@@ -438,7 +438,7 @@ function Classification({ categories, options, userAnswer, setUserAnswer }) {
                           ? 'bg-amber-100 text-amber-700 border-amber-300 hover:bg-amber-200' 
                           : 'bg-emerald-100 text-emerald-700 border-emerald-300 hover:bg-emerald-200'
                       }`}>
-                      Pilih ➔ {idx===0 ? 'A' : 'B'}
+                      Pilih Γ₧ö {idx===0 ? 'A' : 'B'}
                     </motion.button>
                   ))}
                 </div>
@@ -447,7 +447,7 @@ function Classification({ categories, options, userAnswer, setUserAnswer }) {
           </div>
         </div>
       )}
-      {unused.length===0&&<p className="text-emerald-700 text-sm font-bold text-center bg-emerald-100 py-3 rounded-xl border border-emerald-300">✓ Semua objek terklasifikasi. Siap diselesaikan.</p>}
+      {unused.length===0&&<p className="text-emerald-700 text-sm font-bold text-center bg-emerald-100 py-3 rounded-xl border border-emerald-300">Γ£ô Semua objek terklasifikasi. Siap diselesaikan.</p>}
     </div>
   );
 }
@@ -459,7 +459,7 @@ function Matching({ leftItems, rightItems, userAnswer, setUserAnswer }) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-2">
-        <p className="text-xs font-bold text-stone-500 uppercase tracking-widest">» Hubungkan Konsep</p>
+        <p className="text-xs font-bold text-stone-500 uppercase tracking-widest">┬╗ Hubungkan Konsep</p>
         <span className="text-xs font-bold bg-white text-stone-600 px-3 py-1 rounded-full border border-stone-200 shadow-sm">
           {Object.keys(userAnswer).length}/{leftItems.length} TERHUBUNG
         </span>
@@ -507,9 +507,9 @@ function Matching({ leftItems, rightItems, userAnswer, setUserAnswer }) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 //  MAIN GAME LEVEL COMPONENT
-// ─────────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 export default function GameLevel() {
   const { level } = useParams();
   const lvl = parseInt(level, 10) || 1;
@@ -540,7 +540,7 @@ export default function GameLevel() {
   const [matchAns, setMatchAns]     = useState({});
   const [isNavigating, setIsNavigating] = useState(false);
 
-  // ── Load question & total levels ─────────────────────────
+  // ΓöÇΓöÇ Load question & total levels ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
   useEffect(() => {
     if (!student) return;
     
@@ -603,7 +603,7 @@ export default function GameLevel() {
       });
   }, [lvl, student]);
 
-  // ── Adaptive Mechanics Setup ─────────────────────────────
+  // ΓöÇΓöÇ Adaptive Mechanics Setup ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
   useEffect(() => {
     if (phase === 'GAME') {
       if (selectedSolver === 'ARKA') { setTimeLeft(180); setLives(999); }
@@ -613,7 +613,7 @@ export default function GameLevel() {
     }
   }, [phase, selectedSolver]);
 
-  // ── Timer ─────────────────────────────────────────────────
+  // ΓöÇΓöÇ Timer ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
   useEffect(() => {
     if (phase !== 'GAME' || submitted || gameOverRef.current) return;
     if ((lives <= 0 && selectedSolver !== 'ARKA') || timeLeft <= 0) {
@@ -624,13 +624,13 @@ export default function GameLevel() {
     return () => clearTimeout(id);
   }, [timeLeft, lives, phase, submitted, selectedSolver]);
 
-  // ── Dialog data ───────────────────────────────────────────
+  // ΓöÇΓöÇ Dialog data ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
   const introDialogs = storyData?.intro  || [];
   const outroDialogs = storyData?.outro  || [];
   const currentDialogs = phase === 'INTRO' ? introDialogs : (phase === 'OUTRO' ? outroDialogs : []);
   const curDialog = currentDialogs[dialogIdx] || null;
 
-  // ── Which characters are on stage ─────────────────────────
+  // ΓöÇΓöÇ Which characters are on stage ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
   const speakerKey = curDialog ? (curDialog.npcName || curDialog.speaker) : null;
 
   // Collect left and right characters from nearby dialogs
@@ -653,12 +653,12 @@ export default function GameLevel() {
       setPhase('PRE_GAME_ANIM'); 
       setTimeout(() => { setPhase('GAME'); setDialogIdx(0); }, 1500);
     } else if (phase === 'OUTRO') {
-      // Outro selesai → tampilkan layar Level Complete
+      // Outro selesai ΓåÆ tampilkan layar Level Complete
       setPhase('COMPLETE');
     }
   }, [dialogIdx, currentDialogs.length, phase]);
 
-  // ── Verify helpers ────────────────────────────────────────
+  // ΓöÇΓöÇ Verify helpers ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
   const getUserAnswer = () => {
     if (!question) return null;
     if (question.type === 'SEQUENCE') return seqAns;
@@ -738,7 +738,7 @@ export default function GameLevel() {
     else if (r > 0.15) { pts = 60; st = 2; } 
     else { pts = 40; st = 1; }
 
-    // ✅ BALANCED Character Impacts - All equal at ~1.3x bonus for fairness
+    // Γ£à BALANCED Character Impacts - All equal at ~1.3x bonus for fairness
     if (selectedSolver === 'ARKA') pts = Math.floor(pts * 1.3); // Speed bonus
     if (selectedSolver === 'NEXA') pts = Math.floor(pts * 1.3); // Precision bonus (same as Arka, different challenge)
     
@@ -786,7 +786,7 @@ export default function GameLevel() {
     }
   };
 
-  // ── Parse options ─────────────────────────────────────────
+  // ΓöÇΓöÇ Parse options ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
   let opts=[], cats=[], leftItems=[], rightItems=[];
   if (question) {
     try {
@@ -815,70 +815,45 @@ export default function GameLevel() {
   };
   const bgClass = getBgClass(lvl);
 
-  // ── Guards ────────────────────────────────────────────────
+  // ΓöÇΓöÇ Guards ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
   if (loading || loadingQ || !dataReady) {
     return (
-      <div className={`fixed inset-0 flex flex-col items-center justify-center font-sans city-bg ${bgClass}`}>
-        {/* Frosted overlay — tipis agar background city terlihat */}
-        <div className="absolute inset-0 bg-white/30 backdrop-blur-[3px]" />
-
-        {/* Glow ambient */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full pointer-events-none opacity-30 blur-3xl" style={{ background: 'radial-gradient(circle, #0ea5e9 0%, transparent 65%)' }} />
-
-        {/* Content — full width, vertically centered */}
-        <div className="relative z-10 flex flex-col items-center justify-center gap-10 w-full h-full px-8 py-16">
-
-          {/* Spinner block */}
-          <div className="flex flex-col items-center gap-6">
-            <div className="relative w-36 h-36 flex items-center justify-center">
-              <div className="absolute inset-0 rounded-full border-2 border-dashed border-white/30 animate-spin" style={{ animationDuration: '12s' }} />
-              <div className="absolute inset-3 rounded-full border-[3px] border-transparent border-t-sky-400 border-r-sky-300/50 animate-spin" style={{ animationDuration: '1.4s' }} />
-              <div className="absolute inset-8 rounded-full border-2 border-transparent border-t-amber-400 border-l-amber-300/40 animate-spin" style={{ animationDuration: '0.85s', animationDirection: 'reverse' }} />
-              {/* Glow core */}
-              <div className="absolute inset-[42px] rounded-full" style={{ background: 'radial-gradient(circle, rgba(14,165,233,0.25) 0%, transparent 70%)' }} />
-              <span className="text-5xl relative z-10" style={{ filter: 'drop-shadow(0 4px 16px rgba(14,165,233,0.7))' }}>⚡</span>
+      <div className="fixed inset-0 flex flex-col items-center justify-center font-sans" style={{ background: 'linear-gradient(135deg, #0a0a1a 0%, #12082a 50%, #0a1520 100%)' }}>
+        <div className="absolute inset-0" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px)', backgroundSize: '44px 44px' }} />
+        <div className="relative z-10 flex flex-col items-center gap-8 w-full max-w-sm px-8">
+          <div className="relative w-36 h-36 flex items-center justify-center">
+            <div className="absolute inset-0 rounded-full border border-dashed border-indigo-400/30 animate-spin" style={{ animationDuration: '12s' }} />
+            <div className="absolute inset-3 rounded-full border-[3px] border-transparent border-t-indigo-400 border-r-sky-400/60 animate-spin" style={{ animationDuration: '1.4s' }} />
+            <div className="absolute inset-8 rounded-full border-2 border-transparent border-t-white/70 animate-spin" style={{ animationDuration: '0.9s', animationDirection: 'reverse' }} />
+            <span className="text-5xl relative z-10" style={{ filter: 'drop-shadow(0 0 20px #6366f1) drop-shadow(0 0 40px #6366f180)' }}>ΓÜí</span>
+          </div>
+          <div className="text-center space-y-3">
+            <p className="text-[10px] font-black uppercase tracking-[0.5em] text-indigo-400/70">MEMUAT MISI</p>
+            <h2 className="text-3xl font-black text-white tracking-widest uppercase" style={{ textShadow: '0 0 30px rgba(99,102,241,0.8)' }}>MENYIAPKAN</h2>
+            <p className="text-indigo-300/60 text-xs font-bold uppercase tracking-[0.4em]">BAB {lvl}</p>
+          </div>
+          <div className="w-full space-y-2">
+            <div className="flex justify-between text-[10px] font-mono uppercase tracking-widest text-white/30">
+              <span>Memuat data...</span><span className="text-indigo-400">100%</span>
             </div>
-
-            {/* Text */}
-            <div className="text-center space-y-2">
-              <p className="text-[10px] font-black uppercase tracking-[0.5em] text-sky-600/80">MEMUAT MISI</p>
-              <h2 className="text-3xl font-black text-stone-800 drop-shadow-sm">
-                MENYIAPKAN <span className="text-sky-500">BAB {lvl}</span>
-              </h2>
-              <p className="text-stone-500/70 text-sm font-medium">Tunggu sebentar, sedang memuat data...</p>
+            <div className="w-full h-[3px] bg-white/10 rounded-full overflow-hidden">
+              <div className="h-full rounded-full animate-pulse" style={{ width: '65%', background: 'linear-gradient(90deg, #6366f1, #0ea5e9)', boxShadow: '0 0 12px #6366f1' }} />
             </div>
           </div>
-
-          {/* Progress card */}
-          <div className="w-full max-w-sm rounded-2xl px-7 py-5 space-y-3" style={{ background: 'rgba(255,255,255,0.72)', backdropFilter: 'blur(20px)', boxShadow: '0 8px 32px rgba(0,0,0,0.10), inset 0 1px 0 rgba(255,255,255,1)', border: '1px solid rgba(255,255,255,0.85)' }}>
-            <div className="flex justify-between text-[10px] font-mono tracking-widest text-stone-400 uppercase">
-              <span>Memuat data...</span>
-              <span className="text-sky-500 font-bold">Harap Tunggu</span>
-            </div>
-            <div className="w-full h-2 bg-stone-100 rounded-full overflow-hidden">
-              <div className="h-full rounded-full animate-pulse relative overflow-hidden" style={{ width: '55%', background: 'linear-gradient(90deg, #0ea5e9, #38bdf8, #0ea5e9)', boxShadow: '0 0 10px rgba(14,165,233,0.5)' }}>
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent" style={{ animation: 'shimmer 1.5s infinite' }} />
-              </div>
-            </div>
-            <p className="text-center text-[10px] text-stone-400 font-mono uppercase tracking-widest">Sistem sedang menyiapkan sesi belajar Anda</p>
-          </div>
-
+          <p className="text-white/20 text-[10px] font-mono uppercase tracking-[0.3em]">Tunggu sebentar...</p>
         </div>
       </div>
     );
   }
-
   if (!student) return <Navigate to="/register" replace />;
   if (!question) return (
-    <div className={`fixed inset-0 flex flex-col items-center justify-center font-sans city-bg ${bgClass}`}>
-      <div className="absolute inset-0 bg-white/45 backdrop-blur-sm" />
-      <div className="relative z-10 flex flex-col items-center gap-5 px-10 w-full max-w-sm">
-        <div className="text-7xl" style={{ filter: 'drop-shadow(0 4px 16px rgba(251,191,36,0.5))' }}>🗺️</div>
-        <div className="w-full rounded-2xl px-7 py-7 text-center space-y-4" style={{ background: 'rgba(255,255,255,0.72)', backdropFilter: 'blur(16px)', boxShadow: '0 8px 32px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.9)', border: '1px solid rgba(255,255,255,0.8)' }}>
-          <h2 className="text-xl font-black text-stone-800">Modul Tidak Ditemukan</h2>
-          <p className="text-stone-500 text-sm">Bab {lvl} belum tersedia di sistem.</p>
-          <button onClick={()=>navigate('/dashboard')} className="w-full py-3 rounded-xl font-bold text-white text-sm uppercase tracking-widest transition-all hover:scale-105 active:scale-95" style={{ background: 'linear-gradient(135deg, #0ea5e9, #6366f1)', boxShadow: '0 6px 20px rgba(14,165,233,0.4)' }}>KEMBALI KE PETA</button>
-        </div>
+    <div className="fixed inset-0 flex flex-col items-center justify-center font-sans" style={{ background: 'linear-gradient(135deg, #0a0a1a 0%, #12082a 50%, #0a1520 100%)' }}>
+      <div className="absolute inset-0" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)', backgroundSize: '44px 44px' }} />
+      <div className="relative z-10 text-center space-y-6 px-8 max-w-sm w-full">
+        <div className="text-7xl mx-auto" style={{ filter: 'drop-shadow(0 0 20px rgba(251,191,36,0.6))' }}>≡ƒù║∩╕Å</div>
+        <h2 className="text-2xl font-black text-white tracking-wide">Modul Tidak Ditemukan</h2>
+        <p className="text-white/40 text-sm">Bab {lvl} belum tersedia di sistem.</p>
+        <button onClick={()=>navigate('/dashboard')} className="w-full px-8 py-3 rounded-xl font-bold text-white text-sm uppercase tracking-widest transition-all hover:scale-105 active:scale-95" style={{ background: 'linear-gradient(135deg, #6366f1, #0ea5e9)', boxShadow: '0 8px 32px rgba(99,102,241,0.4)' }}>KEMBALI KE PETA</button>
       </div>
     </div>
   );
@@ -887,7 +862,7 @@ export default function GameLevel() {
     <>
     <div className={`min-h-screen w-full flex flex-col relative overflow-hidden text-stone-800 font-sans city-bg ${bgClass}`}>
 
-      {/* ── MODERN KODOMO CITY AMBIENT BACKGROUND OVERLAY ── */}
+      {/* ΓöÇΓöÇ MODERN KODOMO CITY AMBIENT BACKGROUND OVERLAY ΓöÇΓöÇ */}
       <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden bg-white/5 backdrop-blur-[2px]">
         {/* Soft lighting */}
         <div
@@ -895,97 +870,81 @@ export default function GameLevel() {
         />
       </div>
 
-      {/* ════════════════ PRE-GAME TRANSITION ANIMATION ════════════════ */}
+      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ PRE-GAME TRANSITION ANIMATION ΓÇö ULTRA PREMIUM ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
       <AnimatePresence>
         {phase === 'PRE_GAME_ANIM' && (
           <motion.div
-            key="pre-game-anim"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0, transition: { duration: 0.45 } }}
-            className={`city-bg ${bgClass}`}
-            style={{
-              position: 'fixed',
-              inset: 0,
-              zIndex: 200,
-              width: '100vw',
-              height: '100vh',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              overflow: 'hidden',
-            }}
+            exit={{ opacity: 0, scale: 1.04, transition: { duration: 0.65, ease: [0.4,0,0.2,1] } }}
+            className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden"
+            style={{ background: 'linear-gradient(135deg, rgba(5,5,20,0.97) 0%, rgba(15,10,40,0.97) 50%, rgba(5,20,30,0.97) 100%)', backdropFilter: 'blur(24px)' }}
           >
-            {/* — BG LAYERS (pointer-events:none, tidak ganggu centering) — */}
-            <div style={{ position:'absolute', inset:0, background:'rgba(255,255,255,0.32)', backdropFilter:'blur(4px)' }} />
-            <div style={{ position:'absolute', inset:0, opacity:0.06, backgroundImage:`linear-gradient(${scene.glow} 1px, transparent 1px), linear-gradient(90deg, ${scene.glow} 1px, transparent 1px)`, backgroundSize:'52px 52px' }} />
-            <motion.div animate={{ scale:[1,1.3,1], opacity:[0.22,0.48,0.22] }} transition={{ duration:5, repeat:Infinity, ease:'easeInOut' }} style={{ position:'absolute', top:'-10vh', left:'-10vw', width:'55vw', height:'55vw', maxWidth:600, maxHeight:600, borderRadius:'50%', background:`radial-gradient(circle, ${scene.glow}80 0%, transparent 65%)`, filter:'blur(70px)', pointerEvents:'none' }} />
-            <motion.div animate={{ scale:[1.2,0.85,1.2], opacity:[0.12,0.32,0.12] }} transition={{ duration:7, repeat:Infinity, ease:'easeInOut', delay:1.5 }} style={{ position:'absolute', bottom:'-8vh', right:'-8vw', width:'45vw', height:'45vw', maxWidth:500, maxHeight:500, borderRadius:'50%', background:`radial-gradient(circle, ${scene.glow}60 0%, transparent 70%)`, filter:'blur(60px)', pointerEvents:'none' }} />
+            {/* Grid */}
+            <div className="absolute inset-0" style={{ backgroundImage: `linear-gradient(${scene.glow}15 1px, transparent 1px), linear-gradient(90deg, ${scene.glow}15 1px, transparent 1px)`, backgroundSize: '48px 48px' }} />
+            {/* Mega glow */}
+            <motion.div animate={{ scale: [1,1.3,1], opacity:[0.12,0.3,0.12] }} transition={{ duration:5, repeat:Infinity, ease:'easeInOut' }} className="absolute w-[600px] h-[600px] rounded-full pointer-events-none" style={{ background:`radial-gradient(circle, ${scene.glow}50 0%, transparent 65%)`, filter:'blur(80px)' }} />
+            {/* Secondary glow */}
+            <motion.div animate={{ scale:[1.2,0.85,1.2], opacity:[0.08,0.22,0.08] }} transition={{ duration:7, repeat:Infinity, ease:'easeInOut', delay:1 }} className="absolute w-[380px] h-[380px] rounded-full pointer-events-none" style={{ background:'radial-gradient(circle, #6366f180 0%, transparent 70%)', filter:'blur(60px)', top:'25%', right:'15%' }} />
             {/* Floating particles */}
-            <div style={{ position:'absolute', inset:0, overflow:'hidden', pointerEvents:'none' }}>
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
               {[0,1,2,3,4,5,6,7].map(i => (
-                <motion.div key={i}
-                  initial={{ opacity:0, y:'110vh', x:`${5+i*12}vw` }}
-                  animate={{ opacity:[0,0.7,0.7,0], y:'-10vh' }}
-                  transition={{ delay:i*0.35, duration:4+i*0.5, repeat:Infinity, ease:'easeOut' }}
-                  style={{ position:'absolute', width:8, height:8, borderRadius:'50%', background:scene.glow, boxShadow:`0 0 8px ${scene.glow}, 0 0 16px ${scene.glow}80` }}
-                />
+                <motion.div key={i} initial={{ opacity:0, y:'110vh', x:`${8+i*12}vw` }} animate={{ opacity:[0,0.8,0.8,0], y:'-10vh' }} transition={{ delay:i*0.3, duration:5+i*0.5, repeat:Infinity, ease:'easeOut' }} className="absolute w-1.5 h-1.5 rounded-full" style={{ background:scene.glow, boxShadow:`0 0 10px ${scene.glow}, 0 0 20px ${scene.glow}60` }} />
               ))}
             </div>
-
-            {/* — CENTER CONTENT — guaranteed centered by parent flex — */}
+            {/* Card */}
             <motion.div
-              initial={{ scale:0.88, opacity:0, y:32 }}
+              initial={{ scale:0.88, opacity:0, y:28 }}
               animate={{ scale:1, opacity:1, y:0 }}
-              transition={{ duration:0.55, ease:[0.16,1,0.3,1] }}
-              style={{ position:'relative', zIndex:10, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:28, width:'100%', maxWidth:360, padding:'0 24px' }}
+              transition={{ duration:0.65, ease:[0.16,1,0.3,1] }}
+              className="relative z-10 flex flex-col items-center w-full max-w-sm px-8 py-4"
             >
-              {/* Orbiting rings */}
-              <div style={{ position:'relative', width:160, height:160, flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
-                <motion.div animate={{ rotate:-360 }} transition={{ duration:14, repeat:Infinity, ease:'linear' }} style={{ position:'absolute', inset:0, borderRadius:'50%', border:`2px dashed ${scene.glow}40` }} />
-                <motion.div animate={{ rotate:360 }} transition={{ duration:3, repeat:Infinity, ease:'linear' }} style={{ position:'absolute', inset:16, borderRadius:'50%', borderWidth:3, borderStyle:'solid', borderColor:'transparent', borderTopColor:scene.glow, borderRightColor:`${scene.glow}60`, boxShadow:`0 0 20px ${scene.glow}60` }} />
-                <motion.div animate={{ rotate:-360 }} transition={{ duration:1.8, repeat:Infinity, ease:'linear' }} style={{ position:'absolute', inset:40, borderRadius:'50%', borderWidth:2, borderStyle:'solid', borderColor:'transparent', borderTopColor:scene.glow, borderLeftColor:`${scene.glow}40` }} />
-                <div style={{ position:'absolute', inset:52, borderRadius:'50%', background:`radial-gradient(circle, ${scene.glow}30 0%, transparent 70%)` }} />
-                <motion.div animate={{ scale:[0.9,1.1,0.9] }} transition={{ duration:2.5, repeat:Infinity, ease:'easeInOut' }} style={{ fontSize:52, lineHeight:1, position:'relative', zIndex:1, filter:`drop-shadow(0 4px 14px ${scene.glow}90)` }}>
+              {/* Orbiting rings + icon */}
+              <div className="relative w-40 h-40 flex items-center justify-center mb-8 flex-shrink-0">
+                <motion.div animate={{ rotate:-360 }} transition={{ duration:14, repeat:Infinity, ease:'linear' }} className="absolute inset-0 rounded-full border border-dashed" style={{ borderColor:`${scene.glow}50` }} />
+                <motion.div animate={{ rotate:360 }} transition={{ duration:3, repeat:Infinity, ease:'linear' }} className="absolute inset-[14px] rounded-full" style={{ borderWidth:'3px', borderStyle:'solid', borderColor:'transparent', borderTopColor:scene.glow, borderRightColor:`${scene.glow}60`, boxShadow:`0 0 20px ${scene.glow}50` }} />
+                <motion.div animate={{ rotate:-360 }} transition={{ duration:1.8, repeat:Infinity, ease:'linear' }} className="absolute inset-[34px] rounded-full" style={{ borderWidth:'2px', borderStyle:'solid', borderColor:'transparent', borderTopColor:'rgba(255,255,255,0.8)', borderLeftColor:'rgba(255,255,255,0.3)' }} />
+                <motion.div animate={{ scale:[0.9,1.1,0.9] }} transition={{ duration:2.5, repeat:Infinity, ease:'easeInOut' }} className="text-5xl relative z-10" style={{ filter:`drop-shadow(0 0 16px ${scene.glow}) drop-shadow(0 0 32px ${scene.glow}70)` }}>
                   {question?.level_emoji || scene.icon}
                 </motion.div>
               </div>
 
-              {/* Text */}
-              <motion.div initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.2 }} style={{ textAlign:'center' }}>
-                <p style={{ fontSize:10, fontWeight:900, letterSpacing:'0.5em', textTransform:'uppercase', color:scene.glow, marginBottom:6 }}>PROBLEM SOLVING PROTOCOL</p>
-                <h2 style={{ fontSize:'clamp(28px, 6vw, 40px)', fontWeight:900, color:'#1c1917', lineHeight:1.15, marginBottom:8, textShadow:'0 1px 4px rgba(0,0,0,0.06)' }}>SIAP<br/>BERTARUNG!</h2>
-                <div style={{ display:'flex', flexWrap:'wrap', alignItems:'center', justifyContent:'center', gap:'6px 8px' }}>
-                  <span style={{ fontSize:11, fontWeight:700, color:'#78716c', textTransform:'uppercase', letterSpacing:'0.1em' }}>BAB {lvl}</span>
-                  <span style={{ width:4, height:4, borderRadius:'50%', background:scene.glow, display:'inline-block' }} />
-                  <span style={{ fontSize:11, fontWeight:700, color:scene.glow, textTransform:'uppercase', letterSpacing:'0.1em' }}>{scene.label}</span>
-                  <span style={{ width:4, height:4, borderRadius:'50%', background:scene.glow, display:'inline-block' }} />
-                  <span style={{ fontSize:11, fontWeight:700, color:'#78716c', textTransform:'uppercase', letterSpacing:'0.1em' }}>{lvl>=7?'🔥 HARD':lvl>=4?'⭐ MEDIUM':'💚 EASY'}</span>
+              {/* Text block */}
+              <motion.div initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.2, duration:0.55 }} className="text-center w-full space-y-3">
+                <p className="text-[10px] font-black uppercase tracking-[0.5em]" style={{ color:`${scene.glow}` }}>PROBLEM SOLVING PROTOCOL</p>
+                <h2 className="text-4xl font-black text-white leading-tight" style={{ textShadow:`0 2px 20px ${scene.glow}60, 0 4px 40px rgba(0,0,0,0.6)` }}>SIAP<br/>BERTARUNG</h2>
+                <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 pt-1">
+                  <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest">BAB {lvl}</span>
+                  <span className="w-1 h-1 rounded-full bg-white/30" />
+                  <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color:scene.glow }}>{scene.label}</span>
+                  <span className="w-1 h-1 rounded-full bg-white/30" />
+                  <span className="text-[11px] font-bold text-white/40 uppercase tracking-widest">{lvl>=7?'≡ƒöÑ HARD':lvl>=4?'Γ¡É MEDIUM':'≡ƒÆÜ EASY'}</span>
                 </div>
               </motion.div>
 
-              {/* Progress card */}
-              <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.3 }} style={{ width:'100%', borderRadius:16, padding:'18px 22px', background:'rgba(255,255,255,0.80)', backdropFilter:'blur(20px)', boxShadow:`0 8px 32px rgba(0,0,0,0.10), 0 0 0 1px rgba(255,255,255,0.9)` }}>
-                <div style={{ height:3, borderRadius:4, marginBottom:12, background:`linear-gradient(90deg, ${scene.glow}, ${scene.glow}80, ${scene.glow})` }} />
-                <div style={{ display:'flex', justifyContent:'space-between', fontSize:10, fontFamily:'monospace', textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:8, color:'#a8a29e' }}>
-                  <span>Memuat soal...</span>
-                  <motion.span style={{ color:scene.glow, fontWeight:700 }} animate={{ opacity:[0.5,1,0.5] }} transition={{ duration:1.5, repeat:Infinity }}>Siap!</motion.span>
+              {/* Progress bar */}
+              <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.3 }} className="w-full mt-10 space-y-2">
+                <div className="flex justify-between text-[10px] font-mono uppercase tracking-widest">
+                  <span className="text-white/30">Memuat soal...</span>
+                  <motion.span style={{ color:scene.glow }} animate={{ opacity:[0.5,1,0.5] }} transition={{ duration:1.5, repeat:Infinity }}>100%</motion.span>
                 </div>
-                <div style={{ width:'100%', height:8, background:'#f5f5f4', borderRadius:8, overflow:'hidden' }}>
-                  <motion.div initial={{ width:0 }} animate={{ width:'100%' }} transition={{ duration:3.2, ease:'easeInOut', delay:0.1 }} style={{ height:'100%', borderRadius:8, position:'relative', overflow:'hidden', background:`linear-gradient(90deg, ${scene.glow}, ${scene.glow}cc)`, boxShadow:`0 0 10px ${scene.glow}80` }}>
-                    <motion.div animate={{ x:['-100%','200%'] }} transition={{ duration:1.1, repeat:Infinity, ease:'easeInOut', delay:0.4 }} style={{ position:'absolute', inset:0, background:'linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent)' }} />
+                <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
+                  <motion.div
+                    initial={{ width:0 }}
+                    animate={{ width:'100%' }}
+                    transition={{ duration:3.2, ease:'easeInOut', delay:0.1 }}
+                    className="h-full rounded-full relative overflow-hidden"
+                    style={{ background:`linear-gradient(90deg, ${scene.glow}, #ffffff88, ${scene.glow})`, boxShadow:`0 0 12px ${scene.glow}` }}
+                  >
+                    <motion.div animate={{ x:['-100%','200%'] }} transition={{ duration:1.1, repeat:Infinity, ease:'easeInOut', delay:0.4 }} className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
                   </motion.div>
                 </div>
               </motion.div>
 
               {/* Bouncing dots */}
-              <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.45 }} style={{ display:'flex', gap:10 }}>
+              <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.45 }} className="flex gap-3 mt-8">
                 {[0,1,2,3].map(i => (
-                  <motion.div key={i}
-                    animate={{ y:[0,-10,0], opacity:[0.35,1,0.35] }}
-                    transition={{ duration:0.85, delay:i*0.18, repeat:Infinity, ease:'easeInOut' }}
-                    style={{ width:10, height:10, borderRadius:'50%', background:i%2===0?scene.glow:'rgba(0,0,0,0.12)', boxShadow:i%2===0?`0 0 8px ${scene.glow}`:undefined }}
-                  />
+                  <motion.div key={i} animate={{ y:[0,-10,0], opacity:[0.3,1,0.3] }} transition={{ duration:0.9, delay:i*0.18, repeat:Infinity, ease:'easeInOut' }} className="w-2.5 h-2.5 rounded-full" style={{ background:i%2===0?scene.glow:'rgba(255,255,255,0.4)', boxShadow:i%2===0?`0 0 8px ${scene.glow}`:undefined }} />
                 ))}
               </motion.div>
             </motion.div>
@@ -993,7 +952,8 @@ export default function GameLevel() {
         )}
       </AnimatePresence>
 
-            {/* ════════════════ VN PHASE (INTRO / OUTRO) ════════════════ */}
+
+      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ VN PHASE (INTRO / OUTRO) ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
       {(phase === 'INTRO' || phase === 'OUTRO') && (
         <>
           {/* Kodomo-style VN Header */}
@@ -1011,7 +971,7 @@ export default function GameLevel() {
             {phase === 'INTRO' && (
               <button onClick={() => { setPhase('PRE_GAME_ANIM'); setTimeout(()=>setPhase('GAME'), 1500); setDialogIdx(0); }}
                 className="group flex items-center gap-2 text-xs font-bold text-sky-600 border border-sky-300 bg-white/80 backdrop-blur-md px-4 py-2 rounded-full hover:bg-sky-50 hover:border-sky-400 transition-all shadow-sm">
-                Lewati Cerita <span className="group-hover:translate-x-1 transition-transform">▶▶</span>
+                Lewati Cerita <span className="group-hover:translate-x-1 transition-transform">Γû╢Γû╢</span>
               </button>
             )}
           </div>
@@ -1079,14 +1039,14 @@ export default function GameLevel() {
         </>
       )}
 
-      {/* ════════════════ GAME PHASE ════════════════ */}
+      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ GAME PHASE ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
       {phase === 'GAME' && (
         <div className="flex-1 flex flex-col relative z-20 h-screen overflow-hidden">
           {/* Ghibli HUD Header */}
           <header className="bg-white/80 backdrop-blur-md border-b border-stone-200 px-4 sm:px-8 py-3 flex justify-between items-center z-30 shrink-0 shadow-sm">
             <div className="flex items-center gap-4 sm:gap-6">
               <button onClick={() => navigate('/dashboard')} className="group flex items-center justify-center w-10 h-10 rounded-full border border-stone-200 bg-stone-50 hover:bg-stone-100 transition-colors shadow-sm text-stone-500 hover:text-stone-700">
-                <span className="group-hover:-translate-x-0.5 transform block">◁</span>
+                <span className="group-hover:-translate-x-0.5 transform block">Γùü</span>
               </button>
               
               <div className="hidden sm:block h-8 w-px bg-stone-300" />
@@ -1114,7 +1074,7 @@ export default function GameLevel() {
                     }`} 
                   />
                 ))}
-                {selectedSolver === 'ARKA' && <span className="text-blue-500 font-bold ml-1 text-sm">∞</span>}
+                {selectedSolver === 'ARKA' && <span className="text-blue-500 font-bold ml-1 text-sm">Γê₧</span>}
               </div>
               
               <div className="flex flex-col items-end">
@@ -1201,7 +1161,7 @@ export default function GameLevel() {
         </div>
       )}
 
-      {/* ════════════════ LEVEL COMPLETE SCREEN ════════════════ */}
+      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ LEVEL COMPLETE SCREEN ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
       <AnimatePresence>
         {phase === 'COMPLETE' && winData && (
           <motion.div
@@ -1224,7 +1184,7 @@ export default function GameLevel() {
                 transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
                 className="text-7xl md:text-8xl mb-4 select-none drop-shadow-xl"
               >
-                🏆
+                ≡ƒÅå
               </motion.div>
 
               {/* Title */}
@@ -1236,7 +1196,7 @@ export default function GameLevel() {
               >
                 LEVEL SELESAI
               </motion.h1>
-              <p className="text-amber-800 font-bold mb-8">Bab {lvl} — Misi Berhasil</p>
+              <p className="text-amber-800 font-bold mb-8">Bab {lvl} ΓÇö Misi Berhasil</p>
 
               {/* Stars */}
               <div className="flex justify-center gap-3 mb-6">
@@ -1248,7 +1208,7 @@ export default function GameLevel() {
                     transition={{ delay: 0.35 + i * 0.18, type: 'spring', stiffness: 200 }}
                     className="text-4xl md:text-5xl drop-shadow-md"
                   >
-                    {i < winData.bintang ? '⭐' : '☆'}
+                    {i < winData.bintang ? 'Γ¡É' : 'Γÿå'}
                   </motion.div>
                 ))}
               </div>
@@ -1319,7 +1279,7 @@ export default function GameLevel() {
                     ) : (
                       <>
                         <span>Next Level</span>
-                        <span className="text-xl">▶</span>
+                        <span className="text-xl">Γû╢</span>
                       </>
                     )}
                   </motion.button>
@@ -1338,8 +1298,8 @@ export default function GameLevel() {
                   disabled={isNavigating}
                   className="flex-1 py-5 rounded-xl font-black text-lg uppercase tracking-widest border-2 border-stone-300 bg-white hover:bg-stone-50 text-stone-700 hover:text-stone-900 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                 >
-                  <span>◁</span>
-                  <span>{(lvl >= (totalLevels || 10)) ? 'Selesai 🎉' : 'Dashboard'}</span>
+                  <span>Γùü</span>
+                  <span>{(lvl >= (totalLevels || 10)) ? 'Selesai ≡ƒÄë' : 'Dashboard'}</span>
                 </motion.button>
               </motion.div>
             </motion.div>
@@ -1349,7 +1309,7 @@ export default function GameLevel() {
 
     </div>
 
-    {/* ════════════════ TERMINAL FEEDBACK OVERLAY (Fixed to Viewport) ════════════════ */}
+    {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ TERMINAL FEEDBACK OVERLAY (Fixed to Viewport) ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
     <AnimatePresence>
       {feedback && (
         <motion.div 
@@ -1377,7 +1337,7 @@ export default function GameLevel() {
                     : 'bg-rose-100 text-rose-600 hover:bg-rose-200'
                 }`}
               >
-                ✕
+                Γ£ò
               </motion.button>
               
               {/* Top accent bar */}
@@ -1394,7 +1354,7 @@ export default function GameLevel() {
                       ? 'bg-emerald-50 border-emerald-200 text-emerald-500' 
                       : 'bg-rose-50 border-rose-200 text-rose-500'
                   }`}>
-                  {feedback.type==='success'?'✓':'✕'}
+                  {feedback.type==='success'?'Γ£ô':'Γ£ò'}
                 </motion.div>
                 
                 {/* Main Title */}
@@ -1451,7 +1411,7 @@ export default function GameLevel() {
                         }}
                         className="flex-1 py-4 rounded-xl font-bold text-base uppercase tracking-wide border-2 transition-all shadow-lg flex items-center justify-center gap-2 bg-gradient-to-br from-emerald-400 to-emerald-500 border-emerald-600 text-white hover:shadow-xl active:shadow-md"
                       >
-                        <span>▶ Lanjut Level</span>
+                        <span>Γû╢ Lanjut Level</span>
                       </motion.button>
                     )}
                     <motion.button
@@ -1467,7 +1427,7 @@ export default function GameLevel() {
                       }}
                       className="flex-1 py-4 rounded-xl font-bold text-base uppercase tracking-wide border-2 border-stone-300 bg-white hover:bg-stone-50 text-stone-700 hover:text-stone-900 transition-all flex items-center justify-center gap-2 shadow-md hover:shadow-lg active:shadow-sm"
                     >
-                      <span>◁ {lvl >= (totalLevels || 10) ? 'Selesai' : 'Dashboard'}</span>
+                      <span>Γùü {lvl >= (totalLevels || 10) ? 'Selesai' : 'Dashboard'}</span>
                     </motion.button>
                   </motion.div>
                 )}
@@ -1486,7 +1446,7 @@ export default function GameLevel() {
                       onClick={() => setFeedback(null)}
                       className="flex-1 py-4 rounded-xl font-bold text-base uppercase tracking-wide border-2 transition-all shadow-lg flex items-center justify-center gap-2 bg-gradient-to-br from-rose-400 to-rose-500 border-rose-600 text-white hover:shadow-xl active:shadow-md"
                     >
-                      <span>↻ Coba Lagi</span>
+                      <span>Γå╗ Coba Lagi</span>
                     </motion.button>
                     <motion.button
                       whileHover={{ scale: 1.05, y: -2 }}
@@ -1497,7 +1457,7 @@ export default function GameLevel() {
                       }}
                       className="flex-1 py-4 rounded-xl font-bold text-base uppercase tracking-wide border-2 border-stone-300 bg-white hover:bg-stone-50 text-stone-700 hover:text-stone-900 transition-all flex items-center justify-center gap-2 shadow-md hover:shadow-lg active:shadow-sm"
                     >
-                      <span>◁ Dashboard</span>
+                      <span>Γùü Dashboard</span>
                     </motion.button>
                   </motion.div>
                 )}
