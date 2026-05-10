@@ -290,17 +290,25 @@ export default function DashboardGuru() {
           </div>
         </motion.div>
 
-        {/* TABS */}
-        <div className="flex flex-wrap gap-4 mb-8">
+        {/* TABS & ACTIONS */}
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+          <div className="flex flex-wrap gap-4">
+            <button 
+              onClick={() => setActiveTab('siswa')}
+              className={`px-8 py-4 rounded-2xl font-bold transition-all text-sm md:text-base border ${activeTab === 'siswa' ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/20 border-blue-600' : 'bg-white text-stone-600 hover:bg-stone-50 border-stone-200 shadow-sm'}`}>
+              Data Murid & Hasil
+            </button>
+            <button 
+              onClick={() => setActiveTab('soal')}
+              className={`px-8 py-4 rounded-2xl font-bold transition-all text-sm md:text-base border ${activeTab === 'soal' ? 'bg-amber-500 text-white shadow-xl shadow-amber-500/20 border-amber-500' : 'bg-white text-stone-600 hover:bg-amber-50 border-stone-200 shadow-sm'}`}>
+              Kelola Bank Soal
+            </button>
+          </div>
+          
           <button 
-            onClick={() => setActiveTab('siswa')}
-            className={`px-8 py-4 rounded-2xl font-bold transition-all text-sm md:text-base border ${activeTab === 'siswa' ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/20 border-blue-600' : 'bg-white text-stone-600 hover:bg-stone-50 border-stone-200 shadow-sm'}`}>
-            Data Murid & Hasil
-          </button>
-          <button 
-            onClick={() => setActiveTab('soal')}
-            className={`px-8 py-4 rounded-2xl font-bold transition-all text-sm md:text-base border ${activeTab === 'soal' ? 'bg-amber-500 text-white shadow-xl shadow-amber-500/20 border-amber-500' : 'bg-white text-stone-600 hover:bg-amber-50 border-stone-200 shadow-sm'}`}>
-            Kelola Bank Soal
+            onClick={() => window.open('/admin/leaderboard', '_blank')}
+            className="px-6 py-4 rounded-2xl font-black transition-all text-sm md:text-base border bg-gradient-to-r from-emerald-400 to-teal-500 text-white border-transparent shadow-lg hover:shadow-emerald-500/30 hover:scale-105 flex items-center gap-2">
+            <span>📺 Buka Layar Proyeksi (Leaderboard)</span>
           </button>
         </div>
 

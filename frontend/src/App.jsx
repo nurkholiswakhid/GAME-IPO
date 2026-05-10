@@ -12,6 +12,7 @@ import GameLevel from './pages/GameLevel';
 import Leaderboard from './pages/Leaderboard';
 import LoginGuru from './pages/LoginGuru';
 import DashboardGuru from './pages/DashboardGuru';
+import LeaderboardGuru from './pages/LeaderboardGuru';
 
 // Helper ScrollToTop (Memperbaiki posisi scroll saat navigasi pindah halaman)
 function ScrollToTop() {
@@ -292,6 +293,7 @@ export default function App() {
           {/* Area Guru */}
           <Route path="/login-guru" element={<LoginGuru />} />
           <Route path="/admin" element={<DashboardGuru />} />
+          <Route path="/admin/leaderboard" element={<LeaderboardGuru />} />
 
           {/* Fallback 404 Route */}
           <Route path="*" element={<NotFound />} />
