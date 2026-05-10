@@ -535,6 +535,10 @@ export default function GameLevel() {
   const [totalLevels, setTotalLevels] = useState(null);
   const [hintsUsed, setHintsUsed]   = useState(0);
   const gameOverRef                 = useRef(false);
+  const correctAnswerRef            = useRef(false); // Lock: cegah double-trigger jawaban benar
+  const capturedTimeRef             = useRef(300);   // Snapshot timeLeft saat jawaban benar
+  const capturedWrongRef            = useRef(0);     // Snapshot wrongCount saat jawaban benar
+  const dbSavePromiseRef            = useRef(null);  // Promise DB save — ditunggu saat outro selesai
 
   const [seqAns, setSeqAns]         = useState([]);
   const [classAns, setClassAns]     = useState({});
@@ -543,10 +547,25 @@ export default function GameLevel() {
   const [showGameOverPopup, setShowGameOverPopup] = useState(false);
 
   // ── Load question & total levels ─────────────────────────
+  // prevLvlRef: deteksi apakah trigger karena lvl berubah atau hanya student berubah
+  const prevLvlRef = useRef(null);
   useEffect(() => {
     if (!student) return;
-    
-    // Reset all game states when level changes
+
+    const lvlChanged = prevLvlRef.current !== lvl;
+    prevLvlRef.current = lvl;
+
+    // GUARD: Hanya skip jika student berubah (bukan lvl) dan game sedang outro/complete
+    // Ini mencegah refreshStudentData() men-trigger reset saat outro masih berjalan
+    if (!lvlChanged && correctAnswerRef.current) return;
+
+    // Jika lvl berubah (navigasi ke level baru), selalu reset semua state
+    if (lvlChanged) {
+      correctAnswerRef.current = false;
+      dbSavePromiseRef.current  = null;
+    }
+
+    // Reset all game states
     setLoadingQ(true);
     setDataReady(false);
     setPhase('INTRO');
@@ -563,6 +582,10 @@ export default function GameLevel() {
     setHintsUsed(0);
     setIsNavigating(false);
     gameOverRef.current = false;
+    correctAnswerRef.current = false;
+    capturedTimeRef.current  = 300;
+    capturedWrongRef.current = 0;
+    dbSavePromiseRef.current = null;
     
     // Fetch total levels count with retries
     const fetchLevelCount = async () => {
@@ -662,13 +685,26 @@ export default function GameLevel() {
     if (dialogIdx + 1 < currentDialogs.length) {
       setDialogIdx(i => i + 1);
     } else if (phase === 'INTRO') {
-      setPhase('PRE_GAME_ANIM'); 
+      setPhase('PRE_GAME_ANIM');
       setTimeout(() => { setPhase('GAME'); setDialogIdx(0); }, 1500);
     } else if (phase === 'OUTRO') {
-      // Outro selesai → tampilkan layar Level Complete
-      setPhase('COMPLETE');
+      // Outro selesai — tunggu DB save selesai dulu, lalu refresh data & tampilkan COMPLETE
+      const doFinish = async () => {
+        try {
+          // Tunggu DB save yang dimulai di handleLevelComplete
+          if (dbSavePromiseRef.current) {
+            await dbSavePromiseRef.current;
+          }
+        } catch (e) {
+          console.warn('DB save error saat outro selesai:', e.message);
+        }
+        // Refresh data siswa → level berikutnya terbuka
+        await refreshStudentData();
+        setPhase('COMPLETE');
+      };
+      doFinish();
     }
-  }, [dialogIdx, currentDialogs.length, phase]);
+  }, [dialogIdx, currentDialogs.length, phase, refreshStudentData]);
 
   // ── Verify helpers ────────────────────────────────────────
   const getUserAnswer = () => {
@@ -691,17 +727,24 @@ export default function GameLevel() {
   };
 
   const processAnswer = (ans) => {
-    if (submitted) return;
+    // Ref-based lock — cegah double-trigger (state React async tidak reliable di closure)
+    if (correctAnswerRef.current || gameOverRef.current) return;
     const ok = verifyAnswer(question.type, question.correct_config, ans);
     if (ok) {
-      // Segera tandai gameOverRef agar timer tidak memicu game over saat menunggu
-      gameOverRef.current = true;
+      // LOCK SEGERA — sinkron, sebelum React re-render apapun
+      correctAnswerRef.current = true;
+      gameOverRef.current = true; // Hentikan timer seketika
+
+      // Snapshot nilai tepat saat jawaban benar (hindari stale closure)
+      capturedTimeRef.current  = timeLeft;
+      capturedWrongRef.current = wrongCount;
+
+      // Feedback singkat 1.2 detik, lalu langsung Outro → Complete
       setFeedback({ type: 'success', text: 'KERJA BAGUS!', explanation: question.explanation });
-      // Setelah 2 detik, hilangkan feedback → masuk Outro VN → popup berhasil
       setTimeout(() => {
         setFeedback(null);
         handleLevelComplete();
-      }, 2000);
+      }, 1200);
     } else {
       let nl = lives;
       nl -= 1;
@@ -748,59 +791,63 @@ export default function GameLevel() {
   };
 
   const handleLevelComplete = async () => {
+    // Guard secondary — ref sudah handle primary lock di processAnswer
     if (submitted) return;
     setSubmitted(true);
 
-    // ── Bintang berdasarkan jumlah kesalahan ────────────────
-    // 0 salah → 3★, 1 salah → 2★, 2 salah → 1★
-    const st = Math.max(0, 3 - wrongCount);
+    // Gunakan nilai snapshot (diambil saat jawaban benar, sebelum async apapun)
+    const snapshotWrong  = capturedWrongRef.current;
+    const snapshotTime   = capturedTimeRef.current;
+    const elapsedSeconds = 300 - snapshotTime;
+    const st             = Math.max(0, 3 - snapshotWrong);
 
-    // ── XP = star_xp + timer_xp ─────────────────────────────
-    const starXPMap = { 3: 50, 2: 30, 1: 10, 0: 0 };
-    const starXP = starXPMap[st] || 0;
-    const elapsedSeconds = 300 - timeLeft;
-    const timerXP = getTimerXP(elapsedSeconds);
-    const totalXP = starXP + timerXP;
+    const starXPMap  = { 3: 50, 2: 30, 1: 10, 0: 0 };
+    const starXP     = starXPMap[st] || 0;
+    const timerXP    = getTimerXP(elapsedSeconds);
+    const totalXP    = starXP + timerXP;
+    const pendingWin = { bintang: st, starXP, timerXP, totalXP, wrongCount: snapshotWrong, elapsedSeconds };
 
-    let success = false;
-    try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/results`, {
-        session_id: student.session_id, 
-        level_number: lvl,
-        poin: totalXP, 
-        bintang: st, 
-        waktu_detik: elapsedSeconds, 
-        is_complete: true, 
-        attempts: 1,
-        wrong_count: wrongCount
-      }, { timeout: 10000 });
-      
-      if (res.status === 201 || res.data?.message) {
-        console.log(`Level ${lvl} result saved — ${st}★, XP: ${starXP}+${timerXP}=${totalXP}`);
-        success = true;
-        await new Promise(r => setTimeout(r, 100));
-        await refreshStudentData();
+    const outroDialogs = storyData?.outro || [];
+
+    if (outroDialogs.length > 0) {
+      // ── Tampilkan OUTRO dulu, simpan DB di background ────
+      setWinData(pendingWin);
+      setDialogIdx(0);
+      setPhase('OUTRO'); // Langsung pindah ke VN outro
+
+      // Simpan ke DB — simpan promise ke ref agar handleDialogNext bisa menunggu
+      dbSavePromiseRef.current = axios.post(`${import.meta.env.VITE_API_URL}/api/results`, {
+        session_id: student.session_id, level_number: lvl,
+        poin: totalXP, bintang: st, waktu_detik: elapsedSeconds,
+        is_complete: true, attempts: 1, wrong_count: snapshotWrong
+      }, { timeout: 10000 })
+        .then(res => {
+          if (res.status === 201 || res.data?.message) {
+            console.log(`Level ${lvl} saved — ${st}★, XP: ${totalXP}`);
+          }
+          return res;
+        })
+        .catch(e => { console.error('Save failed (background):', e.message); throw e; });
+    } else {
+      // ── Tidak ada outro: simpan dulu, baru tampilkan popup ─
+      try {
+        const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/results`, {
+          session_id: student.session_id, level_number: lvl,
+          poin: totalXP, bintang: st, waktu_detik: elapsedSeconds,
+          is_complete: true, attempts: 1, wrong_count: snapshotWrong
+        }, { timeout: 10000 });
+        if (res.status === 201 || res.data?.message) {
+          await refreshStudentData();
+        }
+      } catch (e) {
+        console.error('Failed to submit result:', e.message);
+        setSubmitted(false);
+        correctAnswerRef.current = false;
+        setFeedback({ type: 'error', text: 'SAVE_FAILED: Network error', explanation: 'Level result could not be saved.' });
+        return;
       }
-    } catch (e) { 
-      console.error('Failed to submit level result:', e.message); 
-      setSubmitted(false);
-      setFeedback({ type: 'error', text: 'SAVE_FAILED: Network error', explanation: 'Level result could not be saved. Please try again.' });
-      return;
-    }
-    
-    if (success) {
-      setWinData({ bintang: st, starXP, timerXP, totalXP, wrongCount, elapsedSeconds });
-      const outroDialogs = storyData?.outro || [];
-      if (outroDialogs.length > 0) {
-        // Reset dialog index dulu, lalu transisi ke OUTRO di tick berikutnya
-        setDialogIdx(0);
-        // Delay singkat agar React commit dialogIdx=0 sebelum OUTRO render
-        setTimeout(() => {
-          setPhase('OUTRO');
-        }, 50);
-      } else {
-        setPhase('COMPLETE');
-      }
+      setWinData(pendingWin);
+      setPhase('COMPLETE');
     }
   };
 
@@ -1226,169 +1273,161 @@ export default function GameLevel() {
         </div>
       )}
 
-      {/* ════════════════ LEVEL COMPLETE SCREEN ════════════════ */}
+      {/* ════════════════ LEVEL COMPLETE — POPUP CARD ════════════════ */}
       <AnimatePresence>
         {phase === 'COMPLETE' && winData && (
           <motion.div
+            key="complete-popup-container"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] flex items-center justify-center p-4 overflow-auto city-bg"
+            exit={{ opacity: 0, transition: { duration: 0.4 } }}
+            className={`fixed inset-0 z-[300] flex justify-center p-4 sm:p-6 overflow-y-auto font-sans city-bg ${bgClass}`}
           >
-            <div className="absolute inset-0 bg-white/50 pointer-events-none" />
+            {/* Full screen dark blur overlay */}
+            <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md pointer-events-none" />
+            
+            {/* Confetti (Di luar popup agar meriah di seluruh layar) */}
+            <div className="fixed top-0 w-full pointer-events-none z-0">
+              {[...Array(24)].map((_, i) => (
+                <motion.div key={i}
+                  className="absolute top-0 rounded-sm"
+                  style={{ left: `${(i / 23) * 100}%`, width: 8 + (i%3)*4, height: 8 + (i%3)*4,
+                    background: ['#FFD166','#EF476F','#06D6A0','#A29BFE', scene.glow || '#FFD166'][i % 5] }}
+                  initial={{ y: -20, rotate: 0, opacity: 1 }}
+                  animate={{ y: '110vh', rotate: 720*(i%2?1:-1), opacity:[1,1,0] }}
+                  transition={{ duration: 4 + (i%3)*1.2, delay: i*0.07, ease:'easeOut' }}
+                />
+              ))}
+            </div>
 
+            {/* POPUP CARD */}
             <motion.div
               initial={{ scale: 0.85, y: 30, opacity: 0 }}
               animate={{ scale: 1, y: 0, opacity: 1 }}
-              transition={{ type: 'spring', stiffness: 180, damping: 20, delay: 0.1 }}
-              className="relative z-10 w-full max-w-lg text-center font-sans"
+              exit={{ scale: 0.85, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              className="relative m-auto z-10 w-full max-w-lg bg-white rounded-[2rem] p-8 md:p-10 text-center shadow-2xl border-4 overflow-hidden"
+              style={{ borderColor: winData.bintang === 3 ? '#A7F3D0' : winData.bintang === 2 ? '#FDE68A' : '#FECDD3' }}
             >
-              {/* Trophy Icon */}
-              <motion.div
-                animate={{ rotate: [-5, 5, -5], y: [0, -8, 0] }}
-                transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-                className="text-7xl md:text-8xl mb-4 select-none drop-shadow-xl"
-              >
-                🏆
-              </motion.div>
+              {/* Top accent bar */}
+              <div className="absolute top-0 left-0 w-full h-3" 
+                   style={{ background: winData.bintang === 3 ? 'linear-gradient(90deg, #34D399, #10B981)' : winData.bintang === 2 ? 'linear-gradient(90deg, #FCD34D, #F59E0B)' : 'linear-gradient(90deg, #FB7185, #E11D48)' }} />
 
-              {/* Title */}
-              <motion.h1
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.25 }}
-                className="text-4xl md:text-5xl font-serif font-black tracking-wide uppercase mb-1 text-amber-600"
-              >
-                LEVEL SELESAI
-              </motion.h1>
-              <p className="text-amber-800 font-bold mb-8">Bab {lvl} — Misi Berhasil</p>
+              {/* Ambient inner glow */}
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[300px] h-[300px] rounded-full blur-3xl opacity-20 pointer-events-none"
+                   style={{ background: winData.bintang === 3 ? '#10B981' : winData.bintang === 2 ? '#F59E0B' : '#E11D48' }} />
 
-              {/* Stars */}
-              <div className="flex justify-center gap-3 mb-6">
-                {[0, 1, 2].map(i => (
-                  <motion.div
-                    key={i}
-                    initial={{ scale: 0, rotate: -30 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    transition={{ delay: 0.35 + i * 0.18, type: 'spring', stiffness: 200 }}
-                    className="text-4xl md:text-5xl drop-shadow-md"
-                  >
-                    {i < winData.bintang ? '⭐' : '☆'}
-                  </motion.div>
-                ))}
-              </div>
+              <div className="relative z-10 flex flex-col items-center">
+                {/* Trophy */}
+                <motion.div
+                  initial={{ scale: 0, rotate: -15 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: 'spring', stiffness: 220, damping: 15, delay: 0.1 }}
+                  className="mb-2"
+                >
+                  <motion.span
+                    animate={{ y: [0, -8, 0] }} transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                    style={{ fontSize: 80, lineHeight: 1, filter: 'drop-shadow(0 4px 10px rgba(251,191,36,0.5))' }}
+                    className="inline-block"
+                  >🏆</motion.span>
+                </motion.div>
 
-              {/* XP Breakdown Card */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7 }}
-                className="rounded-2xl border border-stone-200 bg-white p-6 mb-4 shadow-xl"
-              >
-                <div className="flex justify-around mb-4">
-                  <div>
-                    <p className="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1">⭐ Bintang</p>
-                    <p className="text-3xl font-black text-amber-500">{winData.bintang} / 3</p>
-                  </div>
-                  <div className="w-px bg-stone-200" />
-                  <div>
-                    <p className="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1">❌ Kesalahan</p>
-                    <p className="text-3xl font-black text-stone-600">{winData.wrongCount}</p>
-                  </div>
-                  <div className="w-px bg-stone-200" />
-                  <div>
-                    <p className="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1">⏱️ Waktu</p>
-                    <p className="text-3xl font-black text-stone-600">{Math.floor(winData.elapsedSeconds/60)}:{String(winData.elapsedSeconds%60).padStart(2,'0')}</p>
-                  </div>
+                {/* Title & Badges */}
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-full bg-slate-100 text-slate-500 border border-slate-200">BAB {lvl}</span>
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-full text-white" style={{ background: scene.glow || '#6366f1' }}>{scene.label}</span>
                 </div>
                 
-                {/* XP Breakdown */}
-                <div className="border-t border-stone-200 pt-4 space-y-2">
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-stone-500 font-semibold">⭐ Star XP</span>
-                    <motion.span 
-                      initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.9 }}
-                      className="font-black text-amber-600">+{winData.starXP}</motion.span>
+                <h1 className="text-4xl md:text-5xl font-black text-slate-800 leading-tight mb-4">
+                  LEVEL <span style={{ color: winData.bintang === 3 ? '#10B981' : winData.bintang === 2 ? '#F59E0B' : '#E11D48' }}>SELESAI!</span>
+                </h1>
+
+                {/* Stars */}
+                <div className="flex gap-3 mb-4">
+                  {[0,1,2].map(i => (
+                    <motion.span key={i}
+                      initial={{ scale:0, rotate:-45 }} animate={{ scale:1, rotate:0 }} transition={{ delay: 0.3 + i*0.15, type:'spring', stiffness:250, damping:18 }}
+                      style={{ fontSize: 52, filter: i < winData.bintang ? 'drop-shadow(0 4px 12px rgba(251,191,36,0.6))' : 'grayscale(1) opacity(0.15)' }}
+                    >⭐</motion.span>
+                  ))}
+                </div>
+
+                {/* Grade Label */}
+                <div className="text-sm font-black uppercase tracking-widest px-5 py-2 rounded-full mb-6"
+                     style={{
+                       color: winData.bintang===3?'#059669':winData.bintang===2?'#D97706':'#BE123C',
+                       background: winData.bintang===3?'#D1FAE5':winData.bintang===2?'#FEF3C7':'#FFE4E6'
+                     }}>
+                  {winData.bintang===3?'✨ PERFORMA SEMPURNA!':winData.bintang===2?'👍 KERJA BAGUS!':'💪 TERUS BERLATIH!'}
+                </div>
+
+                {/* Stats Grid */}
+                <div className="w-full grid grid-cols-3 gap-3 mb-6">
+                  {[
+                    { icon:'⭐', val:`${winData.bintang}/3`, lbl:'Bintang', bg:'bg-amber-50', border:'border-amber-100', text:'text-amber-600' },
+                    { icon:'❌', val:winData.wrongCount, lbl:'Salah', bg:'bg-rose-50', border:'border-rose-100', text:'text-rose-600' },
+                    { icon:'⏱️', val:`${Math.floor(winData.elapsedSeconds/60)}:${String(winData.elapsedSeconds%60).padStart(2,'0')}`, lbl:'Waktu', bg:'bg-indigo-50', border:'border-indigo-100', text:'text-indigo-600' },
+                  ].map(({icon,val,lbl,bg,border,text},idx)=>(
+                    <motion.div key={lbl} initial={{ opacity:0, y:15 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.5+idx*0.1 }}
+                      className={`rounded-2xl p-3 text-center ${bg} border ${border}`}
+                    >
+                      <div className="text-2xl mb-1">{icon}</div>
+                      <div className={`text-lg font-black ${text}`}>{val}</div>
+                      <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">{lbl}</div>
+                    </motion.div>
+                  ))}
+                </div>
+
+                {/* XP Summary Box */}
+                <div className="w-full bg-slate-50 border border-slate-100 rounded-2xl p-4 mb-8">
+                  <div className="flex justify-between items-center text-sm mb-1.5">
+                    <span className="font-semibold text-slate-400 uppercase tracking-widest text-[10px]">⭐ Star XP</span>
+                    <span className="font-black text-amber-500">+{winData.starXP}</span>
                   </div>
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-stone-500 font-semibold">⏱️ Timer XP</span>
-                    <motion.span 
-                      initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 1.0 }}
-                      className="font-black text-blue-600">+{winData.timerXP}</motion.span>
+                  <div className="flex justify-between items-center text-sm mb-3">
+                    <span className="font-semibold text-slate-400 uppercase tracking-widest text-[10px]">⏱️ Timer XP</span>
+                    <span className="font-black text-indigo-500">+{winData.timerXP}</span>
                   </div>
-                  <div className="border-t border-dashed border-stone-300 pt-2 flex justify-between items-center">
-                    <span className="text-stone-700 font-black uppercase tracking-wide text-sm">Total XP</span>
-                    <motion.span 
-                      initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 1.15, type: 'spring' }}
-                      className="text-2xl font-black text-emerald-600">{winData.totalXP}</motion.span>
+                  <div className="flex justify-between items-center pt-3 border-t border-slate-200">
+                    <span className="font-black text-slate-700 uppercase tracking-widest text-xs">TOTAL XP</span>
+                    <motion.span initial={{ scale:0 }} animate={{ scale:1 }} transition={{ delay:0.8, type:'spring', stiffness:200 }}
+                      className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-indigo-500"
+                    >
+                      +{winData.totalXP}
+                    </motion.span>
                   </div>
                 </div>
-              </motion.div>
 
-              {/* Action Buttons */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.9 }}
-                className="flex flex-col sm:flex-row gap-4"
-              >
-                {/* Next Level Button - Show unless this is the last level */}
-                {lvl < (totalLevels || 10) && (
-                  <motion.button
-                    whileHover={!isNavigating ? { scale: 1.04 } : {}}
-                    whileTap={!isNavigating ? { scale: 0.96 } : {}}
-                    onClick={() => {
-                      if (!isNavigating) {
-                        setIsNavigating(true);
-                        setTimeout(() => navigate(`/game/${lvl + 1}`), 300);
+                {/* Buttons */}
+                <div className="w-full flex flex-col gap-3">
+                  {lvl < (totalLevels||10) && (
+                    <motion.button
+                      whileHover={!isNavigating?{scale:1.02}:{}} whileTap={!isNavigating?{scale:0.98}:{}}
+                      onClick={()=>{ if(!isNavigating){ setIsNavigating(true); setTimeout(()=>navigate(`/game/${lvl+1}`),300); } }}
+                      disabled={isNavigating}
+                      className="w-full py-4 rounded-xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-2 text-white shadow-md disabled:opacity-50 transition-all"
+                      style={{ background: scene.glow || '#6366f1' }}
+                    >
+                      {isNavigating
+                        ? <><motion.div animate={{rotate:360}} transition={{duration:1,repeat:Infinity,ease:'linear'}} className="w-4 h-4 border-2 border-transparent border-r-white border-t-white rounded-full"/><span>MEMUAT...</span></>
+                        : <><span>LEVEL BERIKUTNYA</span><span className="text-lg">▶</span></>
                       }
-                    }}
+                    </motion.button>
+                  )}
+                  {lvl >= (totalLevels||10) && (
+                    <motion.button
+                      whileHover={{scale:1.02}} whileTap={{scale:0.98}}
+                      onClick={()=>{ setIsNavigating(true); setTimeout(()=>navigate('/dashboard'),300); }}
+                      className="w-full py-4 rounded-xl font-black text-sm uppercase tracking-widest text-white shadow-md bg-gradient-to-r from-amber-400 to-rose-400"
+                    >🎉 SEMUA LEVEL SELESAI!</motion.button>
+                  )}
+                  <motion.button
+                    whileHover={!isNavigating?{scale:1.02}:{}} whileTap={!isNavigating?{scale:0.98}:{}}
+                    onClick={()=>{ if(!isNavigating){ setIsNavigating(true); setTimeout(()=>navigate('/dashboard'),300); } }}
                     disabled={isNavigating}
-                    className="flex-1 py-5 rounded-xl font-black text-lg uppercase tracking-widest border-2 transition-all shadow-xl flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
-                    style={{
-                      background: isNavigating 
-                        ? `${scene.glow}20` 
-                        : `linear-gradient(135deg, ${scene.glow}40, ${scene.glow}20)`,
-                      borderColor: scene.glow,
-                      color: '#fff',
-                      boxShadow: `0 0 25px ${scene.glow}${isNavigating ? '20' : '40'}`,
-                    }}
-                  >
-                    {isNavigating ? (
-                      <>
-                        <motion.div 
-                          animate={{ rotate: 360 }}
-                          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                          className="w-4 h-4 border-2 border-transparent border-r-white border-t-white rounded-full"
-                        />
-                        <span>MEMUAT...</span>
-                      </>
-                    ) : (
-                      <>
-                        <span>Next Level</span>
-                        <span className="text-xl">▶</span>
-                      </>
-                    )}
-                  </motion.button>
-                )}
+                    className="w-full py-3.5 rounded-xl font-bold text-xs uppercase tracking-widest text-slate-500 bg-slate-100 hover:bg-slate-200 disabled:opacity-50 transition-all"
+                  >◁ KEMBALI KE DASHBOARD</motion.button>
+                </div>
 
-                {/* Exit / Dashboard Button */}
-                <motion.button
-                  whileHover={!isNavigating ? { scale: 1.02 } : {}}
-                  whileTap={!isNavigating ? { scale: 0.97 } : {}}
-                  onClick={() => {
-                    if (!isNavigating) {
-                      setIsNavigating(true);
-                      setTimeout(() => navigate('/dashboard'), 300);
-                    }
-                  }}
-                  disabled={isNavigating}
-                  className="flex-1 py-5 rounded-xl font-black text-lg uppercase tracking-widest border-2 border-stone-300 bg-white hover:bg-stone-50 text-stone-700 hover:text-stone-900 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
-                >
-                  <span>◁</span>
-                  <span>{(lvl >= (totalLevels || 10)) ? 'Selesai 🎉' : 'Dashboard'}</span>
-                </motion.button>
-              </motion.div>
+              </div>
             </motion.div>
           </motion.div>
         )}
