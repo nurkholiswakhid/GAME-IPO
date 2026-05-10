@@ -694,13 +694,13 @@ export default function GameLevel() {
     if (submitted) return;
     const ok = verifyAnswer(question.type, question.correct_config, ans);
     if (ok) {
+      // Segera tandai gameOverRef agar timer tidak memicu game over saat menunggu
+      gameOverRef.current = true;
       setFeedback({ type: 'success', text: 'KERJA BAGUS!', explanation: question.explanation });
-      // Auto-dismiss after 2s, then proceed to outro VN → success popup
-      setTimeout(() => { 
-        if (!submitted) {
-          setFeedback(null); 
-          handleLevelComplete(); 
-        }
+      // Setelah 2 detik, hilangkan feedback → masuk Outro VN → popup berhasil
+      setTimeout(() => {
+        setFeedback(null);
+        handleLevelComplete();
       }, 2000);
     } else {
       let nl = lives;
@@ -792,8 +792,12 @@ export default function GameLevel() {
       setWinData({ bintang: st, starXP, timerXP, totalXP, wrongCount, elapsedSeconds });
       const outroDialogs = storyData?.outro || [];
       if (outroDialogs.length > 0) {
+        // Reset dialog index dulu, lalu transisi ke OUTRO di tick berikutnya
         setDialogIdx(0);
-        setPhase('OUTRO');
+        // Delay singkat agar React commit dialogIdx=0 sebelum OUTRO render
+        setTimeout(() => {
+          setPhase('OUTRO');
+        }, 50);
       } else {
         setPhase('COMPLETE');
       }
@@ -1027,6 +1031,15 @@ export default function GameLevel() {
                 className="group flex items-center gap-2 text-xs font-bold text-sky-600 border border-sky-300 bg-white/80 backdrop-blur-md px-4 py-2 rounded-full hover:bg-sky-50 hover:border-sky-400 transition-all shadow-sm">
                 Lewati Cerita <span className="group-hover:translate-x-1 transition-transform">▶▶</span>
               </button>
+            )}
+            {phase === 'OUTRO' && (
+              <div className="flex items-center gap-3">
+                <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-300">✨ Percakapan Akhir</span>
+                <button onClick={() => setPhase('COMPLETE')}
+                  className="group flex items-center gap-2 text-xs font-bold text-stone-500 border border-stone-300 bg-white/80 backdrop-blur-md px-4 py-2 rounded-full hover:bg-stone-50 transition-all shadow-sm">
+                  Lewati <span className="group-hover:translate-x-1 transition-transform">▶▶</span>
+                </button>
+              </div>
             )}
           </div>
 
@@ -1463,46 +1476,20 @@ export default function GameLevel() {
                   </motion.div>
                 )}
 
-                {/* Success Action Buttons */}
+                {/* Success: auto-lanjut ke Outro VN dalam 2 detik */}
                 {feedback.type === 'success' && (
-                  <motion.div 
+                  <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.9 }}
-                    className="w-full flex flex-col sm:flex-row gap-3"
+                    transition={{ delay: 0.5 }}
+                    className="w-full flex items-center justify-center gap-3 text-emerald-600"
                   >
-                    {lvl < (totalLevels || 10) && (
-                      <motion.button
-                        whileHover={{ scale: 1.05, y: -2 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={async () => {
-                          setIsNavigating(true);
-                          if (!submitted) {
-                            await handleLevelComplete();
-                          }
-                          setFeedback(null);
-                          setTimeout(() => navigate(`/game/${lvl + 1}`), 300);
-                        }}
-                        className="flex-1 py-4 rounded-xl font-bold text-base uppercase tracking-wide border-2 transition-all shadow-lg flex items-center justify-center gap-2 bg-gradient-to-br from-emerald-400 to-emerald-500 border-emerald-600 text-white hover:shadow-xl active:shadow-md"
-                      >
-                        <span>▶ Lanjut Level</span>
-                      </motion.button>
-                    )}
-                    <motion.button
-                      whileHover={{ scale: 1.05, y: -2 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={async () => {
-                        setIsNavigating(true);
-                        if (!submitted) {
-                          await handleLevelComplete();
-                        }
-                        setFeedback(null);
-                        setTimeout(() => navigate('/dashboard'), 300);
-                      }}
-                      className="flex-1 py-4 rounded-xl font-bold text-base uppercase tracking-wide border-2 border-stone-300 bg-white hover:bg-stone-50 text-stone-700 hover:text-stone-900 transition-all flex items-center justify-center gap-2 shadow-md hover:shadow-lg active:shadow-sm"
-                    >
-                      <span>◁ {lvl >= (totalLevels || 10) ? 'Selesai' : 'Dashboard'}</span>
-                    </motion.button>
+                    <motion.span
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
+                      className="w-4 h-4 rounded-full border-2 border-emerald-300 border-t-emerald-600 inline-block flex-shrink-0"
+                    />
+                    <span className="text-xs font-black uppercase tracking-widest">Melanjutkan ke percakapan akhir...</span>
                   </motion.div>
                 )}
                 

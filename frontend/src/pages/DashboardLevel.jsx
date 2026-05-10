@@ -18,7 +18,8 @@ const LEVEL_META = {
   10: { icon: '👑', name: 'Ujian Arsitektur',   color: 'from-amber-200 to-yellow-300 text-amber-800',   mechanic: 'MENJODOHKAN' },
 };
 
-// XP progression — max XP per level = 100 (50 star + 50 timer), 10 levels = 1000 total\r\nconst MAX_XP = 1000;
+// XP progression — max XP per level = 100 (50 star + 50 timer), 10 levels = 1000 total
+const MAX_XP = 1000;
 
 export default function DashboardLevel() {
   const { student, loading, logoutStudent } = useContext(GameContext);
