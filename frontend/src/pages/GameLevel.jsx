@@ -618,7 +618,18 @@ export default function GameLevel() {
   useEffect(() => {
     if (phase !== 'GAME' || submitted || gameOverRef.current) return;
     if ((lives <= 0 && selectedSolver !== 'ARKA') || timeLeft <= 0) {
-      if (!gameOverRef.current) { gameOverRef.current = true; doSubmit(false); }
+      if (!gameOverRef.current) {
+          gameOverRef.current = true;
+          setFeedback(null);
+          axios.post(`${import.meta.env.VITE_API_URL}/api/results`, {
+            session_id: student.session_id,
+            level_number: lvl,
+            poin: 0, bintang: 0,
+            waktu_detik: 300 - timeLeft,
+            is_complete: false, attempts: 1
+          }).catch(e => console.error('Timer game over submit failed:', e.message));
+          setShowGameOverPopup(true);
+        }
       return;
     }
     const id = setTimeout(() => setTimeLeft(t => t - 1), 1000);
@@ -1522,6 +1533,193 @@ export default function GameLevel() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* ════════════════ GAME OVER POPUP (3x Gagal) ════════════════ */}
+      <AnimatePresence>
+        {showGameOverPopup && (
+          <GameOverPopup lvl={lvl} navigate={navigate} setShowGameOverPopup={setShowGameOverPopup} />
+        )}
+      </AnimatePresence>
     </>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+//  GAME OVER POPUP COMPONENT (Auto-redirect with countdown)
+// ─────────────────────────────────────────────────────────────
+function GameOverPopup({ lvl, navigate, setShowGameOverPopup }) {
+  const [countdown, setCountdown] = React.useState(5);
+
+  React.useEffect(() => {
+    if (countdown <= 0) {
+      setShowGameOverPopup(false);
+      navigate('/dashboard');
+      return;
+    }
+    const timer = setTimeout(() => setCountdown(prev => prev - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [countdown, navigate, setShowGameOverPopup]);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-md flex items-center justify-center p-4"
+    >
+      <motion.div
+        initial={{ scale: 0.7, y: 40, opacity: 0 }}
+        animate={{ scale: 1, y: 0, opacity: 1 }}
+        exit={{ scale: 0.7, y: 40, opacity: 0 }}
+        transition={{ type: 'spring', stiffness: 200, damping: 22 }}
+        className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden border border-rose-200"
+      >
+        {/* Top accent gradient */}
+        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-rose-400 via-red-500 to-rose-400" />
+
+        {/* Animated background particles */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          {[...Array(6)].map((_, i) => (
+            <motion.div
+              key={i}
+              animate={{
+                y: [0, -200],
+                x: [0, (i % 2 === 0 ? 30 : -30)],
+                opacity: [0.3, 0],
+                scale: [1, 0.5]
+              }}
+              transition={{ duration: 3 + i * 0.5, repeat: Infinity, delay: i * 0.4, ease: 'easeOut' }}
+              className="absolute rounded-full"
+              style={{
+                width: 8 + i * 3,
+                height: 8 + i * 3,
+                left: `${15 + i * 14}%`,
+                bottom: '-10%',
+                background: i % 2 === 0 ? 'rgba(244,63,94,0.2)' : 'rgba(251,113,133,0.15)',
+              }}
+            />
+          ))}
+        </div>
+
+        <div className="relative z-10 flex flex-col items-center text-center px-8 py-10">
+          {/* Animated Failure Icon */}
+          <motion.div
+            initial={{ scale: 0, rotate: -20 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ delay: 0.15, type: 'spring', stiffness: 180 }}
+            className="relative mb-6"
+          >
+            <div className="w-28 h-28 rounded-full bg-gradient-to-br from-rose-100 to-red-50 border-4 border-rose-200 flex items-center justify-center shadow-xl">
+              <motion.span
+                animate={{ scale: [1, 1.15, 1] }}
+                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                className="text-6xl select-none"
+              >
+                😞
+              </motion.span>
+            </div>
+            {/* Pulse ring */}
+            <motion.div
+              animate={{ scale: [1, 1.4], opacity: [0.4, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: 'easeOut' }}
+              className="absolute inset-0 rounded-full border-2 border-rose-300"
+            />
+          </motion.div>
+
+          {/* Title */}
+          <motion.h2
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25 }}
+            className="text-3xl md:text-4xl font-black text-rose-600 mb-2 tracking-tight"
+          >
+            MISI GAGAL
+          </motion.h2>
+
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.35 }}
+            className="text-stone-500 font-medium text-sm md:text-base mb-6"
+          >
+            Kamu telah kehabisan 3 kesempatan menjawab.<br />
+            Jangan menyerah, pelajari materinya dan coba lagi!
+          </motion.p>
+
+          {/* Info Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.45 }}
+            className="w-full rounded-2xl bg-rose-50/80 border border-rose-200 p-5 mb-8"
+          >
+            <div className="flex justify-around text-center">
+              <div>
+                <p className="text-[10px] font-bold text-rose-400 uppercase tracking-widest mb-1">Level</p>
+                <p className="text-2xl font-black text-rose-600">{lvl}</p>
+              </div>
+              <div className="w-px bg-rose-200" />
+              <div>
+                <p className="text-[10px] font-bold text-rose-400 uppercase tracking-widest mb-1">Skor</p>
+                <p className="text-2xl font-black text-rose-600">0</p>
+              </div>
+              <div className="w-px bg-rose-200" />
+              <div>
+                <p className="text-[10px] font-bold text-rose-400 uppercase tracking-widest mb-1">Bintang</p>
+                <p className="text-2xl font-black text-rose-600">☆ ☆ ☆</p>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* CTA Button */}
+          <motion.button
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            whileHover={{ scale: 1.04, y: -2 }}
+            whileTap={{ scale: 0.96 }}
+            onClick={() => {
+              setShowGameOverPopup(false);
+              navigate('/dashboard');
+            }}
+            className="w-full py-4 rounded-xl font-black text-base uppercase tracking-widest border-2 border-rose-400 bg-gradient-to-br from-rose-500 to-red-500 text-white shadow-xl hover:shadow-2xl transition-all flex items-center justify-center gap-3"
+            style={{ boxShadow: '0 8px 30px rgba(244,63,94,0.3)' }}
+          >
+            <span>◁</span>
+            <span>Kembali ke Dashboard</span>
+          </motion.button>
+
+          {/* Auto-redirect countdown */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+            className="mt-5 flex flex-col items-center gap-2"
+          >
+            <p className="text-xs text-stone-400 font-medium">
+              Otomatis kembali ke dashboard dalam
+            </p>
+            <div className="flex items-center gap-2">
+              <div className="relative w-10 h-10">
+                <svg className="w-10 h-10 -rotate-90" viewBox="0 0 36 36">
+                  <circle cx="18" cy="18" r="15.5" fill="none" stroke="#fecdd3" strokeWidth="3" />
+                  <motion.circle
+                    cx="18" cy="18" r="15.5" fill="none" stroke="#f43f5e" strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeDasharray={97.4}
+                    animate={{ strokeDashoffset: 97.4 - (97.4 * countdown / 5) }}
+                    transition={{ duration: 0.8, ease: 'easeInOut' }}
+                  />
+                </svg>
+                <span className="absolute inset-0 flex items-center justify-center text-sm font-black text-rose-600">
+                  {countdown}
+                </span>
+              </div>
+              <span className="text-xs font-bold text-rose-500 uppercase tracking-wider">detik</span>
+            </div>
+          </motion.div>
+        </div>
+      </motion.div>
+    </motion.div>
   );
 }
