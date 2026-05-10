@@ -1299,6 +1299,11 @@ function SequenceFields({ optState, setOptState, corState, setCorState }) {
 // ════════════════════════════════════════════════════════════════════════════
 function MultipleChoiceFields({ optState, setOptState, corState, setCorState }) {
   const items = optState.items;
+  const hasItems = items.length > 0;
+  const hasCorrect = corState.selected && corState.selected !== '';
+  const completeness = hasItems && hasCorrect ? 100 : (hasItems ? 50 : 0);
+  const emptyOptions = items.filter(it => !it || it.trim() === '').length;
+  const filledOptions = items.filter(it => it && it.trim() !== '').length;
 
   const updateItem = (idx, val) => {
     const oldVal = items[idx];
@@ -1311,6 +1316,7 @@ function MultipleChoiceFields({ optState, setOptState, corState, setCorState }) 
   };
 
   const addItem = () => setOptState({ ...optState, items: [...items, ''] });
+  
   const removeItem = (idx) => {
     const removed = items[idx];
     setOptState({ ...optState, items: items.filter((_, i) => i !== idx) });
@@ -1320,42 +1326,273 @@ function MultipleChoiceFields({ optState, setOptState, corState, setCorState }) 
   };
 
   const toggleCorrect = (val) => {
-    setCorState({ ...corState, selected: val });
+    if (val && val.trim() !== '') {
+      setCorState({ ...corState, selected: val });
+    }
   };
 
   return (
     <div className="space-y-4">
-      <div className="bg-white border border-emerald-200 rounded-xl overflow-hidden">
-        <div className="px-4 py-3 bg-emerald-50 border-b border-emerald-100 flex justify-between items-center">
-          <div>
-            <span className="text-xs font-black text-emerald-700 uppercase tracking-widest">Pilihan Jawaban</span>
-            <p className="text-xs text-emerald-500 mt-0.5">Centang satu opsi yang merupakan jawaban benar ✓</p>
+      {/* STEP 1️⃣ ADD OPTIONS */}
+      <div className="bg-white border-2 border-blue-300 rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300">
+        <div className="px-4 py-4 bg-gradient-to-br from-blue-150 via-blue-50 to-white border-b-2 border-blue-200">
+          <div className="flex items-center gap-2.5 mb-3">
+            <span className="text-3xl">❓</span>
+            <div>
+              <p className="text-sm font-black text-blue-900 uppercase tracking-wider leading-tight">Tambah Opsi Jawaban</p>
+              <p className="text-xs text-blue-600 font-medium mt-0.5">Buat pilihan jawaban untuk soal</p>
+            </div>
           </div>
-          <button type="button" onClick={addItem} className={smBtn('emerald')}>+ Tambah Opsi</button>
-        </div>
-        <div className="divide-y divide-stone-100">
-          {items.map((it, idx) => {
-            const isCorrect = corState.selected === it && it !== '';
-            return (
-              <div key={idx} className={`flex gap-2 items-center px-4 py-3 transition-colors ${isCorrect ? 'bg-emerald-50' : ''}`}>
-                <button
-                  type="button"
-                  onClick={() => it && toggleCorrect(it)}
-                  title="Tandai sebagai jawaban benar"
-                  className={`w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs font-black transition-all flex-shrink-0 ${
-                    isCorrect ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-stone-300 text-stone-300 hover:border-emerald-400'
-                  }`}>
-                  ✓
-                </button>
-                <input value={it} onChange={e => updateItem(idx, e.target.value)}
-                  className={inp + ' flex-1'} placeholder="Teks pilihan jawaban..." />
-                <button type="button" onClick={() => removeItem(idx)}
-                  className="px-2 py-2 rounded bg-red-50 hover:bg-red-100 text-red-500 text-xs font-bold border border-red-100">✕</button>
+          {/* Progress Info */}
+          {hasItems && (
+            <div className="flex gap-4 text-xs font-bold">
+              <div className="flex items-center gap-1.5 bg-blue-200 text-blue-900 px-3 py-1.5 rounded-full">
+                <span className="text-lg">📝</span>
+                <span>Opsi: {filledOptions}</span>
               </div>
-            );
-          })}
+              {emptyOptions > 0 && (
+                <div className="flex items-center gap-1.5 bg-amber-200 text-amber-900 px-3 py-1.5 rounded-full">
+                  <span className="text-lg">⏳</span>
+                  <span>Kosong: {emptyOptions}</span>
+                </div>
+              )}
+            </div>
+          )}
         </div>
+
+        {/* Options List */}
+        {!hasItems ? (
+          <div className="px-4 py-12 text-center">
+            <p className="text-4xl mb-3">📭</p>
+            <p className="text-stone-500 font-medium mb-4">Belum ada opsi jawaban</p>
+            <button
+              type="button"
+              onClick={addItem}
+              className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all active:scale-95"
+            >
+              + Tambah Opsi Pertama
+            </button>
+          </div>
+        ) : (
+          <div className="p-4 space-y-2.5">
+            {items.map((it, idx) => {
+              const isFilled = it && it.trim() !== '';
+              const isCorrect = corState.selected === it && isFilled;
+
+              return (
+                <div
+                  key={idx}
+                  className={`border-2 rounded-xl p-3 transition-all ${
+                    isCorrect
+                      ? 'bg-gradient-to-r from-blue-150 to-blue-100 border-blue-400 shadow-md'
+                      : isFilled
+                      ? 'bg-gradient-to-r from-stone-100 to-white border-stone-300 hover:border-blue-300 hover:shadow-sm'
+                      : 'bg-gradient-to-r from-red-100 to-red-50 border-red-300'
+                  }`}
+                >
+                  <div className="flex gap-2.5 items-start">
+                    {/* Option Number Badge */}
+                    <span
+                      className={`w-7 h-7 rounded-full text-white text-xs font-black flex items-center justify-center flex-shrink-0 shadow-sm transition-all ${
+                        isCorrect
+                          ? 'bg-gradient-to-br from-blue-600 to-blue-700 ring-2 ring-blue-400'
+                          : isFilled
+                          ? 'bg-gradient-to-br from-stone-400 to-stone-500'
+                          : 'bg-gradient-to-br from-red-400 to-red-500'
+                      }`}
+                    >
+                      {idx + 1}
+                    </span>
+
+                    {/* Input Field */}
+                    <input
+                      value={it}
+                      onChange={e => updateItem(idx, e.target.value)}
+                      placeholder="Masukkan teks pilihan jawaban..."
+                      className={`flex-1 px-3 py-2.5 rounded-lg border-2 font-semibold text-sm outline-none transition-all ${
+                        isCorrect
+                          ? 'border-blue-500 bg-blue-50 text-blue-900 focus:border-blue-600 focus:shadow-lg'
+                          : isFilled
+                          ? 'border-stone-300 text-stone-700 focus:border-blue-400 focus:bg-blue-50 focus:shadow-md'
+                          : 'border-red-300 text-red-700 focus:border-red-500 focus:bg-red-50 focus:shadow-md'
+                      }`}
+                    />
+
+                    {/* Delete Button */}
+                    <button
+                      type="button"
+                      onClick={() => removeItem(idx)}
+                      className="px-2.5 py-2.5 rounded-lg bg-red-100 hover:bg-red-200 text-red-600 font-bold text-sm border-2 border-red-300 transition-all hover:shadow-md active:scale-95"
+                      title="Hapus opsi ini"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Add Button */}
+        {hasItems && (
+          <div className="px-4 pb-4 border-t-2 border-blue-200 pt-3">
+            <button
+              type="button"
+              onClick={addItem}
+              className="w-full px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all active:scale-95"
+            >
+              + Tambah Opsi
+            </button>
+          </div>
+        )}
       </div>
+
+      {/* STEP 2️⃣ SELECT CORRECT ANSWER */}
+      {filledOptions >= 2 && (
+        <div className="bg-white border-2 border-emerald-300 rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300">
+          <div className="px-4 py-4 bg-gradient-to-br from-emerald-150 via-emerald-50 to-white border-b-2 border-emerald-200">
+            <div className="flex items-center gap-2.5 mb-2">
+              <span className="text-3xl">✓</span>
+              <div>
+                <p className="text-sm font-black text-emerald-900 uppercase tracking-wider leading-tight">Pilih Jawaban Benar</p>
+                <p className="text-xs text-emerald-600 font-medium mt-0.5">Tentukan mana opsi yang merupakan jawaban yang benar</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-4 space-y-2.5">
+            {items.map((it, idx) => {
+              if (!it || it.trim() === '') return null;
+              const isCorrect = corState.selected === it;
+
+              return (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => toggleCorrect(it)}
+                  className={`w-full text-left border-2 rounded-xl p-4 transition-all transform duration-300 ${
+                    isCorrect
+                      ? 'bg-gradient-to-br from-emerald-150 to-emerald-100 border-emerald-500 shadow-lg hover:shadow-xl hover:scale-102'
+                      : 'bg-gradient-to-br from-stone-100 to-white border-stone-300 hover:border-emerald-300 hover:shadow-md hover:scale-101'
+                  }`}
+                >
+                  <div className="flex gap-3 items-center">
+                    {/* Radio Button */}
+                    <div
+                      className={`w-8 h-8 rounded-full border-3 flex items-center justify-center flex-shrink-0 transition-all shadow-sm ${
+                        isCorrect
+                          ? 'bg-gradient-to-br from-emerald-500 to-emerald-600 border-emerald-600 ring-2 ring-emerald-300'
+                          : 'border-stone-400 hover:border-emerald-400'
+                      }`}
+                    >
+                      {isCorrect && <span className="text-white font-bold text-lg">✓</span>}
+                    </div>
+
+                    {/* Option Text */}
+                    <div className="flex-1">
+                      <p
+                        className={`font-bold text-sm break-words transition-colors duration-200 ${
+                          isCorrect ? 'text-emerald-900' : 'text-stone-700'
+                        }`}
+                      >
+                        {it}
+                      </p>
+                    </div>
+
+                    {/* Status Badge */}
+                    {isCorrect && (
+                      <div className="flex-shrink-0 px-3 py-1.5 bg-emerald-200 text-emerald-800 rounded-full text-xs font-bold animate-bounce ring-2 ring-emerald-300">
+                        Benar ✓
+                      </div>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Selection Status */}
+          {hasCorrect && (
+            <div className="px-4 pb-4 border-t-2 border-emerald-200 pt-4">
+              <div className="bg-gradient-to-r from-emerald-150 to-green-150 border-2 border-emerald-400 rounded-xl p-4 text-center">
+                <p className="text-sm font-black text-emerald-900 uppercase tracking-wider mb-1">
+                  ✅ Jawaban Benar Dipilih
+                </p>
+                <p className="text-xs text-emerald-700 font-semibold">
+                  "{corState.selected}"
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* STEP 3️⃣ PREVIEW (when complete) */}
+      {hasItems && filledOptions >= 2 && hasCorrect && (
+        <div className="bg-white border-2 border-green-300 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
+          <div className="px-4 py-4 bg-gradient-to-br from-green-150 via-green-50 to-white border-b-2 border-green-200">
+            <div className="flex items-center gap-2.5">
+              <span className="text-3xl animate-bounce">👁️</span>
+              <div>
+                <p className="text-sm font-black text-green-900 uppercase tracking-wider leading-tight">Preview Soal</p>
+                <p className="text-xs text-green-600 font-medium mt-0.5">Cara siswa akan melihat soal ini</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-6 space-y-4">
+            {/* Stats */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-gradient-to-br from-blue-100 to-blue-50 border-2 border-blue-300 rounded-lg p-3 text-center">
+                <p className="text-2xl font-black text-blue-600">{items.length}</p>
+                <p className="text-xs font-bold text-blue-700 uppercase mt-1">Total Opsi</p>
+              </div>
+              <div className="bg-gradient-to-br from-green-100 to-emerald-50 border-2 border-green-400 rounded-lg p-3 text-center">
+                <p className="text-2xl font-black text-green-600">✓</p>
+                <p className="text-xs font-bold text-green-700 uppercase mt-1">Lengkap</p>
+              </div>
+            </div>
+
+            {/* Preview of Options */}
+            <div className="space-y-2">
+              <p className="text-xs font-black text-stone-700 uppercase tracking-wider">Pilihan yang Ditampilkan:</p>
+              <div className="space-y-2">
+                {items.map((it, idx) => (
+                  <div
+                    key={idx}
+                    className={`border-2 rounded-lg p-3 transition-all ${
+                      it === corState.selected
+                        ? 'bg-gradient-to-r from-green-200 to-emerald-150 border-green-500 ring-2 ring-green-400 ring-opacity-50'
+                        : 'bg-stone-100 border-stone-300'
+                    }`}
+                  >
+                    <div className="flex gap-2 items-center">
+                      <span className={`text-sm font-black ${it === corState.selected ? 'text-green-700' : 'text-stone-600'}`}>
+                        {String.fromCharCode(65 + idx)}.
+                      </span>
+                      <span className={`font-semibold text-sm ${it === corState.selected ? 'text-green-900' : 'text-stone-700'}`}>
+                        {it}
+                      </span>
+                      {it === corState.selected && <span className="ml-auto text-lg animate-bounce">✓</span>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Success Message */}
+            <div className="bg-gradient-to-r from-green-150 via-emerald-100 to-green-100 border-2 border-green-400 rounded-xl p-4 text-center">
+              <p className="text-sm font-black text-green-900 uppercase tracking-wider">
+                ✅ Soal Siap Disimpan
+              </p>
+              <p className="text-xs text-green-700 font-medium mt-2">
+                Semua opsi sudah lengkap dan jawaban benar sudah ditentukan
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -1365,37 +1602,200 @@ function MultipleChoiceFields({ optState, setOptState, corState, setCorState }) 
 // ════════════════════════════════════════════════════════════════════════════
 function TrueFalseFields({ optState, setOptState, corState, setCorState }) {
   const options = [
-    { label: 'BENAR ✓', value: 'BENAR' },
-    { label: 'SALAH ✗', value: 'SALAH' }
+    { label: 'BENAR ✓', value: 'BENAR', emoji: '✅', color: 'green', description: 'Pernyataan tersebut benar' },
+    { label: 'SALAH ✗', value: 'SALAH', emoji: '❌', color: 'red', description: 'Pernyataan tersebut salah' }
   ];
+
+  const hasSelected = corState.selected && corState.selected !== '';
 
   return (
     <div className="space-y-4">
-      <div className="bg-white border border-teal-200 rounded-xl overflow-hidden">
-        <div className="px-4 py-3 bg-teal-50 border-b border-teal-100">
-          <span className="text-xs font-black text-teal-700 uppercase tracking-widest">Pilih Jawaban Benar</span>
-          <p className="text-xs text-teal-500 mt-1">Tentukan apakah pernyataan adalah BENAR atau SALAH</p>
+      {/* STEP 1️⃣ SELECT ANSWER */}
+      <div className="bg-white border-2 border-cyan-300 rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300">
+        <div className="px-4 py-4 bg-gradient-to-br from-cyan-150 via-cyan-50 to-white border-b-2 border-cyan-200">
+          <div className="flex items-center gap-2.5">
+            <span className="text-3xl">🎯</span>
+            <div>
+              <p className="text-sm font-black text-cyan-900 uppercase tracking-wider leading-tight">Pilih Jawaban Benar</p>
+              <p className="text-xs text-cyan-600 font-medium mt-0.5">Tentukan apakah pernyataan BENAR atau SALAH</p>
+            </div>
+          </div>
         </div>
-        <div className="divide-y divide-stone-100">
+
+        <div className="p-4 space-y-3">
           {options.map((opt, idx) => {
             const isCorrect = corState.selected === opt.value;
+            const bgColor = opt.color === 'green' ? 'from-green-150 to-green-100 border-green-500' : 'from-red-150 to-red-100 border-red-500';
+            const hoverColor = opt.color === 'green' ? 'hover:border-green-300 hover:shadow-md' : 'hover:border-red-300 hover:shadow-md';
+            const textColor = opt.color === 'green' ? 'text-green-900' : 'text-red-900';
+            const badgeColor = opt.color === 'green' ? 'from-green-600 to-green-700 ring-green-300' : 'from-red-600 to-red-700 ring-red-300';
+
             return (
-              <div key={idx} className={`flex gap-3 items-center px-4 py-3 transition-colors ${isCorrect ? 'bg-teal-50' : ''}`}>
-                <button
-                  type="button"
-                  onClick={() => setCorState({ ...corState, selected: opt.value })}
-                  title="Tandai sebagai jawaban benar"
-                  className={`w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs font-black transition-all flex-shrink-0 ${
-                    isCorrect ? 'bg-teal-500 border-teal-500 text-white' : 'border-stone-300 text-stone-300 hover:border-teal-400'
-                  }`}>
-                  ✓
-                </button>
-                <span className="text-sm font-bold text-stone-700">{opt.label}</span>
-              </div>
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => setCorState({ ...corState, selected: opt.value })}
+                className={`w-full text-left border-2 rounded-xl p-5 transition-all transform duration-300 ${
+                  isCorrect
+                    ? `bg-gradient-to-br ${bgColor} shadow-lg hover:shadow-xl hover:scale-102`
+                    : `bg-gradient-to-br from-stone-100 to-white border-stone-300 ${hoverColor} hover:scale-101`
+                }`}
+              >
+                <div className="flex gap-4 items-center">
+                  {/* Radio Button */}
+                  <div
+                    className={`w-10 h-10 rounded-full border-3 flex items-center justify-center flex-shrink-0 transition-all shadow-sm ${
+                      isCorrect
+                        ? `bg-gradient-to-br ${badgeColor} border-${opt.color}-700 ring-2`
+                        : `border-stone-400 hover:border-${opt.color === 'green' ? 'green' : 'red'}-400`
+                    }`}
+                  >
+                    {isCorrect && <span className="text-xl text-white font-bold">✓</span>}
+                  </div>
+
+                  {/* Option Content */}
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl">{opt.emoji}</span>
+                      <div>
+                        <p className={`font-black text-lg transition-colors duration-200 ${isCorrect ? textColor : 'text-stone-700'}`}>
+                          {opt.label}
+                        </p>
+                        <p className={`text-xs font-medium mt-0.5 transition-colors ${isCorrect ? textColor : 'text-stone-500'}`}>
+                          {opt.description}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Selection Badge */}
+                  {isCorrect && (
+                    <div className={`flex-shrink-0 px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider ${
+                      opt.color === 'green'
+                        ? 'bg-green-200 text-green-800 ring-2 ring-green-400 ring-opacity-50'
+                        : 'bg-red-200 text-red-800 ring-2 ring-red-400 ring-opacity-50'
+                    } animate-bounce`}>
+                      Dipilih
+                    </div>
+                  )}
+                </div>
+              </button>
             );
           })}
         </div>
+
+        {/* Selection Confirmation */}
+        {hasSelected && (
+          <div className="px-4 pb-4 border-t-2 border-cyan-200 pt-4">
+            <div className={`border-2 rounded-xl p-4 text-center transition-all ${
+              corState.selected === 'BENAR'
+                ? 'bg-gradient-to-r from-green-150 to-emerald-100 border-green-400'
+                : 'bg-gradient-to-r from-red-150 to-rose-100 border-red-400'
+            }`}>
+              <p className={`text-sm font-black uppercase tracking-wider ${
+                corState.selected === 'BENAR' ? 'text-green-900' : 'text-red-900'
+              }`}>
+                {corState.selected === 'BENAR' ? '✅ Jawaban: BENAR' : '❌ Jawaban: SALAH'}
+              </p>
+              <p className={`text-xs font-medium mt-1.5 ${
+                corState.selected === 'BENAR' ? 'text-green-700' : 'text-red-700'
+              }`}>
+                Pernyataan dipilih sebagai {corState.selected}
+              </p>
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* STEP 2️⃣ PREVIEW */}
+      {hasSelected && (
+        <div className="bg-white border-2 border-green-300 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
+          <div className="px-4 py-4 bg-gradient-to-br from-green-150 via-green-50 to-white border-b-2 border-green-200">
+            <div className="flex items-center gap-2.5">
+              <span className="text-3xl animate-bounce">👁️</span>
+              <div>
+                <p className="text-sm font-black text-green-900 uppercase tracking-wider leading-tight">Preview Soal</p>
+                <p className="text-xs text-green-600 font-medium mt-0.5">Cara siswa akan melihat soal ini</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-6 space-y-4">
+            {/* Stats */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-gradient-to-br from-cyan-100 to-cyan-50 border-2 border-cyan-300 rounded-lg p-3 text-center">
+                <p className="text-2xl font-black text-cyan-600">2</p>
+                <p className="text-xs font-bold text-cyan-700 uppercase mt-1">Pilihan</p>
+              </div>
+              <div className="bg-gradient-to-br from-green-100 to-emerald-50 border-2 border-green-400 rounded-lg p-3 text-center">
+                <p className="text-2xl font-black text-green-600">✓</p>
+                <p className="text-xs font-bold text-green-700 uppercase mt-1">Lengkap</p>
+              </div>
+            </div>
+
+            {/* Preview Options */}
+            <div className="space-y-2">
+              <p className="text-xs font-black text-stone-700 uppercase tracking-wider">Pilihan yang Ditampilkan:</p>
+              <div className="space-y-2">
+                {options.map((opt) => (
+                  <div
+                    key={opt.value}
+                    className={`border-2 rounded-lg p-4 transition-all ${
+                      opt.value === corState.selected
+                        ? opt.value === 'BENAR'
+                          ? 'bg-gradient-to-r from-green-200 to-emerald-150 border-green-500 ring-2 ring-green-400 ring-opacity-50'
+                          : 'bg-gradient-to-r from-red-200 to-rose-150 border-red-500 ring-2 ring-red-400 ring-opacity-50'
+                        : 'bg-stone-100 border-stone-300'
+                    }`}
+                  >
+                    <div className="flex gap-3 items-center">
+                      <span className={`text-xl font-black ${
+                        opt.value === corState.selected
+                          ? opt.value === 'BENAR'
+                            ? 'text-green-700'
+                            : 'text-red-700'
+                          : 'text-stone-600'
+                      }`}>
+                        {opt.emoji}
+                      </span>
+                      <span className={`font-semibold text-sm ${
+                        opt.value === corState.selected
+                          ? opt.value === 'BENAR'
+                            ? 'text-green-900'
+                            : 'text-red-900'
+                          : 'text-stone-700'
+                      }`}>
+                        {opt.label}
+                      </span>
+                      {opt.value === corState.selected && (
+                        <span className="ml-auto text-lg animate-bounce">✓</span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Success Message */}
+            <div className={`border-2 rounded-xl p-4 text-center ${
+              corState.selected === 'BENAR'
+                ? 'bg-gradient-to-r from-green-150 via-emerald-100 to-green-100 border-green-400'
+                : 'bg-gradient-to-r from-red-150 via-rose-100 to-red-100 border-red-400'
+            }`}>
+              <p className={`text-sm font-black uppercase tracking-wider ${
+                corState.selected === 'BENAR' ? 'text-green-900' : 'text-red-900'
+              }`}>
+                ✅ Soal Siap Disimpan
+              </p>
+              <p className={`text-xs font-medium mt-2 ${
+                corState.selected === 'BENAR' ? 'text-green-700' : 'text-red-700'
+              }`}>
+                Jawaban yang benar adalah: <span className="font-black">{corState.selected}</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
