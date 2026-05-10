@@ -528,6 +528,7 @@ export default function GameLevel() {
 
   const [timeLeft, setTimeLeft]     = useState(300);
   const [lives, setLives]           = useState(3);
+  const [wrongCount, setWrongCount] = useState(0); // Track total wrong answers for star calc
   const [submitted, setSubmitted]   = useState(false);
   const [feedback, setFeedback]     = useState(null);
   const [winData, setWinData]       = useState(null);
@@ -552,6 +553,7 @@ export default function GameLevel() {
     setDialogIdx(0);
     setTimeLeft(300);
     setLives(3);
+    setWrongCount(0);
     setSubmitted(false);
     setFeedback(null);
     setWinData(null);
@@ -704,14 +706,15 @@ export default function GameLevel() {
       let nl = lives;
       nl -= 1;
       setLives(nl);
+      const newWrongCount = wrongCount + 1;
+      setWrongCount(newWrongCount);
       setFeedback({ type: 'error', text: `JAWABAN KURANG TEPAT. KESEMPATAN: ${nl}`, explanation: question.failure_message || question.explanation });
       setSeqAns([]); setClassAns({}); setMatchAns({});
       if (nl <= 0) {
-        // Game over: submit dengan poin 0
+        // Game over (3x gagal): submit dengan 0 bintang, 0 XP
         setTimeout(() => {
           gameOverRef.current = true;
           setFeedback(null);
-          // Submit game over result
           axios.post(`${import.meta.env.VITE_API_URL}/api/results`, {
             session_id: student.session_id,
             level_number: lvl,
@@ -719,7 +722,8 @@ export default function GameLevel() {
             bintang: 0,
             waktu_detik: 300 - timeLeft,
             is_complete: false,
-            attempts: 1
+            attempts: 1,
+            wrong_count: newWrongCount
           }).catch(e => console.error('Game over submit failed:', e.message));
           setShowGameOverPopup(true);
         }, 2800);
@@ -729,56 +733,63 @@ export default function GameLevel() {
     }
   };
 
+  // ── XP Timer brackets ────────────────────────────────────
+  const getTimerXP = (elapsedSeconds) => {
+    if (elapsedSeconds < 30)  return 50;
+    if (elapsedSeconds < 60)  return 45;
+    if (elapsedSeconds < 90)  return 40;
+    if (elapsedSeconds < 120) return 35;
+    if (elapsedSeconds < 150) return 30;
+    if (elapsedSeconds < 180) return 25;
+    if (elapsedSeconds < 210) return 20;
+    if (elapsedSeconds < 240) return 15;
+    if (elapsedSeconds < 270) return 10;
+    return 5;
+  };
+
   const handleLevelComplete = async () => {
     if (submitted) return;
     setSubmitted(true);
-    let baseTime = 300;
-    
-    // Default ratio scoring
-    let r = timeLeft / baseTime;
-    
-    let pts = 0, st = 0;
-    if (r > 0.75) { pts = 100; st = 3; } 
-    else if (r > 0.4) { pts = 80; st = 3; } 
-    else if (r > 0.15) { pts = 60; st = 2; } 
-    else { pts = 40; st = 1; }
 
-    // ✅ BALANCED Character Impacts - All equal at ~1.3x bonus for fairness
-    
-    // Zeno Hint Impacts
-    if (hintsUsed > 0) {
-      pts = Math.max(10, Math.floor(pts - (hintsUsed * 20))); // Reduce score per hint
-    }
-    
+    // ── Bintang berdasarkan jumlah kesalahan ────────────────
+    // 0 salah → 3★, 1 salah → 2★, 2 salah → 1★
+    const st = Math.max(0, 3 - wrongCount);
+
+    // ── XP = star_xp + timer_xp ─────────────────────────────
+    const starXPMap = { 3: 50, 2: 30, 1: 10, 0: 0 };
+    const starXP = starXPMap[st] || 0;
+    const elapsedSeconds = 300 - timeLeft;
+    const timerXP = getTimerXP(elapsedSeconds);
+    const totalXP = starXP + timerXP;
+
     let success = false;
     try {
       const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/results`, {
         session_id: student.session_id, 
         level_number: lvl,
-        poin: pts, 
+        poin: totalXP, 
         bintang: st, 
-        waktu_detik: 300 - timeLeft, 
+        waktu_detik: elapsedSeconds, 
         is_complete: true, 
-        attempts: 1
+        attempts: 1,
+        wrong_count: wrongCount
       }, { timeout: 10000 });
       
       if (res.status === 201 || res.data?.message) {
-        console.log(`Level ${lvl} result saved successfully`);
+        console.log(`Level ${lvl} result saved — ${st}★, XP: ${starXP}+${timerXP}=${totalXP}`);
         success = true;
-        // Wait briefly for database sync, then refresh student data
         await new Promise(r => setTimeout(r, 100));
         await refreshStudentData();
       }
     } catch (e) { 
       console.error('Failed to submit level result:', e.message); 
-      setSubmitted(false); // Reset so user can try again
+      setSubmitted(false);
       setFeedback({ type: 'error', text: 'SAVE_FAILED: Network error', explanation: 'Level result could not be saved. Please try again.' });
       return;
     }
     
     if (success) {
-      setWinData({ pts, bintang: st });
-      // Jika ada outro dialogs, tampilkan dulu sebelum COMPLETE
+      setWinData({ bintang: st, starXP, timerXP, totalXP, wrongCount, elapsedSeconds });
       const outroDialogs = storyData?.outro || [];
       if (outroDialogs.length > 0) {
         setDialogIdx(0);
@@ -1120,7 +1131,7 @@ export default function GameLevel() {
               
               <div className="flex flex-col items-end">
                 <span className="text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-0.5">Waktu</span>
-                <div className={`font-mono text-xl font-bold tracking-wider ${timeLeft<60?'text-rose-500 animate-pulse':'text-stone-700'}`}>
+                <div className={`font-mono text-xl font-bold tracking-wider ${timeLeft<=120?'text-rose-500 animate-pulse':'text-stone-700'}`}>
                   {mm}:{ss}
                 </div>
               </div>
@@ -1254,27 +1265,49 @@ export default function GameLevel() {
                 ))}
               </div>
 
-              {/* Score Card */}
+              {/* XP Breakdown Card */}
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.7 }}
-                className="rounded-2xl border border-stone-200 bg-white p-6 mb-8 shadow-xl"
+                className="rounded-2xl border border-stone-200 bg-white p-6 mb-4 shadow-xl"
               >
-                <div className="flex justify-around">
+                <div className="flex justify-around mb-4">
                   <div>
-                    <p className="text-xs font-bold text-stone-400 uppercase tracking-widest mb-1">Skor</p>
-                    <p className="text-3xl font-black text-amber-500">{winData.pts}</p>
-                  </div>
-                  <div className="w-px bg-stone-200" />
-                  <div>
-                    <p className="text-xs font-bold text-stone-400 uppercase tracking-widest mb-1">Bintang</p>
+                    <p className="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1">⭐ Bintang</p>
                     <p className="text-3xl font-black text-amber-500">{winData.bintang} / 3</p>
                   </div>
                   <div className="w-px bg-stone-200" />
                   <div>
-                    <p className="text-xs font-bold text-stone-400 uppercase tracking-widest mb-1">Level</p>
-                    <p className="text-3xl font-black text-stone-700">{lvl}</p>
+                    <p className="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1">❌ Kesalahan</p>
+                    <p className="text-3xl font-black text-stone-600">{winData.wrongCount}</p>
+                  </div>
+                  <div className="w-px bg-stone-200" />
+                  <div>
+                    <p className="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1">⏱️ Waktu</p>
+                    <p className="text-3xl font-black text-stone-600">{Math.floor(winData.elapsedSeconds/60)}:{String(winData.elapsedSeconds%60).padStart(2,'0')}</p>
+                  </div>
+                </div>
+                
+                {/* XP Breakdown */}
+                <div className="border-t border-stone-200 pt-4 space-y-2">
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-stone-500 font-semibold">⭐ Star XP</span>
+                    <motion.span 
+                      initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.9 }}
+                      className="font-black text-amber-600">+{winData.starXP}</motion.span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-stone-500 font-semibold">⏱️ Timer XP</span>
+                    <motion.span 
+                      initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 1.0 }}
+                      className="font-black text-blue-600">+{winData.timerXP}</motion.span>
+                  </div>
+                  <div className="border-t border-dashed border-stone-300 pt-2 flex justify-between items-center">
+                    <span className="text-stone-700 font-black uppercase tracking-wide text-sm">Total XP</span>
+                    <motion.span 
+                      initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 1.15, type: 'spring' }}
+                      className="text-2xl font-black text-emerald-600">{winData.totalXP}</motion.span>
                   </div>
                 </div>
               </motion.div>
@@ -1661,23 +1694,40 @@ function GameOverPopup({ lvl, navigate, setShowGameOverPopup }) {
             </div>
           </motion.div>
 
-          {/* CTA Button */}
-          <motion.button
+          {/* CTA Buttons */}
+          <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
-            whileHover={{ scale: 1.04, y: -2 }}
-            whileTap={{ scale: 0.96 }}
-            onClick={() => {
-              setShowGameOverPopup(false);
-              navigate('/dashboard');
-            }}
-            className="w-full py-4 rounded-xl font-black text-base uppercase tracking-widest border-2 border-rose-400 bg-gradient-to-br from-rose-500 to-red-500 text-white shadow-xl hover:shadow-2xl transition-all flex items-center justify-center gap-3"
-            style={{ boxShadow: '0 8px 30px rgba(244,63,94,0.3)' }}
+            className="w-full flex flex-col gap-3"
           >
-            <span>◁</span>
-            <span>Kembali ke Dashboard</span>
-          </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.04, y: -2 }}
+              whileTap={{ scale: 0.96 }}
+              onClick={() => {
+                setShowGameOverPopup(false);
+                navigate(`/game/${lvl}`);
+                window.location.reload();
+              }}
+              className="w-full py-4 rounded-xl font-black text-base uppercase tracking-widest border-2 border-amber-400 bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-xl hover:shadow-2xl transition-all flex items-center justify-center gap-3"
+              style={{ boxShadow: '0 8px 30px rgba(245,158,11,0.3)' }}
+            >
+              <span>↻</span>
+              <span>Ulangi Level</span>
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.02, y: -1 }}
+              whileTap={{ scale: 0.96 }}
+              onClick={() => {
+                setShowGameOverPopup(false);
+                navigate('/dashboard');
+              }}
+              className="w-full py-3 rounded-xl font-bold text-sm uppercase tracking-widest border-2 border-stone-300 bg-white text-stone-600 hover:bg-stone-50 transition-all flex items-center justify-center gap-2"
+            >
+              <span>◁</span>
+              <span>Kembali ke Dashboard</span>
+            </motion.button>
+          </motion.div>
 
           {/* Auto-redirect countdown */}
           <motion.div

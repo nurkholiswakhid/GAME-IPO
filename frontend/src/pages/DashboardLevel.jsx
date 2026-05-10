@@ -18,8 +18,7 @@ const LEVEL_META = {
   10: { icon: '👑', name: 'Ujian Arsitektur',   color: 'from-amber-200 to-yellow-300 text-amber-800',   mechanic: 'MENJODOHKAN' },
 };
 
-// XP progression — setiap level memberi +10 XP dari total 100
-const MAX_XP = 100;
+// XP progression — max XP per level = 100 (50 star + 50 timer), 10 levels = 1000 total\r\nconst MAX_XP = 1000;
 
 export default function DashboardLevel() {
   const { student, loading, logoutStudent } = useContext(GameContext);
@@ -60,11 +59,15 @@ export default function DashboardLevel() {
 
   const getLevelStatus = (n) => {
     const results = student.level_results?.filter(r => r.level_number === n) || [];
-    const bestResult = results.find(r => r.is_complete);
-    if (bestResult) return 'COMPLETED';
+    // Level dianggap COMPLETED jika sudah pernah selesai DAN mendapat minimal 1 bintang
+    const bestStars = results.length > 0 ? Math.max(...results.map(r => r.bintang || 0)) : 0;
+    const hasCompleted = results.some(r => r.is_complete) && bestStars >= 1;
+    if (hasCompleted) return 'COMPLETED';
     if (n === 1) return 'UNLOCKED';
+    // Level berikutnya terbuka jika level sebelumnya selesai dengan minimal 1 bintang
     const prevResults = student.level_results?.filter(r => r.level_number === n - 1) || [];
-    if (prevResults.some(r => r.is_complete)) return 'UNLOCKED';
+    const prevBestStars = prevResults.length > 0 ? Math.max(...prevResults.map(r => r.bintang || 0)) : 0;
+    if (prevResults.some(r => r.is_complete) && prevBestStars >= 1) return 'UNLOCKED';
     return 'LOCKED';
   };
   // Ambil bintang tertinggi dari semua percobaan di level tersebut
@@ -75,7 +78,7 @@ export default function DashboardLevel() {
   };
 
   const completedCount = [...Array(10)].filter((_, i) => getLevelStatus(i + 1) === 'COMPLETED').length;
-  const xp = completedCount * 10;
+  const xp = student.total_poin || 0; // XP = total poin dari semua level
   const heroLevel = Math.max(1, Math.ceil(completedCount / 2));
 
   return (
@@ -128,7 +131,7 @@ export default function DashboardLevel() {
                     transition={{ delay: 0.1 }}
                     className="backdrop-blur-md bg-gradient-to-br from-blue-50 to-blue-100 px-6 py-3 rounded-2xl text-center border border-blue-200/60 shadow-md hover:shadow-lg transition-all hover:from-blue-100 hover:to-blue-150 min-w-[90px]"
                   >
-                    <p className="text-[10px] text-blue-600 font-black uppercase tracking-widest mb-1">💰 POIN</p>
+                    <p className="text-[10px] text-blue-600 font-black uppercase tracking-widest mb-1">🚀 XP</p>
                     <p className="text-2xl font-black text-blue-700 leading-none">{student.total_poin}</p>
                   </motion.div>
                   <motion.div 
@@ -166,7 +169,7 @@ export default function DashboardLevel() {
                 <div className="h-5 bg-gradient-to-r from-stone-100 to-stone-200 rounded-full overflow-hidden border-2 border-stone-300/50 shadow-inner">
                   <motion.div 
                     initial={{width:0}} 
-                    animate={{width:`${xp}%`}} 
+                    animate={{width:`${Math.min(100, (xp / MAX_XP) * 100)}%`}} 
                     transition={{duration:1.2, ease:'easeOut'}} 
                     className="h-full bg-gradient-to-r from-sky-400 via-blue-400 to-emerald-400 relative shadow-lg"
                   >
