@@ -103,6 +103,7 @@ export default function DashboardGuru() {
     const storyState = parseStoryState(q.story_json);
     const hasStoryData = !!q.story_json && q.story_json.length > 5;
     const qType = q.type || 'CLASSIFICATION';
+    const parsedOptState = parseOptionsState(qType, q.options_json || '[]');
     setEditForm({
       question_text: q.question_text || '',
       story_json: q.story_json || '',
@@ -114,8 +115,8 @@ export default function DashboardGuru() {
       topic: q.topic || 'GENERAL',
       storyState: storyState,
       showStory: hasStoryData,
-      optState: parseOptionsState(qType, q.options_json || '[]'),
-      corState: parseCorrectState(qType, q.correct_config || '{}')
+      optState: parsedOptState,
+      corState: parseCorrectState(qType, q.correct_config || '{}', parsedOptState)
     });
     setValidationError('');
   };
@@ -126,7 +127,7 @@ export default function DashboardGuru() {
 
     const qType = editingQuestion.type || 'CLASSIFICATION';
     const options_json = buildOptionsJSON(qType, editForm.optState);
-    const correct_config = buildCorrectJSON(qType, editForm.corState);
+    const correct_config = buildCorrectJSON(qType, editForm.corState, editForm.optState);
     const story_json = editForm.showStory ? buildStoryJSON(editForm.storyState) : '';
 
     if (!options_json) { setValidationError('❌ Opsi soal belum lengkap!'); return; }
@@ -167,7 +168,7 @@ export default function DashboardGuru() {
     }
 
     const options_json = buildOptionsJSON(createForm.type, createForm.optState);
-    const correct_config = buildCorrectJSON(createForm.type, createForm.corState);
+    const correct_config = buildCorrectJSON(createForm.type, createForm.corState, createForm.optState);
     const story_json = createForm.showStory ? buildStoryJSON(createForm.storyState) : '';
 
     if (!options_json) { setValidationError('❌ Opsi soal belum lengkap!'); return; }

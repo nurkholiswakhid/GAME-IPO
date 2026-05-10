@@ -4,23 +4,46 @@ import React from 'react';
 
 export function buildOptionsJSON(type, optState) {
   try {
-    if (type === 'MATCHING') {
-      return JSON.stringify({ left: optState.left.filter(Boolean), right: optState.right.filter(Boolean) });
+    if (type === 'TRUE_FALSE') {
+      // TRUE_FALSE selalu punya opsi tetap BENAR dan SALAH
+      return JSON.stringify(['BENAR', 'SALAH']);
     }
-    // CLASSIFICATION, SEQUENCE, MULTIPLE_CHOICE, TRUE_FALSE
-    return JSON.stringify(optState.items.filter(Boolean));
+    if (type === 'MATCHING') {
+      const left  = optState.left.filter(Boolean);
+      const right = optState.right.filter(Boolean);
+      if (left.length === 0 || right.length === 0) return ''; // validasi wajib isi
+      return JSON.stringify({ left, right });
+    }
+    // CLASSIFICATION, SEQUENCE, MULTIPLE_CHOICE
+    const items = optState.items.filter(Boolean);
+    if (items.length === 0) return ''; // validasi: harus ada minimal 1 item
+    return JSON.stringify(items);
   } catch { return ''; }
 }
 
-export function buildCorrectJSON(type, corState) {
+export function buildCorrectJSON(type, corState, optState = null) {
   try {
     if (type === 'CLASSIFICATION') {
       const res = {};
-      Object.entries(corState.mapping).forEach(([item, cat]) => {
-        if (!cat || !item) return;
+      // corState.mapping is now { indexStr: category }
+      // Need to convert indices to item texts
+      Object.entries(corState.mapping).forEach(([indexStrOrItem, cat]) => {
+        if (!cat) return;
         if (!res[cat]) res[cat] = [];
-        res[cat].push(item);
+        
+        // Check if this is an index (numeric string) or item text
+        if (optState && !isNaN(indexStrOrItem)) {
+          const itemIdx = parseInt(indexStrOrItem, 10);
+          const itemText = optState.items[itemIdx];
+          if (itemText) {
+            res[cat].push(itemText);
+          }
+        } else {
+          // Backward compatibility: it's already item text
+          res[cat].push(indexStrOrItem);
+        }
       });
+      if (Object.keys(res).length === 0) return ''; // validasi: semua item harus punya kategori
       return JSON.stringify(res);
     }
     if (type === 'MATCHING') {
@@ -28,12 +51,25 @@ export function buildCorrectJSON(type, corState) {
       Object.entries(corState.mapping).forEach(([l, r]) => {
         if (l && r) cleanMapping[l] = r;
       });
+      if (Object.keys(cleanMapping).length === 0) return ''; // validasi: harus ada pasangan
       return JSON.stringify(cleanMapping);
     }
     if (type === 'SEQUENCE' || type === 'SEQUENCING') {
-      return JSON.stringify(corState.order.filter(Boolean));
+      // Convert indices to item text for storage
+      const order = corState.order.filter(idx => idx !== null && idx !== undefined && idx !== '');
+      if (order.length === 0) return ''; // validasi: harus ada urutan
+      if (optState && optState.items) {
+        const itemTexts = order.map(idx => {
+          const itemIdx = parseInt(idx, 10);
+          return optState.items[itemIdx] || '';
+        }).filter(Boolean);
+        if (itemTexts.length === 0) return '';
+        return JSON.stringify(itemTexts);
+      }
+      return JSON.stringify(order); // Fallback: already text
     }
     if (type === 'MULTIPLE_CHOICE' || type === 'TRUE_FALSE') {
+      if (!corState.selected) return ''; // validasi: harus pilih jawaban benar
       return JSON.stringify(corState.selected);
     }
   } catch { return ''; }
@@ -71,20 +107,38 @@ export function parseOptionsState(type, optionsJson) {
     if (type === 'MATCHING') {
       return { left: parsed.left || [], right: parsed.right || [], items: [] };
     }
-    return { items: Array.isArray(parsed) ? parsed : [], left: [], right: [] };
+    // For CLASSIFICATION, SEQUENCE, MULTIPLE_CHOICE
+    const items = Array.isArray(parsed) ? parsed : [];
+    return { items, left: [], right: [] };
   } catch {
     return emptyOptState(type);
   }
 }
 
-export function parseCorrectState(type, correctJson) {
+export function parseCorrectState(type, correctJson, optState = null) {
   try {
     const parsed = JSON.parse(correctJson);
     if (type === 'CLASSIFICATION') {
       const mapping = {};
+      // parsed format: { category: [items...] }
+      // Convert to { itemIndex: category } for new system
       Object.entries(parsed).forEach(([cat, items]) => {
         if (Array.isArray(items)) {
-          items.forEach(it => { mapping[it] = cat; });
+          items.forEach(it => { 
+            // If optState is provided, find the index of this item
+            if (optState && optState.items) {
+              const itemIndex = optState.items.indexOf(it);
+              if (itemIndex >= 0) {
+                mapping[itemIndex] = cat;
+              } else {
+                // Fallback: item not found, use text as key
+                mapping[it] = cat;
+              }
+            } else {
+              // No optState, use text as key (backward compatibility)
+              mapping[it] = cat;
+            }
+          });
         }
       });
       return { mapping, order: [], selected: '' };
@@ -93,7 +147,22 @@ export function parseCorrectState(type, correctJson) {
       return { mapping: parsed || {}, order: [], selected: '' };
     }
     if (type === 'SEQUENCE' || type === 'SEQUENCING') {
-      return { mapping: {}, order: parsed || [], selected: '' };
+      // Convert stored item text back to indices for editing
+      const order = parsed || [];
+      if (optState && optState.items && Array.isArray(order)) {
+        // If all items are numeric strings (already indices), use as-is
+        const allIndices = order.every(o => !isNaN(parseInt(o, 10)));
+        if (allIndices) {
+          return { mapping: {}, order: order.map(o => parseInt(o, 10)), selected: '' };
+        }
+        // Otherwise, convert item text to indices
+        const indices = order.map(itemText => {
+          const idx = optState.items.indexOf(itemText);
+          return idx >= 0 ? idx : null;
+        }).filter(idx => idx !== null);
+        return { mapping: {}, order: indices, selected: '' };
+      }
+      return { mapping: {}, order: order || [], selected: '' };
     }
     if (type === 'MULTIPLE_CHOICE' || type === 'TRUE_FALSE') {
       return { mapping: {}, order: [], selected: parsed || '' };
@@ -164,36 +233,151 @@ const inp = 'w-full px-3 py-2 rounded-lg border border-stone-200 bg-white focus:
 const smBtn = (color='stone') => `px-3 py-1 text-xs font-bold rounded-lg bg-${color}-100 hover:bg-${color}-200 text-${color}-700 border border-${color}-200 transition-all`;
 
 // ════════════════════════════════════════════════════════════════════════════
+// CATEGORY PICKER - Enhanced Dropdown Selector
+// ════════════════════════════════════════════════════════════════════════════
+function CategoryPicker({ existingCategories, value, onChange }) {
+  const [open, setOpen] = React.useState(false);
+  const [searchTerm, setSearchTerm] = React.useState(value);
+  
+  React.useEffect(() => {
+    setSearchTerm(value);
+  }, [value]);
+
+  const suggestions = existingCategories.filter(cat => 
+    cat.toLowerCase().includes(searchTerm.toLowerCase()) && cat !== value
+  );
+
+  const handleSelect = (cat) => {
+    onChange(cat);
+    setSearchTerm(cat);
+    setOpen(false);
+  };
+
+  const handleInputChange = (e) => {
+    const val = e.target.value;
+    setSearchTerm(val);
+    onChange(val);
+    setOpen(val.length > 0);
+  };
+
+  const handleAddNew = (cat) => {
+    if (cat && !existingCategories.includes(cat)) {
+      onChange(cat);
+      setOpen(false);
+    }
+  };
+
+  const handleClear = (e) => {
+    e.stopPropagation();
+    onChange('');
+    setSearchTerm('');
+    setOpen(false);
+  };
+
+  return (
+    <div className="relative w-full">
+      <div className="relative flex items-center">
+        <input
+          value={searchTerm}
+          onChange={handleInputChange}
+          onFocus={() => setOpen(true)}
+          onBlur={() => setTimeout(() => setOpen(false), 150)}
+          className={`w-full px-4 py-3 pr-12 rounded-lg border-2 font-bold outline-none transition-all text-sm ${value ? 'bg-green-100 border-green-500 text-green-900 shadow-sm' : 'bg-white border-amber-400 focus:border-violet-500 focus:bg-violet-50 text-stone-700'}`}
+          placeholder="Pilih atau ketik kategori..." 
+        />
+        <div className="absolute right-3 flex gap-2 items-center">
+          {value && (
+            <button
+              type="button"
+              onClick={handleClear}
+              className="text-red-400 hover:text-red-600 font-bold text-lg hover:scale-125 transition-transform"
+              title="Hapus pilihan"
+            >
+              ✕
+            </button>
+          )}
+          {value && <span className="text-xl">✓</span>}
+        </div>
+      </div>
+
+      {open && (
+        <div className="absolute z-50 top-full left-0 right-0 mt-2 bg-white border-2 border-violet-300 rounded-xl shadow-xl overflow-hidden">
+          {/* Existing Categories */}
+          {existingCategories.length > 0 && (
+            <div className="p-3 border-b border-stone-100">
+              <p className="text-xs font-black text-stone-500 uppercase mb-2 px-2">📌 Kategori Tersedia</p>
+              <div className="space-y-1.5">
+                {existingCategories.map((cat) => (
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => handleSelect(cat)}
+                    className={`w-full text-left px-3 py-2.5 rounded-lg font-bold text-sm transition-all ${
+                      value === cat
+                        ? 'bg-violet-500 text-white'
+                        : 'bg-violet-50 text-violet-700 hover:bg-violet-100 border border-violet-200'
+                    }`}
+                  >
+                    🏷️ {cat}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Suggestions or Add New */}
+          {searchTerm && !existingCategories.includes(searchTerm) && (
+            <div className="p-3">
+              <button
+                type="button"
+                onClick={() => handleAddNew(searchTerm)}
+                className="w-full px-3 py-2.5 rounded-lg bg-gradient-to-r from-green-100 to-emerald-100 border-2 border-green-400 text-green-800 font-bold text-sm hover:shadow-md transition-all flex items-center gap-2 justify-center"
+              >
+                ➕ Tambah Kategori: <strong>"{searchTerm}"</strong>
+              </button>
+            </div>
+          )}
+
+          {existingCategories.length === 0 && !searchTerm && (
+            <div className="p-4 text-center text-stone-500 text-xs font-medium">
+              Ketik kategori untuk mulai menambah
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ════════════════════════════════════════════════════════════════════════════
 // CLASSIFICATION FIELDS
 // ════════════════════════════════════════════════════════════════════════════
 function ClassificationFields({ optState, setOptState, corState, setCorState }) {
   const items = optState.items.filter(Boolean);
   const allItems = optState.items;
+  const [activeStep, setActiveStep] = React.useState(allItems.length === 0 ? 1 : items.length > 0 && Object.values(corState.mapping).filter(Boolean).length === items.length ? 3 : 2);
 
   const updateItem = (idx, val) => {
-    const oldVal = allItems[idx];
     const next = [...allItems];
     next[idx] = val;
     setOptState({ ...optState, items: next });
-    
-    if (oldVal !== val && oldVal) {
-      const map = { ...corState.mapping };
-      if (map[oldVal] !== undefined) {
-        map[val] = map[oldVal];
-        delete map[oldVal];
-      }
-      setCorState({ ...corState, mapping: map });
-    }
   };
 
-  const addItem = () => setOptState({ ...optState, items: [...allItems, ''] });
+  const addItem = () => {
+    setOptState({ ...optState, items: [...allItems, ''] });
+  };
+
   const removeItem = (idx) => {
-    const removed = allItems[idx];
     const next = allItems.filter((_, i) => i !== idx);
-    const map = { ...corState.mapping };
-    delete map[removed];
+    const newMapping = {};
+    Object.entries(corState.mapping).forEach(([indexStr, cat]) => {
+      const indexNum = parseInt(indexStr, 10);
+      if (indexNum === idx) return;
+      else if (indexNum > idx) newMapping[indexNum - 1] = cat;
+      else newMapping[indexNum] = cat;
+    });
     setOptState({ ...optState, items: next });
-    setCorState({ ...corState, mapping: map });
+    setCorState({ ...corState, mapping: newMapping });
   };
 
   const getCategories = () => {
@@ -207,90 +391,259 @@ function ClassificationFields({ optState, setOptState, corState, setCorState }) 
   const getItemsByCategory = (cat) => {
     return Object.entries(corState.mapping)
       .filter(([_, c]) => c === cat)
-      .map(([item, _]) => item);
+      .map(([indexStr, _]) => {
+        const idx = parseInt(indexStr, 10);
+        return items[idx] || allItems[idx];
+      })
+      .filter(Boolean);
   };
 
+  const CATEGORY_COLORS = ['bg-red-100', 'bg-blue-100', 'bg-green-100', 'bg-yellow-100', 'bg-purple-100', 'bg-pink-100', 'bg-indigo-100', 'bg-cyan-100'];
+  const CATEGORY_TEXT_COLORS = ['text-red-700', 'text-blue-700', 'text-green-700', 'text-yellow-700', 'text-purple-700', 'text-pink-700', 'text-indigo-700', 'text-cyan-700'];
+  const CATEGORY_BORDER_COLORS = ['border-red-200', 'border-blue-200', 'border-green-200', 'border-yellow-200', 'border-purple-200', 'border-pink-200', 'border-indigo-200', 'border-cyan-200'];
+  
+  const getCategoryColor = (idx) => ({
+    bg: CATEGORY_COLORS[idx % CATEGORY_COLORS.length],
+    text: CATEGORY_TEXT_COLORS[idx % CATEGORY_TEXT_COLORS.length],
+    border: CATEGORY_BORDER_COLORS[idx % CATEGORY_BORDER_COLORS.length]
+  });
+
+  const completionPercentage = items.length > 0 ? Math.round((Object.values(corState.mapping).filter(Boolean).length / items.length) * 100) : 0;
+  const isComplete = items.length > 0 && Object.values(corState.mapping).filter(Boolean).length === items.length;
+
   return (
-    <div className="space-y-4">
-      {/* ITEMS INPUT SECTION */}
-      <div className="bg-white border border-violet-200 rounded-xl overflow-hidden">
-        <div className="px-4 py-3 bg-violet-50 border-b border-violet-100 flex justify-between items-center">
+    <div className="space-y-5">
+      {/* PROGRESS BAR */}
+      <div className="bg-gradient-to-r from-violet-50 to-purple-50 border-2 border-violet-300 rounded-2xl p-5 shadow-sm">
+        <div className="flex justify-between items-center mb-3">
           <div>
-            <span className="text-xs font-black text-violet-700 uppercase tracking-widest">Item yang Dikelompokkan</span>
-            <p className="text-xs text-violet-500 mt-0.5">Daftar item yang akan siswa kelompokkan</p>
+            <span className="text-xs font-black text-violet-800 uppercase tracking-widest">📊 Progress Setup Soal</span>
+            <p className="text-xs text-violet-600 mt-1">Kelengkapan data untuk soal klasifikasi</p>
           </div>
-          <button type="button" onClick={addItem} className={smBtn('violet')}>+ Tambah Item</button>
+          <span className="text-lg font-black text-violet-700">{completionPercentage}%</span>
         </div>
-        <div className="divide-y divide-stone-100">
-          {allItems.map((it, idx) => (
-            <div key={idx} className="flex gap-2 items-center px-4 py-3 hover:bg-violet-50 transition-colors">
-              <span className="text-xs font-bold text-stone-400 w-5">{idx + 1}.</span>
-              <input 
-                value={it} 
-                onChange={e => updateItem(idx, e.target.value)}
-                className={inp + ' flex-1'} 
-                placeholder="Contoh: Keyboard, Monitor, Printer..." />
-              <button type="button" onClick={() => removeItem(idx)}
-                className="px-2 py-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-500 text-xs font-bold border border-red-100 transition-all">✕</button>
+        <div className="w-full h-4 bg-violet-200 rounded-full overflow-hidden border-2 border-violet-300 shadow-inner">
+          <div className="h-full bg-gradient-to-r from-violet-500 via-purple-500 to-violet-600 transition-all duration-500 rounded-full shadow-lg" style={{width: `${completionPercentage}%`}}></div>
+        </div>
+      </div>
+
+      {/* STEP 1: INPUT ITEMS */}
+      <div className={`border-2 rounded-2xl transition-all overflow-hidden ${activeStep === 1 ? 'border-violet-400 bg-violet-50/50 shadow-lg' : 'border-stone-200 bg-white'}`}>
+        <div className={`px-6 py-5 rounded-t-xl flex items-center gap-3 ${activeStep === 1 ? 'bg-gradient-to-r from-violet-100 to-purple-100 border-b border-violet-200' : 'bg-stone-50 border-b border-stone-100'}`}>
+          <span className={`flex-shrink-0 w-9 h-9 rounded-full font-black text-sm flex items-center justify-center shadow-md ${activeStep === 1 ? 'bg-gradient-to-br from-violet-500 to-purple-600 text-white' : 'bg-gradient-to-br from-violet-400 to-purple-500 text-white'}`}>1️⃣</span>
+          <div className="flex-1">
+            <h3 className="font-black text-lg text-violet-900">Langkah 1: Masukkan Item-Item</h3>
+            <p className="text-xs text-violet-600 mt-1 font-medium">Tambahkan semua item/objek yang akan dikelompokkan siswa</p>
+          </div>
+          {allItems.length > 0 && (
+            <span className="text-sm font-bold px-4 py-2 bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 rounded-full border border-green-400 shadow-sm">📦 {allItems.length} item</span>
+          )}
+        </div>
+        <div className="px-6 py-5 space-y-3 bg-white">
+          {allItems.length === 0 ? (
+            <div className="py-10 text-center">
+              <div className="text-5xl mb-4">📦</div>
+              <p className="text-stone-600 font-black text-base mb-4">Belum ada item. Mulai dengan menambah item pertama!</p>
+              <p className="text-xs text-stone-500 mb-6">Contoh item: Keyboard, Monitor, CPU, RAM, Printer, dll</p>
             </div>
-          ))}
-          {allItems.length === 0 && (
-            <div className="px-4 py-6 text-center text-stone-400 text-xs italic">Belum ada item. Klik "Tambah Item" untuk mulai.</div>
+          ) : (
+            <div className="space-y-2.5">
+              {allItems.map((it, idx) => (
+                <div key={idx} className={`flex gap-3 items-center p-4 rounded-xl border-2 transition-all duration-300 group ${it ? 'bg-gradient-to-r from-violet-50 to-purple-50 border-violet-300 hover:shadow-md' : 'bg-stone-50 border-stone-200'}`}>
+                  <div className="flex-shrink-0 w-9 h-9 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 text-white text-xs font-black flex items-center justify-center shadow-sm">{idx + 1}</div>
+                  <input 
+                    value={it} 
+                    onChange={e => updateItem(idx, e.target.value)}
+                    className="flex-1 px-4 py-2.5 rounded-lg border border-stone-300 bg-white focus:bg-violet-50 focus:border-violet-400 outline-none text-sm font-medium transition-all" 
+                    placeholder="Contoh: Keyboard, Monitor, Printer..." />
+                  <button type="button" onClick={() => removeItem(idx)}
+                    className="opacity-0 group-hover:opacity-100 px-3 py-2.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-500 text-sm font-bold border border-red-200 transition-all">🗑️</button>
+                </div>
+              ))}
+            </div>
+          )}
+          <button type="button" onClick={addItem} 
+            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white font-black text-sm transition-all shadow-md hover:shadow-lg active:scale-95">
+            ➕ Tambah Item Baru
+          </button>
+          {allItems.length > 0 && (
+            <div className="p-4 bg-blue-50 border-2 border-blue-300 rounded-xl mt-4">
+              <div className="flex gap-2 items-start">
+                <span className="text-lg mt-0.5">💡</span>
+                <div>
+                  <p className="text-xs text-blue-900 font-black mb-1">Tips Menambah Item:</p>
+                  <p className="text-xs text-blue-700 leading-relaxed">Tambahkan <strong>minimal 3-5 item</strong> untuk membuat soal yang bermakna. Pastikan item-item tersebut dapat dikelompokkan ke dalam <strong>2-3 kategori berbeda</strong>.</p>
+                </div>
+              </div>
+            </div>
           )}
         </div>
       </div>
 
-      {/* CATEGORY ASSIGNMENT SECTION */}
+      {/* STEP 2: ASSIGN CATEGORIES */}
       {items.length > 0 && (
-        <div className="bg-white border border-violet-200 rounded-xl overflow-hidden">
-          <div className="px-4 py-3 bg-violet-50 border-b border-violet-100">
-            <div>
-              <span className="text-xs font-black text-violet-700 uppercase tracking-widest">Kategori Tiap Item</span>
-              <p className="text-xs text-violet-500 mt-0.5">Tentukan kategori untuk setiap item (contoh: INPUT, OUTPUT, INTERNAL)</p>
+        <div className={`border-2 rounded-2xl transition-all overflow-hidden ${activeStep === 2 ? 'border-violet-400 bg-violet-50/50 shadow-lg' : 'border-stone-200 bg-white'}`}>
+          <div className={`px-6 py-5 rounded-t-xl flex items-center gap-3 ${activeStep === 2 ? 'bg-gradient-to-r from-violet-100 to-purple-100 border-b border-violet-200' : 'bg-stone-50 border-b border-stone-100'}`}>
+            <span className={`flex-shrink-0 w-9 h-9 rounded-full font-black text-sm flex items-center justify-center shadow-md ${activeStep === 2 ? 'bg-gradient-to-br from-violet-500 to-purple-600 text-white' : Object.values(corState.mapping).filter(Boolean).length > 0 ? 'bg-gradient-to-br from-green-500 to-emerald-600 text-white' : 'bg-stone-200 text-stone-600'}`}>2️⃣</span>
+            <div className="flex-1">
+              <h3 className="font-black text-lg text-violet-900">Langkah 2: Kelompokkan ke Kategori</h3>
+              <p className="text-xs text-violet-600 mt-1 font-medium">Tentukan kategori untuk setiap item yang akan siswa pelajari</p>
             </div>
+            {Object.values(corState.mapping).filter(Boolean).length > 0 && (
+              <span className="text-sm font-bold px-4 py-2 bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-800 rounded-full border border-blue-300 shadow-sm">{Object.values(corState.mapping).filter(Boolean).length}/{items.length} ✓</span>
+            )}
           </div>
-          <div className="divide-y divide-stone-100">
-            {items.map((it, pidx) => (
-              <div key={it || pidx} className="flex gap-3 items-center px-4 py-3 hover:bg-violet-50 transition-colors">
-                <span className="text-xs font-bold text-stone-400 w-5">{pidx + 1}.</span>
-                <span className="flex-shrink-0 w-32 text-sm font-bold text-stone-700 bg-stone-100 px-3 py-2 rounded-lg border border-stone-200">{it}</span>
-                <span className="text-stone-300 font-bold">→</span>
-                <input
-                  value={corState.mapping[it] || ''}
-                  onChange={e => setCorState({ ...corState, mapping: { ...corState.mapping, [it]: e.target.value } })}
-                  className={inp + ' flex-1'}
-                  placeholder="Ketik nama kategori..." />
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* CATEGORY SUMMARY SECTION */}
-      {items.length > 0 && getCategories().length > 0 && (
-        <div className="bg-gradient-to-br from-violet-50 to-purple-50 border border-violet-200 rounded-xl overflow-hidden p-4">
-          <div className="text-xs font-black text-violet-700 uppercase tracking-widest mb-3">📊 Ringkasan Kategori</div>
-          <div className="space-y-2">
-            {getCategories().map(cat => (
-              <div key={cat} className="flex gap-2 items-start">
-                <span className="inline-block px-2 py-1 bg-violet-500 text-white text-xs font-black rounded-full min-w-max">{cat}</span>
-                <div className="flex flex-wrap gap-1 flex-1">
-                  {getItemsByCategory(cat).map(item => (
-                    <span key={item} className="inline-block px-2 py-1 bg-white text-stone-700 text-xs font-bold rounded border border-stone-200">
-                      {item}
-                    </span>
+          <div className="px-6 py-5 space-y-3 bg-white">
+            {/* Quick Category Selector - Show existing categories */}
+            {getCategories().length > 0 && (
+              <div className="mb-5 p-4 bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-300 rounded-xl">
+                <p className="text-xs font-black text-purple-800 uppercase mb-3">⚡ Tombol Cepat - Kategori yang Ada</p>
+                <div className="flex flex-wrap gap-2">
+                  {getCategories().map((cat, idx) => (
+                    <button
+                      key={cat}
+                      type="button"
+                      onClick={() => {
+                        const unassignedIdx = items.findIndex((_, i) => !corState.mapping[i]);
+                        if (unassignedIdx >= 0) {
+                          setCorState({ ...corState, mapping: { ...corState.mapping, [unassignedIdx]: cat } });
+                        }
+                      }}
+                      className="px-4 py-2 rounded-lg bg-white border-2 border-purple-300 text-purple-800 font-bold text-sm hover:bg-purple-100 transition-all active:scale-95"
+                    >
+                      🏷️ {cat}
+                    </button>
                   ))}
                 </div>
+                <p className="text-xs text-purple-700 mt-3 font-medium">Klik tombol untuk assign ke item pertama yang belum punya kategori</p>
               </div>
-            ))}
+            )}
+
+            <div className="space-y-3">
+              {items.map((it, pidx) => {
+                const category = corState.mapping[pidx] || '';
+                const isAssigned = !!category;
+                return (
+                  <div key={pidx} className={`flex gap-3 items-center p-4 rounded-xl border-2 transition-all duration-300 ${isAssigned ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-300 shadow-sm' : 'bg-gradient-to-r from-amber-50 to-orange-50 border-amber-300 hover:shadow-md'}`}>
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 text-white text-xs font-black flex items-center justify-center shadow-sm">{pidx + 1}</div>
+                    <div className="flex-shrink-0">
+                      <div className={`px-4 py-2 rounded-lg font-bold text-sm border-2 transition-all ${isAssigned ? 'bg-white border-green-400 text-green-800 shadow-sm' : 'bg-white border-stone-300 text-stone-700'}`}>{it}</div>
+                    </div>
+                    <div className={`text-2xl ${isAssigned ? 'text-green-500' : 'text-stone-300'}`}>→</div>
+                    <div className="flex-1 relative">
+                      <CategoryPicker
+                        existingCategories={getCategories()}
+                        value={category}
+                        onChange={(cat) => setCorState({ ...corState, mapping: { ...corState.mapping, [pidx]: cat } })}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="mt-5 p-4 bg-gradient-to-br from-blue-50 to-cyan-50 border-2 border-blue-300 rounded-xl">
+              <div className="flex gap-2 items-start">
+                <span className="text-lg mt-0.5">💡</span>
+                <div>
+                  <p className="text-sm text-blue-900 font-black mb-1">Tips Memberikan Kategori:</p>
+                  <p className="text-xs text-blue-700 leading-relaxed">
+                    ✅ <strong>Pilih dari dropdown</strong> kategori yang sudah ada (lebih cepat)<br/>
+                    ✅ atau <strong>ketik nama baru</strong> untuk membuat kategori baru<br/>
+                    ✅ Gunakan nama <strong>konsisten, jelas, dan mudah diingat</strong><br/>
+                    Contoh: HARDWARE, SOFTWARE, NETWORK atau INPUT, OUTPUT, STORAGE
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}
 
-      {/* VALIDATION MESSAGE */}
-      {items.length > 0 && Object.values(corState.mapping).filter(Boolean).length < items.length && (
-        <div className="px-4 py-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-700 font-bold">
-          ⚠️ {items.length - Object.values(corState.mapping).filter(Boolean).length} item masih belum memiliki kategori
+      {/* STEP 3: REVIEW & PREVIEW */}
+      {items.length > 0 && getCategories().length > 0 && (
+        <div className={`border-2 rounded-2xl transition-all overflow-hidden ${activeStep === 3 ? 'border-violet-400 bg-violet-50/50 shadow-lg' : 'border-stone-200 bg-white'}`}>
+          <div className={`px-6 py-5 rounded-t-xl flex items-center gap-3 ${activeStep === 3 ? 'bg-gradient-to-r from-emerald-100 to-teal-100 border-b border-emerald-200' : 'bg-stone-50 border-b border-stone-100'}`}>
+            <span className={`flex-shrink-0 w-9 h-9 rounded-full font-black text-sm flex items-center justify-center shadow-md ${isComplete ? 'bg-gradient-to-br from-green-500 to-emerald-600 text-white' : 'bg-stone-200 text-stone-600'}`}>3️⃣</span>
+            <div className="flex-1">
+              <h3 className="font-black text-lg text-emerald-900">Langkah 3: Pratinjau Kategori</h3>
+              <p className="text-xs text-emerald-700 mt-1 font-medium">Lihat bagaimana pengelompokan yang akan dilihat siswa</p>
+            </div>
+            {isComplete && (
+              <span className="text-sm font-bold px-4 py-2 bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 rounded-full border border-green-400 shadow-md animate-pulse">✨ Sempurna!</span>
+            )}
+          </div>
+          <div className="px-6 py-6 bg-white">
+            <div className="space-y-4">
+              {getCategories().map((cat, catIdx) => {
+                const colors = getCategoryColor(catIdx);
+                const itemsInCat = getItemsByCategory(cat);
+                return (
+                  <div key={cat} className={`${colors.bg} border-3 ${colors.border} rounded-2xl p-5 shadow-sm hover:shadow-md transition-all`}>
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className={`w-10 h-10 rounded-full ${colors.bg} border-3 ${colors.border} flex items-center justify-center text-lg font-bold`}>🏷️</div>
+                      <div>
+                        <div className={`text-lg font-black ${colors.text}`}>{cat}</div>
+                        <div className="text-xs font-bold text-stone-500">{itemsInCat.length} item</div>
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {itemsInCat.map((item, idx) => (
+                        <span key={idx} className={`px-4 py-2.5 rounded-xl font-bold text-sm bg-white ${colors.text} border-2 ${colors.border} shadow-sm transition-transform hover:scale-105`}>
+                          ✓ {item}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {!isComplete && (
+              <div className="mt-6 p-5 bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-400 rounded-2xl">
+                <div className="flex gap-3 items-start">
+                  <span className="text-2xl flex-shrink-0">⏳</span>
+                  <div>
+                    <p className="text-sm font-black text-amber-900 mb-1">Belum Selesai!</p>
+                    <p className="text-xs text-amber-800 font-medium leading-relaxed">
+                      <strong>{items.length - Object.values(corState.mapping).filter(Boolean).length} item</strong> masih perlu kategori. 
+                      Selesaikan <strong>Langkah 2</strong> terlebih dahulu sebelum menyimpan.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {isComplete && (
+              <div className="mt-6 p-5 bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-400 rounded-2xl">
+                <div className="flex gap-3 items-start">
+                  <span className="text-2xl">🎉</span>
+                  <div>
+                    <p className="text-sm font-black text-green-900 mb-1">Mantap! Setup Selesai!</p>
+                    <p className="text-xs text-green-800 font-medium leading-relaxed">
+                      Soal klasifikasi Anda sudah siap. <strong>{getCategories().length} kategori</strong> dengan total <strong>{items.length} item</strong> akan ditampilkan kepada siswa. 
+                      Sekarang Anda bisa menyimpan soal ini!
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* COMPLETION CHECK */}
+      {items.length > 0 && !isComplete && Object.values(corState.mapping).filter(Boolean).length < items.length && (
+        <div className="p-5 bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-400 rounded-2xl shadow-sm">
+          <div className="flex gap-3 items-start">
+            <span className="text-2xl flex-shrink-0">⏳</span>
+            <div className="flex-1">
+              <p className="font-black text-amber-900 text-sm mb-1.5">Masih Ada Pekerjaan!</p>
+              <p className="text-xs text-amber-800 font-medium leading-relaxed">
+                <strong>{items.length - Object.values(corState.mapping).filter(Boolean).length} dari {items.length} item</strong> masih perlu kategori. 
+                Selesaikan pengelompokan di <strong>Langkah 2</strong> untuk melanjutkan.
+              </p>
+            </div>
+          </div>
         </div>
       )}
     </div>
@@ -402,94 +755,223 @@ function MatchingFields({ optState, setOptState, corState, setCorState }) {
 // SEQUENCE FIELDS
 // ════════════════════════════════════════════════════════════════════════════
 function SequenceFields({ optState, setOptState, corState, setCorState }) {
-  const items = optState.items;
+  const items = optState.items.filter(Boolean);
+  const order = corState.order.filter(idx => items[idx] !== undefined && items[idx] !== '');
+  const unordered = items.map((_, idx) => idx).filter(idx => !order.includes(idx));
+
+  // Step calculations
+  const hasItems = items.length > 0;
+  const allOrdered = unordered.length === 0 && items.length > 0;
+  const progress = hasItems ? Math.round((order.length / items.length) * 100) : 0;
 
   const updateItem = (idx, val) => {
-    const oldVal = items[idx];
-    const next = [...items];
+    const next = [...optState.items];
     next[idx] = val;
     setOptState({ ...optState, items: next });
-    if (oldVal !== val) {
-      const order = corState.order.map(o => o === oldVal ? val : o);
-      setCorState({ ...corState, order });
+  };
+
+  const addItem = () => setOptState({ ...optState, items: [...optState.items, ''] });
+  
+  const removeItem = (idx) => {
+    // Remove item and shift down all indices > idx
+    const next = optState.items.filter((_, i) => i !== idx);
+    const newOrder = corState.order
+      .filter(orderIdx => orderIdx !== idx) // Remove if this index
+      .map(orderIdx => orderIdx > idx ? orderIdx - 1 : orderIdx); // Shift down indices > removed
+    setOptState({ ...optState, items: next });
+    setCorState({ ...corState, order: newOrder });
+  };
+
+  const addToOrder = (idx) => {
+    if (!order.includes(idx)) {
+      setCorState({ ...corState, order: [...order, idx] });
     }
   };
 
-  const addItem = () => setOptState({ ...optState, items: [...items, ''] });
-  const removeItem = (idx) => {
-    const removed = items[idx];
-    setOptState({ ...optState, items: items.filter((_, i) => i !== idx) });
-    setCorState({ ...corState, order: corState.order.filter(o => o !== removed) });
+  const removeFromOrder = (orderIdx) => {
+    setCorState({ ...corState, order: order.filter((_, i) => i !== orderIdx) });
   };
 
-  const availIds = items.filter(Boolean);
-  const order = corState.order.filter(id => availIds.includes(id));
-  const unordered = availIds.filter(id => !order.includes(id));
-
-  const addToOrder = (id) => setCorState({ ...corState, order: [...order, id] });
-  const removeFromOrder = (idx) => setCorState({ ...corState, order: order.filter((_, i) => i !== idx) });
-  const moveUp = (idx) => {
-    if (idx === 0) return;
-    const next = [...order]; [next[idx-1], next[idx]] = [next[idx], next[idx-1]];
+  const moveUp = (orderIdx) => {
+    if (orderIdx === 0) return;
+    const next = [...order];
+    [next[orderIdx - 1], next[orderIdx]] = [next[orderIdx], next[orderIdx - 1]];
     setCorState({ ...corState, order: next });
   };
-  const moveDown = (idx) => {
-    if (idx === order.length-1) return;
-    const next = [...order]; [next[idx], next[idx+1]] = [next[idx+1], next[idx]];
+
+  const moveDown = (orderIdx) => {
+    if (orderIdx === order.length - 1) return;
+    const next = [...order];
+    [next[orderIdx], next[orderIdx + 1]] = [next[orderIdx + 1], next[orderIdx]];
     setCorState({ ...corState, order: next });
+  };
+
+  const addAllQuickly = () => {
+    const allIndices = items.map((_, idx) => idx);
+    setCorState({ ...corState, order: allIndices });
   };
 
   return (
-    <div className="space-y-4">
-      <div className="bg-white border border-amber-200 rounded-xl overflow-hidden">
-        <div className="px-4 py-3 bg-amber-50 border-b border-amber-100 flex justify-between items-center">
-          <span className="text-xs font-black text-amber-700 uppercase tracking-widest">Daftar Item (acak)</span>
-          <button type="button" onClick={addItem} className={smBtn('amber')}>+ Tambah</button>
+    <div className="space-y-5">
+      {/* PROGRESS BAR */}
+      <div className="bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200 rounded-xl p-4">
+        <div className="flex justify-between items-center mb-2">
+          <span className="text-sm font-black text-amber-800">📊 Progres Urutan</span>
+          <span className="text-lg font-black text-amber-700">{progress}%</span>
         </div>
-        <div className="divide-y divide-stone-100">
-          {items.map((it, idx) => (
-            <div key={idx} className="flex gap-2 items-center px-4 py-3">
-              <input value={it} onChange={e => updateItem(idx, e.target.value)}
-                className={inp + ' flex-1'} placeholder="Label langkah..." />
-              <button type="button" onClick={() => removeItem(idx)}
-                className="px-2 py-2 rounded bg-red-50 hover:bg-red-100 text-red-500 text-xs font-bold border border-red-100">✕</button>
-            </div>
-          ))}
+        <div className="w-full bg-amber-100 rounded-full h-3 border border-amber-300 overflow-hidden">
+          <div 
+            className="bg-gradient-to-r from-amber-400 to-orange-400 h-full rounded-full transition-all duration-300"
+            style={{ width: `${progress}%` }}
+          />
         </div>
       </div>
 
-      {availIds.length > 0 && (
-        <div className="bg-white border border-amber-300 rounded-xl overflow-hidden">
-          <div className="px-4 py-3 bg-amber-50 border-b border-amber-100">
-            <span className="text-xs font-black text-amber-700 uppercase tracking-widest">Urutan yang Benar</span>
-            <p className="text-xs text-amber-500 mt-1">Klik item untuk menambahkan ke urutan, lalu atur posisinya</p>
-          </div>
-          <div className="p-4 space-y-2">
-            {order.map((id, idx) => (
-              <div key={idx} className="flex gap-2 items-center bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-                <span className="w-6 h-6 rounded-full bg-amber-400 text-white text-xs font-black flex items-center justify-center">{idx+1}</span>
-                <span className="flex-1 text-sm font-medium text-stone-700">{id}</span>
-                <button type="button" onClick={() => moveUp(idx)} disabled={idx===0}
-                  className="px-2 py-1 rounded bg-stone-100 hover:bg-stone-200 text-stone-500 text-xs disabled:opacity-30">↑</button>
-                <button type="button" onClick={() => moveDown(idx)} disabled={idx===order.length-1}
-                  className="px-2 py-1 rounded bg-stone-100 hover:bg-stone-200 text-stone-500 text-xs disabled:opacity-30">↓</button>
-                <button type="button" onClick={() => removeFromOrder(idx)}
-                  className="px-2 py-1 rounded bg-red-50 text-red-400 hover:bg-red-100 text-xs font-bold">✕</button>
-              </div>
-            ))}
+      {/* STEP 1️⃣ ADD ITEMS */}
+      <div className="bg-white border-2 border-blue-300 rounded-xl overflow-hidden shadow-sm">
+        <div className="px-4 py-3 bg-gradient-to-r from-blue-100 to-blue-50 border-b-2 border-blue-200">
+          <span className="text-sm font-black text-blue-900 uppercase tracking-widest">
+            1️⃣ Tambah Item/Langkah
+          </span>
+          <p className="text-xs text-blue-600 mt-1">Daftarkan semua item yang perlu diurutkan</p>
+        </div>
+        <div className="p-4 space-y-2">
+          {optState.items.map((it, idx) => (
+            <div key={idx} className="flex gap-3 items-center">
+              <span className="w-7 h-7 rounded-full bg-blue-500 text-white text-xs font-black flex items-center justify-center flex-shrink-0">
+                {idx + 1}
+              </span>
+              <input
+                value={it}
+                onChange={e => updateItem(idx, e.target.value)}
+                className="flex-1 px-3 py-2.5 rounded-lg border-2 border-blue-200 font-semibold text-sm focus:border-blue-500 focus:bg-blue-50 outline-none transition-all"
+                placeholder="Ketik langkah..."
+              />
+              <button
+                type="button"
+                onClick={() => removeItem(idx)}
+                className="px-2 py-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-500 hover:text-red-600 text-lg font-bold border border-red-200 transition-all hover:scale-110"
+                title="Hapus item"
+              >
+                ✕
+              </button>
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={addItem}
+            className="w-full mt-3 px-4 py-2.5 rounded-lg bg-gradient-to-r from-blue-100 to-blue-50 border-2 border-blue-300 text-blue-700 font-bold text-sm hover:shadow-md transition-all hover:border-blue-400"
+          >
+            ➕ Tambah Item
+          </button>
+        </div>
+      </div>
+
+      {/* STEP 2️⃣ ORDER ITEMS */}
+      {hasItems && (
+        <div className="bg-white border-2 border-purple-300 rounded-xl overflow-hidden shadow-sm">
+          <div className="px-4 py-3 bg-gradient-to-r from-purple-100 to-purple-50 border-b-2 border-purple-200 flex justify-between items-center">
+            <div>
+              <span className="text-sm font-black text-purple-900 uppercase tracking-widest">
+                2️⃣ Atur Urutan Benar
+              </span>
+              <p className="text-xs text-purple-600 mt-1">Susun item sesuai urutan yang benar</p>
+            </div>
             {unordered.length > 0 && (
-              <div className="pt-2 border-t border-stone-100">
-                <p className="text-xs text-stone-400 mb-2 font-medium">Belum diurutkan — klik untuk tambahkan:</p>
+              <button
+                type="button"
+                onClick={addAllQuickly}
+                className="px-3 py-1.5 rounded-lg bg-purple-500 hover:bg-purple-600 text-white text-xs font-black transition-all"
+                title="Tambahkan semua sekaligus"
+              >
+                ⚡ Semua
+              </button>
+            )}
+          </div>
+          <div className="p-4 space-y-3">
+            {/* Ordered Items */}
+            <div className="space-y-2">
+              {order.length > 0 && <p className="text-xs font-black text-stone-500 uppercase px-1">✓ Sudah Diurutkan</p>}
+              {order.map((itemIdx, orderIdx) => (
+                <div key={orderIdx} className="flex gap-2 items-center bg-gradient-to-r from-purple-50 to-purple-25 border-2 border-purple-200 rounded-lg p-3 hover:shadow-md transition-all">
+                  <span className="w-6 h-6 rounded-full bg-purple-500 text-white text-xs font-black flex items-center justify-center flex-shrink-0">
+                    {orderIdx + 1}
+                  </span>
+                  <span className="flex-1 text-sm font-semibold text-stone-700">{items[itemIdx]}</span>
+                  <button
+                    type="button"
+                    onClick={() => moveUp(orderIdx)}
+                    disabled={orderIdx === 0}
+                    className="px-2 py-1.5 rounded bg-stone-100 hover:bg-stone-200 text-stone-600 text-xs font-bold disabled:opacity-30 transition-all"
+                    title="Naik"
+                  >
+                    ↑
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => moveDown(orderIdx)}
+                    disabled={orderIdx === order.length - 1}
+                    className="px-2 py-1.5 rounded bg-stone-100 hover:bg-stone-200 text-stone-600 text-xs font-bold disabled:opacity-30 transition-all"
+                    title="Turun"
+                  >
+                    ↓
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => removeFromOrder(orderIdx)}
+                    className="px-2 py-1.5 rounded bg-red-50 hover:bg-red-100 text-red-500 text-xs font-bold transition-all"
+                    title="Hapus dari urutan"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            {/* Unordered Items */}
+            {unordered.length > 0 && (
+              <div className="pt-3 border-t-2 border-stone-200">
+                <p className="text-xs font-black text-stone-500 uppercase px-1 mb-2">⏳ Belum Diurutkan</p>
                 <div className="flex flex-wrap gap-2">
-                  {unordered.map((id, uidx) => (
-                    <button key={uidx} type="button" onClick={() => addToOrder(id)}
-                      className="px-3 py-1 rounded-full bg-amber-100 hover:bg-amber-200 text-amber-700 text-xs font-bold border border-amber-200 transition-all">
-                      + {id}
+                  {unordered.map(itemIdx => (
+                    <button
+                      key={itemIdx}
+                      type="button"
+                      onClick={() => addToOrder(itemIdx)}
+                      className="px-3 py-1.5 rounded-full bg-purple-100 hover:bg-purple-200 text-purple-700 text-xs font-bold border border-purple-300 transition-all hover:shadow-md"
+                    >
+                      ➕ {items[itemIdx]}
                     </button>
                   ))}
                 </div>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* STEP 3️⃣ PREVIEW */}
+      {allOrdered && (
+        <div className="bg-white border-2 border-green-300 rounded-xl overflow-hidden shadow-sm">
+          <div className="px-4 py-3 bg-gradient-to-r from-green-100 to-green-50 border-b-2 border-green-200">
+            <span className="text-sm font-black text-green-900 uppercase tracking-widest">
+              3️⃣ Pratinjau Urutan Benar
+            </span>
+          </div>
+          <div className="p-4">
+            <div className="space-y-2">
+              {order.map((itemIdx, idx) => (
+                <div key={idx} className="flex gap-3 items-center bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-3">
+                  <span className="w-7 h-7 rounded-full bg-green-500 text-white text-xs font-black flex items-center justify-center flex-shrink-0">
+                    {idx + 1}
+                  </span>
+                  <span className="text-sm font-semibold text-green-900">{items[itemIdx]}</span>
+                </div>
+              ))}
+            </div>
+            <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg text-xs text-center text-green-700 font-semibold">
+              ✅ Semua item sudah diurutkan dengan benar!
+            </div>
           </div>
         </div>
       )}
