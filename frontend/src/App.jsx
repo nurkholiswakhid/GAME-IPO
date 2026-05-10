@@ -27,91 +27,214 @@ function WelcomeScreen() {
   const navigate = useNavigate();
   const { student, loading } = React.useContext(GameContext);
 
+  const materials = [
+    { level: 1, icon: '🏗️', title: 'Fondasi Arsitektur', desc: 'Konsep dasar sistem komputer', progress: 100 },
+    { level: 2, icon: '⚙️', title: 'Prosesor & CPU', desc: 'Pemrosesan data dan instruksi', progress: 85 },
+    { level: 3, icon: '💾', title: 'Memori & Storage', desc: 'Penyimpanan dan manajemen data', progress: 60 },
+    { level: 4, icon: '🔌', title: 'I/O Subsystem', desc: 'Sistem input/output komputer', progress: 40 },
+    { level: 5, icon: '📡', title: 'Jaringan Komputer', desc: 'Komunikasi antar sistem', progress: 20 }
+  ];
+
   return (
-    <div className="min-h-screen flex items-center justify-center city-bg">
+    <div className="min-h-screen overflow-hidden relative">
+      {/* Background Image with Overlay */}
+      <div 
+        className="fixed inset-0 bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: 'url(/kodomo_city_bg.png)',
+          zIndex: 0
+        }}
+      />
+      
+      {/* Dark Overlay for better text readability */}
+      <div className="fixed inset-0 bg-gradient-to-br from-blue-900/40 via-orange-900/20 to-cyan-900/30" style={{ zIndex: 1 }} />
+      
+      {/* Animated accent orbs */}
+      <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 2 }}>
+        <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full bg-gradient-to-br from-blue-300/15 to-orange-300/8 blur-3xl animate-pulse" />
+        <div className="absolute bottom-0 right-1/4 w-80 h-80 rounded-full bg-gradient-to-tl from-orange-300/12 to-blue-300/5 blur-3xl animate-pulse" style={{animationDelay:'1.5s'}} />
+        <div className="absolute top-1/3 right-0 w-72 h-72 rounded-full bg-gradient-to-l from-yellow-400/8 to-transparent blur-3xl animate-pulse" style={{animationDelay:'0.7s'}} />
+      </div>
 
-      {/* Floating cloud orbs */}
-      <div className="fixed top-1/5 left-1/4 w-80 h-80 rounded-full bg-white/20 blur-3xl animate-pulse pointer-events-none" />
-      <div className="fixed bottom-1/4 right-1/4 w-64 h-64 rounded-full bg-sky-200/20 blur-3xl animate-pulse pointer-events-none" style={{animationDelay:'1.2s'}} />
+      <div className="relative z-10 min-h-screen flex flex-col">
+        {/* Hero Section - Split Screen */}
+        <div className="flex-1 flex items-stretch justify-center px-6 py-12">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, ease: 'easeOut' }}
+            className="w-full flex flex-col lg:flex-row gap-8 lg:gap-12 max-w-7xl mx-auto items-center lg:items-stretch"
+          >
+            {/* LEFT SIDE - Info Section */}
+            <div className="flex flex-col items-center lg:items-start justify-center flex-1 text-center lg:text-left w-full">
+            {/* Game Logo with enhanced animation */}
+            <motion.div
+              initial={{ scale: 0, rotate: -20, opacity: 0 }}
+              animate={{ scale: 1, rotate: 0, opacity: 1 }}
+              transition={{ type: 'spring', stiffness: 150, damping: 15, delay: 0.2 }}
+              className="mb-8 flex justify-center w-full"
+            >
+              <div className="relative flex items-center justify-center w-64 h-48">
+                {/* White oval background */}
+                <div className="absolute inset-0 rounded-full bg-white shadow-2xl" style={{boxShadow: '0 10px 40px rgba(0,0,0,0.2)'}} />
+                
+                <img 
+                  src="/archilogic-logo.png" 
+                  alt="ArchiLogic Logo" 
+                  className="w-40 h-auto drop-shadow-2xl relative z-10"
+                  style={{filter: 'drop-shadow(0 10px 25px rgba(30,144,255,0.4))'}}
+                />
+                <div className="absolute inset-0 rounded-full border-4 border-blue-400/40 animate-spin" style={{animationDuration:'12s'}} />
+                <div className="absolute -inset-4 rounded-full border-2 border-orange-400/30 animate-spin" style={{animationDuration:'18s', animationDirection:'reverse'}} />
+                <div className="absolute -inset-2 rounded-full border border-yellow-400/25 animate-pulse" style={{animationDuration:'2.5s'}} />
+              </div>
+            </motion.div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.9, ease: 'easeOut' }}
-        className="relative z-10 text-center px-6 max-w-3xl mx-auto"
-      >
-        {/* Game Logo */}
-        <motion.div
-          initial={{ scale: 0, rotate: -15 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ type: 'spring', stiffness: 200, damping: 18, delay: 0.2 }}
-          className="mb-8 flex justify-center"
-        >
-          <div className="relative">
-            <div className="w-28 h-28 rounded-3xl bg-gradient-to-br from-sky-400 via-blue-400 to-cyan-400 flex flex-col items-center justify-center shadow-xl text-white" style={{boxShadow:'0 8px 32px rgba(135,206,235,0.6)'}}>
-              <span className="text-5xl font-black leading-none tracking-tighter drop-shadow-sm">VN</span>
-              <span className="text-[10px] font-bold tracking-[0.2em] leading-none mt-1 opacity-90 border-t border-white/40 pt-1 mt-1">CITY</span>
+            {/* Tagline with decorative lines */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="mb-6 w-full"
+            >
+              {/* Top decorative line */}
+              <div className="flex items-center justify-center gap-4 mb-6">
+                <div className="h-1 w-16 bg-gradient-to-r from-transparent to-orange-300 rounded-full"></div>
+                <p className="text-orange-200 text-xs font-black tracking-[0.35em] uppercase font-game drop-shadow-lg">
+                  ◆ Platform Edukasi ◆
+                </p>
+                <div className="h-1 w-16 bg-gradient-to-l from-transparent to-orange-300 rounded-full"></div>
+              </div>
+              <p className="text-orange-100 text-sm font-bold tracking-wider drop-shadow-lg mb-6 text-center">Arsitektur Komputer & Logika Sistem</p>
+              <div className="space-y-3">
+                <h1
+                  className="font-game font-black text-white leading-tight drop-shadow-2xl text-center"
+                  style={{ fontSize: 'clamp(2.8rem, 9vw, 5.5rem)', textShadow: '0 4px 12px rgba(0,0,0,0.5)' }}
+                >
+                  ArchiLogic
+                </h1>
+                <h2
+                  className="font-game font-bold text-orange-100 drop-shadow-lg text-center"
+                  style={{ fontSize: 'clamp(1.5rem, 5vw, 2.5rem)', textShadow: '0 3px 8px rgba(0,0,0,0.4)' }}
+                >
+                  ── Master The Logic ──
+                </h2>
+              </div>
+            </motion.div>
+
+            {/* Description with enhanced styling */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6 }}
+              className="mb-6 w-full"
+            >
+              <p className="text-white text-base md:text-lg font-medium leading-relaxed drop-shadow-md mb-5 text-center" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>
+                Kuasai logika arsitektur komputer melalui <span className="font-bold text-orange-200 bg-gradient-to-r from-orange-500/20 to-yellow-500/20 px-2 py-1 rounded-lg">10 level tantangan interaktif</span> tentang IPO &amp; sistem komputer.
+              </p>
+              <div className="h-1 w-20 bg-gradient-to-r from-blue-400 to-orange-400 rounded-full mb-5 shadow-lg mx-auto"></div>
+              <p className="text-orange-100 text-base font-bold drop-shadow-lg text-center">🏆 Pahami teknologi, raih poin, dan buktikan keahlianmu!</p>
+            </motion.div>
+
+            {/* CTA Buttons */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8 }}
+              className="flex flex-col sm:flex-row gap-5 justify-center items-center w-full mb-6"
+            >
+              <motion.button
+                whileHover={{ scale: 1.08, boxShadow: '0 20px 50px rgba(59,130,246,0.6)' }}
+                whileTap={{ scale: 0.92 }}
+                onClick={() => navigate(student ? '/dashboard' : '/register')}
+                className="relative group px-12 py-4 bg-gradient-to-r from-blue-500 via-orange-500 to-yellow-500 text-white font-black rounded-2xl text-lg font-game tracking-wider shadow-xl overflow-hidden border border-white/30 w-full sm:w-auto"
+              >
+                <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/30 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                <span className="relative flex items-center gap-2 justify-center">
+                  {loading ? '⏳ Loading...' : student ? '▶️ LANJUTKAN MISI' : '🚀 MULAI PETUALANGAN'}
+                </span>
+              </motion.button>
+
+              <motion.button
+                whileHover={{ scale: 1.06, boxShadow: '0 12px 30px rgba(234,88,12,0.3)' }}
+                whileTap={{ scale: 0.92 }}
+                onClick={() => navigate('/login-guru')}
+                className="px-10 py-4 bg-white/80 backdrop-blur-md text-orange-600 font-bold rounded-2xl border-2 border-orange-200 hover:border-orange-400 hover:bg-white transition-all text-sm shadow-md font-game tracking-wide w-full sm:w-auto"
+              >
+                👨‍🏫 Portal Guru
+              </motion.button>
+            </motion.div>
+
+            {/* Quick Info */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.0 }}
+              className="flex flex-wrap justify-center gap-3 text-sm font-medium w-full"
+            >
+              <div className="bg-blue-500/80 backdrop-blur-md px-3 py-2 rounded-full border-2 border-blue-300/60 shadow-lg">
+                <span className="text-white font-bold drop-shadow text-xs">📱 Responsif</span>
+              </div>
+              <div className="bg-orange-500/80 backdrop-blur-md px-3 py-2 rounded-full border-2 border-orange-300/60 shadow-lg">
+                <span className="text-white font-bold drop-shadow text-xs">⚡ Cepat</span>
+              </div>
+              <div className="bg-yellow-500/80 backdrop-blur-md px-3 py-2 rounded-full border-2 border-yellow-300/60 shadow-lg">
+                <span className="text-white font-bold drop-shadow text-xs">🎯 Edukatif</span>
+              </div>
+            </motion.div>
             </div>
-            <div className="absolute inset-0 rounded-3xl border-4 border-sky-300/50 animate-spin" style={{animationDuration:'10s'}} />
-            <div className="absolute -inset-3 rounded-3xl border-2 border-amber-300/30 animate-spin" style={{animationDuration:'14s', animationDirection:'reverse'}} />
-          </div>
-        </motion.div>
 
-        {/* Title */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
-          <p className="text-sky-500 text-xs font-black tracking-[0.4em] uppercase mb-3 font-game">
-            ◈ Media Pembelajaran Interaktif ◈
-          </p>
-          <h1
-            className="font-game font-black text-transparent bg-clip-text bg-gradient-to-r from-sky-500 via-blue-500 to-cyan-500 leading-none mb-2"
-            style={{ fontSize: 'clamp(2.5rem, 8vw, 5rem)' }}
-          >
-            VON NEUMANN
-          </h1>
-          <h2
-            className="font-game font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-orange-400 mb-6"
-            style={{ fontSize: 'clamp(1.2rem, 4vw, 2rem)' }}
-          >
-            ── CITY QUEST ──
-          </h2>
-          <p className="text-stone-600 text-base md:text-lg font-medium leading-relaxed max-w-xl mx-auto mb-10">
-            Jelajahi kota modern dan selesaikan 10 misi tentang arsitektur komputer &amp; siklus IPO.<br/>
-            <span className="text-sky-600 font-bold">Kuasai ilmu dan jadilah penjaga kota digital!</span>
-          </p>
-        </motion.div>
-
-        {/* CTA Buttons */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }}
-          className="flex flex-col sm:flex-row gap-4 justify-center items-center"
-        >
-          <motion.button
-            whileHover={{ scale: 1.06, boxShadow: '0 8px 32px rgba(135,206,235,0.7)' }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => navigate(student ? '/dashboard' : '/register')}
-            className="relative px-10 py-4 bg-gradient-to-r from-sky-400 to-blue-500 text-white font-black rounded-2xl text-lg font-game tracking-wide shadow-xl overflow-hidden"
-          >
-            <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] hover:translate-x-[100%] transition-transform duration-700" />
-            {loading ? '...' : student ? '▶ LANJUTKAN MISI' : '▶ MULAI PETUALANGAN'}
-          </motion.button>
-
-          <motion.button
-            whileHover={{ scale: 1.04 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => navigate('/login-guru')}
-            className="px-8 py-4 glass text-stone-700 font-bold rounded-2xl hover:bg-white/90 transition-all text-sm shadow-sm border border-white/70"
-          >
-            Portal Guru
-          </motion.button>
-        </motion.div>
+            {/* RIGHT SIDE - Course Materials Preview */}
+            <motion.div
+              initial={{ opacity: 0, x: 40 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.7, duration: 0.8 }}
+              className="flex-1 w-full lg:w-auto flex flex-col"
+            >
+              {/* Section header with decorative elements */}
+              <div className="mb-6 w-full">
+                <div className="flex items-center justify-center gap-3 mb-3">
+                  <span className="text-3xl drop-shadow-lg">📚</span>
+                  <h3 className="text-2xl font-black text-white drop-shadow-lg">Materi Pembelajaran</h3>
+                </div>
+                <p className="text-orange-100 text-xs md:text-sm font-bold text-center tracking-wide">5 Modul Utama Arsitektur Komputer</p>
+              </div>
+              
+              <div className="space-y-3 flex-1 overflow-y-auto pr-2">
+                {materials.map((m, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.9 + i * 0.1 }}
+                    whileHover={{ x: 5, boxShadow: '0 15px 40px rgba(234,88,12,0.3)' }}
+                    className="group relative bg-white/90 backdrop-blur-lg rounded-xl overflow-hidden border-2 border-orange-200/70 shadow-lg hover:shadow-xl transition-all duration-300 p-4"
+                  >
+                    {/* Icon background gradient */}
+                    <div className="absolute -top-6 -right-6 w-24 h-24 bg-gradient-to-br from-orange-400/20 to-yellow-400/10 rounded-full blur-2xl group-hover:from-orange-400/25 group-hover:to-yellow-400/15 transition-all" />
+                    
+                    <div className="relative z-10">
+                      {/* Header with icon */}
+                      <div className="mb-3">
+                        <div className="text-3xl drop-shadow-lg">{m.icon}</div>
+                      </div>
+                      
+                      {/* Title */}
+                      <h4 className="text-sm font-black text-orange-700 leading-tight mb-2 group-hover:text-orange-600 transition-colors">{m.title}</h4>
+                      
+                      {/* Description */}
+                      <p className="text-xs text-orange-600 font-medium leading-relaxed">{m.desc}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          </motion.div>
+        </div>
 
         {/* Footer */}
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}
-          className="mt-16 pt-6 border-t border-stone-200/60 text-xs text-stone-500 font-medium">
-          <p className="font-game tracking-wider text-sky-500/80 mb-1">NUR KHOLIS WAKHID · 22050974075 · UNESA 2026</p>
-          <p>S1 Pendidikan Teknologi Informasi — SMK Negeri 1 Lamongan</p>
-        </motion.div>
-      </motion.div>
+
+      </div>
     </div>
   );
 }

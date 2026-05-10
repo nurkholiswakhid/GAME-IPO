@@ -121,7 +121,7 @@ export default function DashboardLevel() {
             </span>
           </motion.div>
           <h2 className="text-4xl md:text-6xl font-serif font-black text-stone-800 tracking-tight">Peta Kota Digital</h2>
-          <p className="text-stone-600 text-base md:text-lg mt-4 max-w-lg mx-auto font-medium">Bantu kelola aliran data dan proses di kota modern ini sesuai prinsip Von Neumann!</p>
+          <p className="text-stone-600 text-base md:text-lg mt-4 max-w-lg mx-auto font-medium">Kuasai arsitektur komputer dan logika sistem dalam ArchiLogic Challenge!</p>
         </div>
 
         {/* ── ELEGANT ZIGZAG LEVEL TIMELINE ── */}
@@ -215,22 +215,7 @@ export default function DashboardLevel() {
           })}
         </div>
 
-        {/* ── FOOTER ACTIONS ── */}
-        <div className="mt-16 glass rounded-3xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-            <button onClick={() => { logoutStudent(); navigate('/'); }}
-              className="text-red-500 hover:text-red-700 bg-red-50 border border-red-100 transition-colors text-sm font-bold px-6 py-3 rounded-2xl hover:bg-red-100 w-full sm:w-auto">
-              KELUAR SESI
-            </button>
-
-          </div>
-
-          <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
-             onClick={() => navigate('/leaderboard')}
-            className="flex items-center justify-center gap-3 px-8 py-3 bg-amber-400 hover:bg-amber-500 border-2 border-amber-400 hover:border-amber-500 text-white font-bold rounded-2xl shadow-sm hover:shadow-md text-sm tracking-wide transition-colors w-full sm:w-auto">
-            🏆 PAPAN PERINGKAT
-          </motion.button>
-        </div>
+        
 
 
       </div>
