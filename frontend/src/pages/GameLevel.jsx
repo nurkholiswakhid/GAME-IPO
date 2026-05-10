@@ -8,13 +8,17 @@ import { GameContext } from '../context/GameContext';
 //  CHARACTER DEFINITIONS & MOODS
 // ─────────────────────────────────────────────────────────────
 const CHARS = {
-  NARASI:       { img: null,              name: 'SYSTEM', color: '#94a3b8', side: 'center', emoji: '⚙️' },
-  ARKA:         { img: '/char_arka.png',  name: 'Arka',   color: '#3b82f6', side: 'left',   emoji: '🧑‍🔧' },
-  NEXA:         { img: '/char_nexa.png',  name: 'Nexa',   color: '#8b5cf6', side: 'right',  emoji: '👩‍💻' },
-  DIRA:         { img: '/char_dira.png',  name: 'Dira',   color: '#10b981', side: 'left',   emoji: '👩‍🎨' },
-  RIVO:         { img: '/char_rivo.png',  name: 'Rivo',   color: '#f97316', side: 'right',  emoji: '👨‍✈️' },
-  ZENO:         { img: '/char_zeno.png',  name: 'Zeno',   color: '#06b6d4', side: 'left',   emoji: '🤖' },
-  NPC:          { img: null,              name: 'NPC',    color: '#94a3b8', side: 'left',   emoji: '🧑'  },
+  NARASI:       { img: null,                  name: 'SYSTEM',     color: '#94a3b8', side: 'center', emoji: '⚙️' },
+  ARKA:         { img: '/char_arka.png',       name: 'Arka',       color: '#3b82f6', side: 'left',   emoji: '🧑‍🔧' },
+  NEXA:         { img: '/char_nexa.png',       name: 'Nexa',       color: '#8b5cf6', side: 'right',  emoji: '👩‍💻' },
+  DIRA:         { img: '/char_dira.png',       name: 'Dira',       color: '#10b981', side: 'left',   emoji: '👩‍🎨' },
+  RIVO:         { img: '/char_rivo.png',       name: 'Rivo',       color: '#f97316', side: 'right',  emoji: '👨‍✈️' },
+  ZENO:         { img: '/char_zeno.png',       name: 'Zeno',       color: '#06b6d4', side: 'left',   emoji: '🤖' },
+  ARDI:         { img: '/char_ardi.png',       name: 'Ardi',       color: '#f59e0b', side: 'right',  emoji: '👦' },
+  BUDI:         { img: '/char_budi.png',       name: 'Budi',       color: '#84cc16', side: 'left',   emoji: '👨' },
+  NPC_MALE:     { img: '/char_npc_male.png',   name: 'NPC Pria',   color: '#64748b', side: 'left',   emoji: '🧑' },
+  NPC_FEMALE:   { img: '/char_npc_female.png', name: 'NPC Wanita', color: '#ec4899', side: 'right',  emoji: '👩' },
+  NPC:          { img: null,                   name: 'NPC',        color: '#94a3b8', side: 'left',   emoji: '🧑' },
 };
 
 const MOOD = {
@@ -29,66 +33,22 @@ const MOOD = {
 };
 
 const SCENES = {
-  lab_komputer: {
-    bg: 'transparent',
-    glow: '#87ceeb', label: 'Pusat Input Data', icon: '⌨️',
-    accent: 'from-blue-100/40 to-blue-50/20',
-    grid: 'rgba(135,206,235,0.1)',
-  },
-  server_room: {
-    bg: 'transparent',
-    glow: '#98fb98', label: 'Jalur Distribusi', icon: '🚦',
-    accent: 'from-green-100/40 to-green-50/20',
-    grid: 'rgba(152,251,152,0.1)',
-  },
-  studio_it: {
-    bg: 'transparent',
-    glow: '#ffb6c1', label: 'Pusat Proses (CPU)', icon: '🧠',
-    accent: 'from-pink-100/40 to-pink-50/20',
-    grid: 'rgba(255,182,193,0.1)',
-  },
-  rumah_user: {
-    bg: 'transparent',
-    glow: '#ffa07a', label: 'Terminal Output', icon: '🖥️',
-    accent: 'from-orange-100/40 to-orange-50/20',
-    grid: 'rgba(255,160,122,0.1)',
-  },
-  data_center: {
-    bg: 'transparent',
-    glow: '#ffd700', label: 'Pabrik Perangkat', icon: '🏭',
-    accent: 'from-amber-100/40 to-amber-50/20',
-    grid: 'rgba(255,215,0,0.1)',
-  },
-  lab_storage: {
-    bg: 'transparent',
-    glow: '#a7f3d0', label: 'Gudang Storage', icon: '🗄️',
-    accent: 'from-emerald-100/40 to-emerald-50/20',
-    grid: 'rgba(167,243,208,0.1)',
-  },
-  kelas_smk: {
-    bg: 'transparent',
-    glow: '#e9d5ff', label: 'Akademi Sistem', icon: '🏫',
-    accent: 'from-purple-100/40 to-purple-50/20',
-    grid: 'rgba(233,213,255,0.1)',
-  },
-  lab_riset: {
-    bg: 'transparent',
-    glow: '#c7d2fe', label: 'Lab Inovasi IT', icon: '🔬',
-    accent: 'from-indigo-100/40 to-indigo-50/20',
-    grid: 'rgba(199,210,254,0.1)',
-  },
-  perpustakaan: {
-    bg: 'transparent',
-    glow: '#cbd5e1', label: 'Jaringan Kota', icon: '🌐',
-    accent: 'from-slate-100/40 to-slate-50/20',
-    grid: 'rgba(203,213,225,0.1)',
-  },
-  final_boss: {
-    bg: 'transparent',
-    glow: '#fef08a', label: 'Ujian Arsitektur', icon: '👑',
-    accent: 'from-yellow-100/40 to-yellow-50/20',
-    grid: 'rgba(254,240,138,0.1)',
-  },
+  lab_komputer:     { bg: 'transparent', glow: '#87ceeb', label: 'Pusat Input Data',   icon: '⌨️', accent: 'from-blue-100/40 to-blue-50/20',    grid: 'rgba(135,206,235,0.1)' },
+  server_room:      { bg: 'transparent', glow: '#98fb98', label: 'Jalur Distribusi',   icon: '🚦', accent: 'from-green-100/40 to-green-50/20',   grid: 'rgba(152,251,152,0.1)' },
+  studio_it:        { bg: 'transparent', glow: '#ffb6c1', label: 'Pusat Proses (CPU)', icon: '🧠', accent: 'from-pink-100/40 to-pink-50/20',     grid: 'rgba(255,182,193,0.1)' },
+  rumah_user:       { bg: 'transparent', glow: '#ffa07a', label: 'Terminal Output',    icon: '🖥️', accent: 'from-orange-100/40 to-orange-50/20', grid: 'rgba(255,160,122,0.1)' },
+  data_center:      { bg: 'transparent', glow: '#ffd700', label: 'Pabrik Perangkat',   icon: '🏭', accent: 'from-amber-100/40 to-amber-50/20',   grid: 'rgba(255,215,0,0.1)'   },
+  lab_storage:      { bg: 'transparent', glow: '#a7f3d0', label: 'Gudang Storage',     icon: '🗄️', accent: 'from-emerald-100/40 to-emerald-50/20', grid: 'rgba(167,243,208,0.1)' },
+  kelas_smk:        { bg: 'transparent', glow: '#e9d5ff', label: 'Akademi Sistem',    icon: '🏫', accent: 'from-purple-100/40 to-purple-50/20', grid: 'rgba(233,213,255,0.1)' },
+  lab_riset:        { bg: 'transparent', glow: '#c7d2fe', label: 'Lab Inovasi IT',    icon: '🔬', accent: 'from-indigo-100/40 to-indigo-50/20', grid: 'rgba(199,210,254,0.1)' },
+  perpustakaan:     { bg: 'transparent', glow: '#cbd5e1', label: 'Jaringan Kota',     icon: '🌐', accent: 'from-slate-100/40 to-slate-50/20',   grid: 'rgba(203,213,225,0.1)' },
+  final_boss:       { bg: 'transparent', glow: '#fef08a', label: 'Ujian Arsitektur',  icon: '👑', accent: 'from-yellow-100/40 to-yellow-50/20', grid: 'rgba(254,240,138,0.1)' },
+  // Alias: scene dari form guru (SCENE_LIST) yang memakai nama berbeda
+  academy_kodomo:   { bg: 'transparent', glow: '#e9d5ff', label: 'Akademi Sistem',    icon: '🏫', accent: 'from-purple-100/40 to-purple-50/20', grid: 'rgba(233,213,255,0.1)' },
+  core_kodomo:      { bg: 'transparent', glow: '#ffb6c1', label: 'Pusat Proses (CPU)', icon: '🧠', accent: 'from-pink-100/40 to-pink-50/20',    grid: 'rgba(255,182,193,0.1)' },
+  hardware_kodomo:  { bg: 'transparent', glow: '#ffd700', label: 'Pabrik Perangkat',  icon: '🏭', accent: 'from-amber-100/40 to-amber-50/20',   grid: 'rgba(255,215,0,0.1)'   },
+  home_kodomo:      { bg: 'transparent', glow: '#ffa07a', label: 'Terminal Output',   icon: '🖥️', accent: 'from-orange-100/40 to-orange-50/20', grid: 'rgba(255,160,122,0.1)' },
+  network_kodomo:   { bg: 'transparent', glow: '#cbd5e1', label: 'Jaringan Kota',     icon: '🌐', accent: 'from-slate-100/40 to-slate-50/20',   grid: 'rgba(203,213,225,0.1)' },
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -115,9 +75,30 @@ function useTypewriter(text, speed = 25) {
 //  CHARACTER SPRITE COMPONENT
 // ─────────────────────────────────────────────────────────────
 function CharacterSprite({ charKey, isActive, side, mood }) {
-  const def = CHARS[charKey];
-  if (!def || !def.img) return null;
+  const def = CHARS[charKey] || CHARS['NPC'];
   const moodDef = MOOD[mood] || MOOD.normal;
+
+  // Jika tidak ada img (karakter emoji-only atau NPC tanpa sprite)
+  if (!def.img) {
+    if (!isActive) return null;
+    return (
+      <motion.div
+        key={charKey}
+        initial={{ y: 20, opacity: 0, scale: 0.8 }}
+        animate={{ y: 0, opacity: 1, scale: 1 }}
+        exit={{ y: 20, opacity: 0, scale: 0.8 }}
+        className={`absolute bottom-[120px] flex items-center justify-center z-10 pointer-events-none`}
+        style={{ [side === 'right' ? 'right' : 'left']: '8%' }}
+      >
+        <div
+          className="w-16 h-16 rounded-full flex items-center justify-center text-4xl shadow-lg border-4 bg-white"
+          style={{ borderColor: def.color }}
+        >
+          {def.emoji}{moodDef.emoji}
+        </div>
+      </motion.div>
+    );
+  }
 
   // Combined filter: mood-based brightness adjustments + soft drop-shadow
   const activeFilter = `brightness(1.05) ${moodDef.filter} drop-shadow(0 10px 15px rgba(0,0,0,0.2))`;
@@ -703,7 +684,7 @@ export default function GameLevel() {
     if (ok) {
       setFeedback({ type: 'success', text: 'KERJA BAGUS!', explanation: question.explanation });
       setTimeout(() => { 
-        if (feedback?.type === 'success' && !submitted) {
+        if (!submitted) {
           setFeedback(null); 
           handleLevelComplete(); 
         }
@@ -714,10 +695,29 @@ export default function GameLevel() {
         nl -= 1;
         setLives(nl);
       }
-      setFeedback({ type: 'error', text: `JAWABAN KURANG TEPAT. ${selectedSolver !== 'ARKA' ? `KESEMPATAN: ${nl}` : 'WAKTU TERUS BERJALAN!' }`, explanation: question.explanation });
+      setFeedback({ type: 'error', text: `JAWABAN KURANG TEPAT. ${selectedSolver !== 'ARKA' ? `KESEMPATAN: ${nl}` : 'WAKTU TERUS BERJALAN!' }`, explanation: question.failure_message || question.explanation });
       setSeqAns([]); setClassAns({}); setMatchAns({});
-      if (nl <= 0 && selectedSolver !== 'ARKA') setTimeout(() => { gameOverRef.current=true; setFeedback(null); doSubmit(false); }, 2800);
-      else setTimeout(() => setFeedback(null), 3000);
+      if (nl <= 0 && selectedSolver !== 'ARKA') {
+        // Game over: submit dengan poin 0
+        setTimeout(() => {
+          gameOverRef.current = true;
+          setFeedback(null);
+          // Submit game over result
+          axios.post(`${import.meta.env.VITE_API_URL}/api/results`, {
+            session_id: student.session_id,
+            level_number: lvl,
+            poin: 0,
+            bintang: 0,
+            waktu_detik: 300 - timeLeft,
+            is_complete: false,
+            attempts: 1
+          }).catch(e => console.error('Game over submit failed:', e.message));
+          setWinData({ pts: 0, bintang: 0 });
+          setPhase('COMPLETE');
+        }, 2800);
+      } else {
+        setTimeout(() => setFeedback(null), 3000);
+      }
     }
   };
 
@@ -775,7 +775,14 @@ export default function GameLevel() {
     
     if (success) {
       setWinData({ pts, bintang: st });
-      setPhase('COMPLETE');
+      // Jika ada outro dialogs, tampilkan dulu sebelum COMPLETE
+      const outroDialogs = storyData?.outro || [];
+      if (outroDialogs.length > 0) {
+        setDialogIdx(0);
+        setPhase('OUTRO');
+      } else {
+        setPhase('COMPLETE');
+      }
     }
   };
 

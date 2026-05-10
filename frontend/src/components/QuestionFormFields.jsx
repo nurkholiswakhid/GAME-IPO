@@ -1836,17 +1836,24 @@ const NPC_LIST = [
 ];
 
 const SCENE_LIST = [
-  { id: 'lab_komputer',    label: 'Lab Komputer',   file: '/bg_lab_komputer.png' },
-  { id: 'data_center',     label: 'Data Center',    file: '/bg_data_center.png' },
-  { id: 'perpustakaan',    label: 'Perpustakaan',   file: '/bg_perpustakaan.png' },
-  { id: 'studio_it',       label: 'Studio IT',      file: '/bg_studio_it.png' },
-  { id: 'academy_kodomo',  label: 'Academy',        file: '/bg_academy_kodomo.png' },
-  { id: 'core_kodomo',     label: 'Core',           file: '/bg_core_kodomo.png' },
-  { id: 'data_center',     label: 'Data Center',    file: '/bg_data_center.png' },
-  { id: 'hardware_kodomo', label: 'Hardware',       file: '/bg_hardware_kodomo.png' },
-  { id: 'home_kodomo',     label: 'Home',           file: '/bg_home_kodomo.png' },
-  { id: 'network_kodomo',  label: 'Network',        file: '/bg_network_kodomo.png' },
+  { id: 'lab_komputer',   label: 'Lab Komputer (Input)',   file: '/bg_lab_komputer.png' },
+  { id: 'server_room',    label: 'Server Room',            file: '/bg_data_center.png' },
+  { id: 'studio_it',      label: 'Studio IT (CPU/Core)',   file: '/bg_studio_it.png' },
+  { id: 'rumah_user',     label: 'Rumah User (Output)',    file: '/bg_home_kodomo.png' },
+  { id: 'data_center',    label: 'Data Center',            file: '/bg_data_center.png' },
+  { id: 'lab_storage',    label: 'Lab Storage',            file: '/bg_lab_komputer.png' },
+  { id: 'kelas_smk',      label: 'Kelas / Akademi',        file: '/bg_academy_kodomo.png' },
+  { id: 'lab_riset',      label: 'Lab Riset IT',           file: '/bg_studio_it.png' },
+  { id: 'perpustakaan',   label: 'Perpustakaan / Network', file: '/bg_perpustakaan.png' },
+  { id: 'final_boss',     label: 'Final Boss Arena',       file: '/bg_network_kodomo.png' },
+  // Legacy aliases (tetap tersedia untuk data lama)
+  { id: 'academy_kodomo', label: 'Academy (Alt)',          file: '/bg_academy_kodomo.png' },
+  { id: 'core_kodomo',    label: 'Core (Alt)',             file: '/bg_core_kodomo.png' },
+  { id: 'hardware_kodomo',label: 'Hardware (Alt)',         file: '/bg_hardware_kodomo.png' },
+  { id: 'home_kodomo',    label: 'Home (Alt)',             file: '/bg_home_kodomo.png' },
+  { id: 'network_kodomo', label: 'Network (Alt)',          file: '/bg_network_kodomo.png' },
 ];
+
 
 // ─── CHARACTER PICKER COMPONENT ──────────────────────────────────────────────
 function CharacterPicker({ value, onChange }) {
